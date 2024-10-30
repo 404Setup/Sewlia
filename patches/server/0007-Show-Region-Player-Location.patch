@@ -5,7 +5,7 @@ Subject: [PATCH] Show Region Player Location
 
 
 diff --git a/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java b/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java
-index 012d3a7da7fe483393a0888c823bd2e78f5c3908..29f9191482adf53f1adc2ae96184ac0b82ca2aeb 100644
+index 012d3a7da7fe483393a0888c823bd2e78f5c3908..4cd82d4e0b0fa5989e5ba1d4909b7a4c7663bfce 100644
 --- a/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java
 +++ b/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java
 @@ -1,7 +1,6 @@
@@ -94,7 +94,7 @@ index 012d3a7da7fe483393a0888c823bd2e78f5c3908..29f9191482adf53f1adc2ae96184ac0b
              )
              .append(
 -                formatRegionStats(region.getData().getRegionStats(), false)
-+                formatRegionStats(region.getData().getRegionStats(), false, true, sender.hasPermission("minecraft.sewlia.tpslocation")) // Sewlia - Show Region Player Location
++                formatRegionStats(region.getData().getRegionStats(), false, true, (sender instanceof Player && sender.hasPermission("minecraft.sewlia.tpslocation"))) // Sewlia - Show Region Player Location
              )
  
              .build();
