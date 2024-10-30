@@ -1,0 +1,109 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Wed, 30 Oct 2024 20:29:31 +0800
+Subject: [PATCH] Show Region Player Location
+
+
+diff --git a/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java b/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java
+index 012d3a7da7fe483393a0888c823bd2e78f5c3908..29f9191482adf53f1adc2ae96184ac0b82ca2aeb 100644
+--- a/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java
++++ b/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java
+@@ -1,7 +1,6 @@
+ package io.papermc.paper.threadedregions.commands;
+ 
+ import io.papermc.paper.threadedregions.RegionizedServer;
+-import io.papermc.paper.threadedregions.RegionizedWorldData;
+ import io.papermc.paper.threadedregions.ThreadedRegionizer;
+ import io.papermc.paper.threadedregions.TickData;
+ import io.papermc.paper.threadedregions.TickRegionScheduler;
+@@ -16,6 +15,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
+ import net.kyori.adventure.text.format.TextColor;
+ import net.kyori.adventure.text.format.TextDecoration;
+ import net.minecraft.server.level.ServerLevel;
++import net.minecraft.server.level.ServerPlayer;
+ import net.minecraft.world.level.ChunkPos;
+ import org.bukkit.Bukkit;
+ import org.bukkit.World;
+@@ -24,6 +24,8 @@ import org.bukkit.command.CommandSender;
+ import org.bukkit.craftbukkit.CraftWorld;
+ import org.bukkit.entity.Entity;
+ import org.bukkit.entity.Player;
++import org.jetbrains.annotations.NotNull;
++
+ import java.text.DecimalFormat;
+ import java.util.ArrayList;
+ import java.util.Arrays;
+@@ -68,16 +70,47 @@ public final class CommandServerHealth extends Command {
+             .build();
+     }
+ 
++    // Sewlia start - Show Region Player Location
++    private static Component formatRegionStats(final TickRegions.RegionStats stats, final boolean newline, final boolean isRegion, final boolean hasPermission) {
++        TextComponent.Builder builder = Component.text();
++        builder.append(Component.text("Chunks: ", PRIMARY));
++        builder.append(Component.text(NO_DECIMAL_PLACES.get().format(stats.getChunkCount()), INFORMATION));
++
++        TextComponent.Builder playerBuild = Component.text();
++        if (hasPermission && isRegion) {
++            List<ServerPlayer> players = TickRegionScheduler.getCurrentRegionizedWorldData().getLocalPlayers();
++            final TextComponent component = getTextComponent(players);
++            playerBuild.append(Component.text(" Players: ", PRIMARY).hoverEvent(HoverEvent.showText(component)));
++        } else {
++            playerBuild.append(Component.text(" Players: ", PRIMARY));
++        }
++        builder.append(playerBuild.build());
++        builder.append(Component.text(NO_DECIMAL_PLACES.get().format(stats.getPlayerCount()), INFORMATION));
++        builder.append(Component.text(" Entities: ", PRIMARY));
++        builder.append(Component.text(NO_DECIMAL_PLACES.get().format(stats.getEntityCount()) + (newline ? "\n" : ""), INFORMATION));
++        return builder.build();
++    }
++
+     private static Component formatRegionStats(final TickRegions.RegionStats stats, final boolean newline) {
+-        return Component.text()
+-            .append(Component.text("Chunks: ", PRIMARY))
+-            .append(Component.text(NO_DECIMAL_PLACES.get().format((long)stats.getChunkCount()), INFORMATION))
+-            .append(Component.text(" Players: ", PRIMARY))
+-            .append(Component.text(NO_DECIMAL_PLACES.get().format((long)stats.getPlayerCount()), INFORMATION))
+-            .append(Component.text(" Entities: ", PRIMARY))
+-            .append(Component.text(NO_DECIMAL_PLACES.get().format((long)stats.getEntityCount()) + (newline ? "\n" : ""), INFORMATION))
+-            .build();
++        return formatRegionStats(stats, newline, false, false);
++    }
++
++    private static @NotNull TextComponent getTextComponent(List<ServerPlayer> players) {
++        TextComponent.@NotNull Builder builder = Component.text();
++        builder.append(Component.text("Region Player List: "));
++        for (final ServerPlayer player : players) {
++            builder.append(Component.text("\n")).
++                    append(Component.text(player.gameProfile.getName()))
++                    .append(Component.text(" | In "))
++                    .append(Component.text(player.getOnPos().getX()))
++                    .append(Component.text(", "))
++                    .append(Component.text(player.getOnPos().getY()))
++                    .append(Component.text(", "))
++                    .append(Component.text(player.getOnPos().getZ()));
++        }
++        return builder.build();
+     }
++    // Sewlia end
+ 
+     private static boolean executeRegion(final CommandSender sender, final String commandLabel, final String[] args) {
+         final ThreadedRegionizer.ThreadedRegion<TickRegions.TickRegionData, TickRegions.TickRegionSectionData> region =
+@@ -120,7 +153,7 @@ public final class CommandServerHealth extends Command {
+                 formatRegionInfo("1m: ", util1m, mspt1m, tps1m, true)
+             )
+             .append(
+-                formatRegionStats(region.getData().getRegionStats(), false)
++                formatRegionStats(region.getData().getRegionStats(), false, true, sender.hasPermission("minecraft.sewlia.tpslocation")) // Sewlia - Show Region Player Location
+             )
+ 
+             .build();
+@@ -214,7 +247,7 @@ public final class CommandServerHealth extends Command {
+ 
+         final TextComponent.Builder lowestRegionsBuilder = Component.text();
+ 
+-        if (sender instanceof Player) {
++        if (sender instanceof Player && sender.hasPermission("minecraft.command.tp")) {
+             lowestRegionsBuilder.append(Component.text(" Click to teleport\n", SECONDARY));
+         }
+         for (int i = 0, len = Math.min(lowestRegionsCount, regionsBelowThreshold.size()); i < len; ++i) {
