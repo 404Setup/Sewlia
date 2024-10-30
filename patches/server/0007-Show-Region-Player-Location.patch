@@ -4,11 +4,75 @@ Date: Wed, 30 Oct 2024 20:29:31 +0800
 Subject: [PATCH] Show Region Player Location
 
 
+diff --git a/src/main/java/io/papermc/paper/threadedregions/RegionizedWorldData.java b/src/main/java/io/papermc/paper/threadedregions/RegionizedWorldData.java
+index cd89a11ff94dfbb9c9e259b85f931bd0d160c06e..06cb6fe685f221d6f24ca07ad2837b9b747042b2 100644
+--- a/src/main/java/io/papermc/paper/threadedregions/RegionizedWorldData.java
++++ b/src/main/java/io/papermc/paper/threadedregions/RegionizedWorldData.java
+@@ -526,6 +526,12 @@ public final class RegionizedWorldData {
+         return this.localPlayers.size();
+     }
+ 
++    // Sewlia start - Don't abuse it.
++    public List<ServerPlayer> getLocalPlayer() {
++        return this.localPlayers;
++    }
++    // Sewlia end
++
+     public Iterable<Entity> getLocalEntities() {
+         return this.allEntities;
+     }
+diff --git a/src/main/java/io/papermc/paper/threadedregions/TickRegions.java b/src/main/java/io/papermc/paper/threadedregions/TickRegions.java
+index 988fe74578065c9464f5639e5cc6af79619edef5..a1d10bac4a1343516bbf8a9f508c9691a00cd203 100644
+--- a/src/main/java/io/papermc/paper/threadedregions/TickRegions.java
++++ b/src/main/java/io/papermc/paper/threadedregions/TickRegions.java
+@@ -7,13 +7,14 @@ import com.mojang.logging.LogUtils;
+ import io.papermc.paper.configuration.GlobalConfiguration;
+ import it.unimi.dsi.fastutil.longs.Long2ReferenceMap;
+ import it.unimi.dsi.fastutil.longs.Long2ReferenceOpenHashMap;
+-import it.unimi.dsi.fastutil.objects.Reference2ReferenceMap;
+-import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
+-import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
++import it.unimi.dsi.fastutil.objects.*;
+ import net.minecraft.server.MinecraftServer;
+ import net.minecraft.server.level.ServerLevel;
++import net.minecraft.server.level.ServerPlayer;
+ import org.slf4j.Logger;
++
+ import java.util.Iterator;
++import java.util.concurrent.ConcurrentLinkedDeque;
+ import java.util.concurrent.TimeUnit;
+ import java.util.concurrent.atomic.AtomicInteger;
+ import java.util.concurrent.atomic.AtomicLong;
+@@ -134,6 +135,7 @@ public final class TickRegions implements ThreadedRegionizer.RegionCallbacks<Tic
+         private final AtomicInteger entityCount = new AtomicInteger();
+         private final AtomicInteger playerCount = new AtomicInteger();
+         private final AtomicInteger chunkCount = new AtomicInteger();
++        private final ConcurrentLinkedDeque<ServerPlayer> players = new ConcurrentLinkedDeque<>();
+ 
+         public int getEntityCount() {
+             return this.entityCount.get();
+@@ -147,10 +149,16 @@ public final class TickRegions implements ThreadedRegionizer.RegionCallbacks<Tic
+             return this.chunkCount.get();
+         }
+ 
++        public ObjectArrayList<ServerPlayer> getPlayers() {
++            return new ObjectArrayList<>(this.players);
++        }
++
+         void updateFrom(final RegionizedWorldData data) {
+             this.entityCount.setRelease(data == null ? 0 : data.getEntityCount());
+             this.playerCount.setRelease(data == null ? 0 : data.getPlayerCount());
+             this.chunkCount.setRelease(data == null ? 0 : data.getChunkCount());
++            this.players.clear();
++            if (data != null) this.players.addAll(data.getLocalPlayer());
+         }
+ 
+         static void updateCurrentRegion() {
 diff --git a/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java b/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java
-index 012d3a7da7fe483393a0888c823bd2e78f5c3908..4cd82d4e0b0fa5989e5ba1d4909b7a4c7663bfce 100644
+index 012d3a7da7fe483393a0888c823bd2e78f5c3908..b1dd19d46156e49395ffc44ab960166ef403f169 100644
 --- a/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java
 +++ b/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java
-@@ -1,7 +1,6 @@
+@@ -1,12 +1,12 @@
  package io.papermc.paper.threadedregions.commands;
  
  import io.papermc.paper.threadedregions.RegionizedServer;
@@ -16,7 +80,13 @@ index 012d3a7da7fe483393a0888c823bd2e78f5c3908..4cd82d4e0b0fa5989e5ba1d4909b7a4c
  import io.papermc.paper.threadedregions.ThreadedRegionizer;
  import io.papermc.paper.threadedregions.TickData;
  import io.papermc.paper.threadedregions.TickRegionScheduler;
-@@ -16,6 +15,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
+ import io.papermc.paper.threadedregions.TickRegions;
+ import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
++import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+ import it.unimi.dsi.fastutil.objects.ObjectObjectImmutablePair;
+ import net.kyori.adventure.text.Component;
+ import net.kyori.adventure.text.TextComponent;
+@@ -16,6 +16,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
  import net.kyori.adventure.text.format.TextColor;
  import net.kyori.adventure.text.format.TextDecoration;
  import net.minecraft.server.level.ServerLevel;
@@ -24,7 +94,7 @@ index 012d3a7da7fe483393a0888c823bd2e78f5c3908..4cd82d4e0b0fa5989e5ba1d4909b7a4c
  import net.minecraft.world.level.ChunkPos;
  import org.bukkit.Bukkit;
  import org.bukkit.World;
-@@ -24,6 +24,8 @@ import org.bukkit.command.CommandSender;
+@@ -24,6 +25,8 @@ import org.bukkit.command.CommandSender;
  import org.bukkit.craftbukkit.CraftWorld;
  import org.bukkit.entity.Entity;
  import org.bukkit.entity.Player;
@@ -33,19 +103,28 @@ index 012d3a7da7fe483393a0888c823bd2e78f5c3908..4cd82d4e0b0fa5989e5ba1d4909b7a4c
  import java.text.DecimalFormat;
  import java.util.ArrayList;
  import java.util.Arrays;
-@@ -68,16 +70,47 @@ public final class CommandServerHealth extends Command {
+@@ -68,16 +71,43 @@ public final class CommandServerHealth extends Command {
              .build();
      }
  
+-    private static Component formatRegionStats(final TickRegions.RegionStats stats, final boolean newline) {
+-        return Component.text()
+-            .append(Component.text("Chunks: ", PRIMARY))
+-            .append(Component.text(NO_DECIMAL_PLACES.get().format((long)stats.getChunkCount()), INFORMATION))
+-            .append(Component.text(" Players: ", PRIMARY))
+-            .append(Component.text(NO_DECIMAL_PLACES.get().format((long)stats.getPlayerCount()), INFORMATION))
+-            .append(Component.text(" Entities: ", PRIMARY))
+-            .append(Component.text(NO_DECIMAL_PLACES.get().format((long)stats.getEntityCount()) + (newline ? "\n" : ""), INFORMATION))
+-            .build();
 +    // Sewlia start - Show Region Player Location
-+    private static Component formatRegionStats(final TickRegions.RegionStats stats, final boolean newline, final boolean isRegion, final boolean hasPermission) {
++    private static Component formatRegionStats(final TickRegions.RegionStats stats, final boolean newline, final boolean hasPermission) {
 +        TextComponent.Builder builder = Component.text();
 +        builder.append(Component.text("Chunks: ", PRIMARY));
 +        builder.append(Component.text(NO_DECIMAL_PLACES.get().format(stats.getChunkCount()), INFORMATION));
 +
 +        TextComponent.Builder playerBuild = Component.text();
-+        if (hasPermission && isRegion) {
-+            List<ServerPlayer> players = TickRegionScheduler.getCurrentRegionizedWorldData().getLocalPlayers();
++        if (hasPermission) {
++            ObjectArrayList<ServerPlayer> players = stats.getPlayers();
 +            final TextComponent component = getTextComponent(players);
 +            playerBuild.append(Component.text(" Players: ", PRIMARY).hoverEvent(HoverEvent.showText(component)));
 +        } else {
@@ -58,19 +137,7 @@ index 012d3a7da7fe483393a0888c823bd2e78f5c3908..4cd82d4e0b0fa5989e5ba1d4909b7a4c
 +        return builder.build();
 +    }
 +
-     private static Component formatRegionStats(final TickRegions.RegionStats stats, final boolean newline) {
--        return Component.text()
--            .append(Component.text("Chunks: ", PRIMARY))
--            .append(Component.text(NO_DECIMAL_PLACES.get().format((long)stats.getChunkCount()), INFORMATION))
--            .append(Component.text(" Players: ", PRIMARY))
--            .append(Component.text(NO_DECIMAL_PLACES.get().format((long)stats.getPlayerCount()), INFORMATION))
--            .append(Component.text(" Entities: ", PRIMARY))
--            .append(Component.text(NO_DECIMAL_PLACES.get().format((long)stats.getEntityCount()) + (newline ? "\n" : ""), INFORMATION))
--            .build();
-+        return formatRegionStats(stats, newline, false, false);
-+    }
-+
-+    private static @NotNull TextComponent getTextComponent(List<ServerPlayer> players) {
++    private static @NotNull TextComponent getTextComponent(ObjectArrayList<ServerPlayer> players) {
 +        TextComponent.@NotNull Builder builder = Component.text();
 +        builder.append(Component.text("Region Player List: "));
 +        for (final ServerPlayer player : players) {
@@ -89,21 +156,30 @@ index 012d3a7da7fe483393a0888c823bd2e78f5c3908..4cd82d4e0b0fa5989e5ba1d4909b7a4c
  
      private static boolean executeRegion(final CommandSender sender, final String commandLabel, final String[] args) {
          final ThreadedRegionizer.ThreadedRegion<TickRegions.TickRegionData, TickRegions.TickRegionSectionData> region =
-@@ -120,7 +153,7 @@ public final class CommandServerHealth extends Command {
+@@ -120,7 +150,7 @@ public final class CommandServerHealth extends Command {
                  formatRegionInfo("1m: ", util1m, mspt1m, tps1m, true)
              )
              .append(
 -                formatRegionStats(region.getData().getRegionStats(), false)
-+                formatRegionStats(region.getData().getRegionStats(), false, true, (sender instanceof Player && sender.hasPermission("minecraft.sewlia.tpslocation"))) // Sewlia - Show Region Player Location
++                formatRegionStats(region.getData().getRegionStats(), false, (sender instanceof Player && sender.hasPermission("minecraft.sewlia.tpslocation"))) // Sewlia - Show Region Player Location
              )
  
              .build();
-@@ -214,7 +247,7 @@ public final class CommandServerHealth extends Command {
+@@ -214,7 +244,7 @@ public final class CommandServerHealth extends Command {
  
          final TextComponent.Builder lowestRegionsBuilder = Component.text();
  
 -        if (sender instanceof Player) {
-+        if (sender instanceof Player && sender.hasPermission("minecraft.command.tp")) {
++        if (sender instanceof Player && sender.hasPermission("minecraft.command.execute")) {
              lowestRegionsBuilder.append(Component.text(" Click to teleport\n", SECONDARY));
          }
          for (int i = 0, len = Math.min(lowestRegionsCount, regionsBelowThreshold.size()); i < len; ++i) {
+@@ -259,7 +289,7 @@ public final class CommandServerHealth extends Command {
+                 .append(Component.text(" TPS\n", PRIMARY))
+ 
+                 .append(Component.text("    ", PRIMARY))
+-                .append(formatRegionStats(region.getData().getRegionStats(), (i + 1) != len))
++                .append(formatRegionStats(region.getData().getRegionStats(), (i + 1) != len, (sender instanceof Player && sender.hasPermission("minecraft.sewlia.tpslocation")))) // Sewlia - Show Region Player Location
+                 .build()
+ 
+                 .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/minecraft:execute as @s in " + world.getWorld().getKey().toString() + " run tp " + centerBlockX + ".5 " + yLoc + " " + centerBlockZ + ".5"))
