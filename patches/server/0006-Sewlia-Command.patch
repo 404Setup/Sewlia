@@ -1,0 +1,46 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Mon, 28 Oct 2024 15:39:36 +0800
+Subject: [PATCH] Sewlia Command
+
+
+diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
+index 5dcf2d844435b4a17e6b3136f9aea4e3af332366..ee393297fc69b22058feb60057494430a72f2475 100644
+--- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
++++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
+@@ -226,6 +226,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+         this.paperConfigurations.initializeGlobalConfiguration(this.registryAccess());
+         this.paperConfigurations.initializeWorldDefaultsConfiguration(this.registryAccess());
+         // Paper end - initialize global and world-defaults configuration
++        one.tranic.sewlia.command.CommandUtil.register(); // Sewlia - commands
+         this.server.spark.enableEarlyIfRequested(); // Paper - spark
+         // Paper start - fix converting txt to json file; convert old users earlier after PlayerList creation but before file load/save
+         if (this.convertOldUsers()) {
+diff --git a/src/main/java/one/tranic/sewlia/command/CommandUtil.java b/src/main/java/one/tranic/sewlia/command/CommandUtil.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..42e9e37c99f20fef38903ed7af6c6ec0934e05c3
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/command/CommandUtil.java
+@@ -0,0 +1,22 @@
++package one.tranic.sewlia.command;
++
++import net.intelie.tinymap.TinySet;
++import one.tranic.sewlia.Reflect;
++import org.bukkit.Bukkit;
++import org.bukkit.command.Command;
++import org.jetbrains.annotations.Nullable;
++
++public class CommandUtil {
++    public static void register() {
++        @Nullable TinySet<Class<Command>> set = Reflect.scanPackage(Command.class, "one.tranic.sewlia.command.mod");
++        if (set == null || set.isEmpty()) return;
++        try {
++            for (Class<Command> clazz : set) {
++                Command cmd = clazz.newInstance();
++                Bukkit.getCommandMap().register(cmd.getName(),"sewlia", cmd);
++            }
++        } catch (InstantiationException | IllegalAccessException e) {
++            throw new RuntimeException(e);
++        }
++    }
++}

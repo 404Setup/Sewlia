@@ -1,0 +1,20 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Wed, 30 Oct 2024 17:23:42 +0800
+Subject: [PATCH] Config Key
+
+
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/fix/VillagersDontReleaseMemory.java b/src/main/java/one/tranic/sewlia/config/mod/fix/VillagersDontReleaseMemory.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..80c80347b9c4a8a00b6c52b92ac0ef5f0e79c4b3
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/fix/VillagersDontReleaseMemory.java
+@@ -0,0 +1,8 @@
++package one.tranic.sewlia.config.mod.fix;
++
++import one.tranic.sewlia.config.annotation.Comment;
++
++public class VillagersDontReleaseMemory {
++    @Comment("test comment")
++    public static Boolean value = false;
++}

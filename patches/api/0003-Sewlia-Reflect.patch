@@ -1,0 +1,58 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Mon, 28 Oct 2024 14:33:09 +0800
+Subject: [PATCH] Sewlia Reflect
+
+
+diff --git a/src/main/java/one/tranic/sewlia/Reflect.java b/src/main/java/one/tranic/sewlia/Reflect.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..3e16e1bef38514cf11c2a4636c9f4d31a59b367d
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/Reflect.java
+@@ -0,0 +1,46 @@
++package one.tranic.sewlia;
++
++import com.google.common.collect.ImmutableSet;
++import com.google.common.reflect.ClassPath;
++import net.intelie.tinymap.TinySet;
++import net.intelie.tinymap.TinySetBuilder;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++public class Reflect {
++    public static <T extends Class<?>> @Nullable TinySet<T> scanPackage(@Nullable T clazz, @NotNull String packageName) {
++        @Nullable TinySet<String> set = scanPackageString(clazz, packageName);
++        if (set == null || set.isEmpty()) return null;
++        try {
++            TinySetBuilder<T> builder = TinySet.builder();
++            for (String s : set) builder.add((T) Class.forName(s));
++            return builder.build();
++        } catch (ClassNotFoundException e) {
++            return null;
++        }
++    }
++
++    public static <T extends Class<?>> @Nullable TinySet<T> scanPackage(@NotNull String packageName) {
++        return scanPackage(null, packageName);
++    }
++
++    public static <T extends Class<?>> @Nullable TinySet<String> scanPackageString(@Nullable T clazz, @NotNull String packageName) {
++        try {
++            ClassPath classs = ClassPath.from(Thread.currentThread().getContextClassLoader());
++            ImmutableSet<ClassPath.ClassInfo> cla = classs.getTopLevelClassesRecursive(packageName);
++            if (cla.isEmpty()) return null;
++
++            TinySetBuilder<String> builder = TinySet.builder();
++            if (clazz == null) {
++                for (ClassPath.ClassInfo c : cla) builder.add(c.getName());
++            } else for (ClassPath.ClassInfo c : cla) if (c.getClass().isAssignableFrom(clazz)) builder.add(c.getName());
++            return builder.build();
++        } catch (Exception e) {
++            return null;
++        }
++    }
++
++    public static @Nullable TinySet<String> scanPackageString(@NotNull String packageName) {
++        return scanPackageString(null, packageName);
++    }
++}
