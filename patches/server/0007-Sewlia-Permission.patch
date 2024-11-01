@@ -6,10 +6,10 @@ Subject: [PATCH] Sewlia Permission
 
 diff --git a/src/main/java/one/tranic/sewlia/Permission.java b/src/main/java/one/tranic/sewlia/Permission.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..d776f0dd6e4f78d4b8928f496ddb218a60ccc13b
+index 0000000000000000000000000000000000000000..f0982f440912f8d2182356221cb3b4aa9ee8da7d
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/Permission.java
-@@ -0,0 +1,29 @@
+@@ -0,0 +1,35 @@
 +package one.tranic.sewlia;
 +
 +import org.bukkit.permissions.PermissionDefault;
@@ -28,6 +28,12 @@ index 0000000000000000000000000000000000000000..d776f0dd6e4f78d4b8928f496ddb218a
 +        setPermission(
 +                "commands.reload",
 +                "Reload Sewlia Config Command",
++                PermissionDefault.OP,
++                parent
++        );
++        setPermission(
++                "feature.tpslocation",
++                "Display player position when using tps command",
 +                PermissionDefault.OP,
 +                parent
 +        );

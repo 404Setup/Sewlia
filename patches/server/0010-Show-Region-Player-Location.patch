@@ -69,24 +69,25 @@ index 988fe74578065c9464f5639e5cc6af79619edef5..a1d10bac4a1343516bbf8a9f508c9691
  
          static void updateCurrentRegion() {
 diff --git a/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java b/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java
-index 012d3a7da7fe483393a0888c823bd2e78f5c3908..b1dd19d46156e49395ffc44ab960166ef403f169 100644
+index 012d3a7da7fe483393a0888c823bd2e78f5c3908..1e19f50d2b2bd402870a1483092eac94f351360f 100644
 --- a/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java
 +++ b/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java
-@@ -1,12 +1,12 @@
+@@ -1,12 +1,8 @@
  package io.papermc.paper.threadedregions.commands;
  
- import io.papermc.paper.threadedregions.RegionizedServer;
+-import io.papermc.paper.threadedregions.RegionizedServer;
 -import io.papermc.paper.threadedregions.RegionizedWorldData;
- import io.papermc.paper.threadedregions.ThreadedRegionizer;
- import io.papermc.paper.threadedregions.TickData;
- import io.papermc.paper.threadedregions.TickRegionScheduler;
- import io.papermc.paper.threadedregions.TickRegions;
+-import io.papermc.paper.threadedregions.ThreadedRegionizer;
+-import io.papermc.paper.threadedregions.TickData;
+-import io.papermc.paper.threadedregions.TickRegionScheduler;
+-import io.papermc.paper.threadedregions.TickRegions;
++import io.papermc.paper.threadedregions.*;
  import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 +import it.unimi.dsi.fastutil.objects.ObjectArrayList;
  import it.unimi.dsi.fastutil.objects.ObjectObjectImmutablePair;
  import net.kyori.adventure.text.Component;
  import net.kyori.adventure.text.TextComponent;
-@@ -16,6 +16,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
+@@ -16,6 +12,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
  import net.kyori.adventure.text.format.TextColor;
  import net.kyori.adventure.text.format.TextDecoration;
  import net.minecraft.server.level.ServerLevel;
@@ -94,17 +95,55 @@ index 012d3a7da7fe483393a0888c823bd2e78f5c3908..b1dd19d46156e49395ffc44ab960166e
  import net.minecraft.world.level.ChunkPos;
  import org.bukkit.Bukkit;
  import org.bukkit.World;
-@@ -24,6 +25,8 @@ import org.bukkit.command.CommandSender;
+@@ -24,23 +21,18 @@ import org.bukkit.command.CommandSender;
  import org.bukkit.craftbukkit.CraftWorld;
  import org.bukkit.entity.Entity;
  import org.bukkit.entity.Player;
 +import org.jetbrains.annotations.NotNull;
 +
  import java.text.DecimalFormat;
- import java.util.ArrayList;
+-import java.util.ArrayList;
  import java.util.Arrays;
-@@ -68,16 +71,43 @@ public final class CommandServerHealth extends Command {
-             .build();
+ import java.util.List;
+ import java.util.Locale;
+ 
+ public final class CommandServerHealth extends Command {
+ 
+-    private static final ThreadLocal<DecimalFormat> TWO_DECIMAL_PLACES = ThreadLocal.withInitial(() -> {
+-        return new DecimalFormat("#,##0.00");
+-    });
+-    private static final ThreadLocal<DecimalFormat> ONE_DECIMAL_PLACES = ThreadLocal.withInitial(() -> {
+-        return new DecimalFormat("#,##0.0");
+-    });
+-    private static final ThreadLocal<DecimalFormat> NO_DECIMAL_PLACES = ThreadLocal.withInitial(() -> {
+-        return new DecimalFormat("#,##0");
+-    });
++    private static final ThreadLocal<DecimalFormat> TWO_DECIMAL_PLACES = ThreadLocal.withInitial(() -> new DecimalFormat("#,##0.00"));
++    private static final ThreadLocal<DecimalFormat> ONE_DECIMAL_PLACES = ThreadLocal.withInitial(() -> new DecimalFormat("#,##0.0"));
++    private static final ThreadLocal<DecimalFormat> NO_DECIMAL_PLACES = ThreadLocal.withInitial(() -> new DecimalFormat("#,##0"));
+ 
+     private static final TextColor HEADER = TextColor.color(79, 164, 240);
+     private static final TextColor PRIMARY = TextColor.color(48, 145, 237);
+@@ -58,30 +50,53 @@ public final class CommandServerHealth extends Command {
+     private static Component formatRegionInfo(final String prefix, final double util, final double mspt, final double tps,
+                                               final boolean newline) {
+         return Component.text()
+-            .append(Component.text(prefix, PRIMARY, TextDecoration.BOLD))
+-            .append(Component.text(ONE_DECIMAL_PLACES.get().format(util * 100.0), CommandUtil.getUtilisationColourRegion(util)))
+-            .append(Component.text("% util at ", PRIMARY))
+-            .append(Component.text(TWO_DECIMAL_PLACES.get().format(mspt), CommandUtil.getColourForMSPT(mspt)))
+-            .append(Component.text(" MSPT at ", PRIMARY))
+-            .append(Component.text(TWO_DECIMAL_PLACES.get().format(tps), CommandUtil.getColourForTPS(tps)))
+-            .append(Component.text(" TPS" + (newline ? "\n" : ""), PRIMARY))
+-            .build();
++                .append(Component.text(prefix, PRIMARY, TextDecoration.BOLD))
++                .append(Component.text(ONE_DECIMAL_PLACES.get().format(util * 100.0), CommandUtil.getUtilisationColourRegion(util)))
++                .append(Component.text("% util at ", PRIMARY))
++                .append(Component.text(TWO_DECIMAL_PLACES.get().format(mspt), CommandUtil.getColourForMSPT(mspt)))
++                .append(Component.text(" MSPT at ", PRIMARY))
++                .append(Component.text(TWO_DECIMAL_PLACES.get().format(tps), CommandUtil.getColourForTPS(tps)))
++                .append(Component.text(" TPS" + (newline ? "\n" : ""), PRIMARY))
++                .build();
      }
  
 -    private static Component formatRegionStats(final TickRegions.RegionStats stats, final boolean newline) {
@@ -135,37 +174,106 @@ index 012d3a7da7fe483393a0888c823bd2e78f5c3908..b1dd19d46156e49395ffc44ab960166e
 +        builder.append(Component.text(" Entities: ", PRIMARY));
 +        builder.append(Component.text(NO_DECIMAL_PLACES.get().format(stats.getEntityCount()) + (newline ? "\n" : ""), INFORMATION));
 +        return builder.build();
-+    }
-+
+     }
+ 
+-    private static boolean executeRegion(final CommandSender sender, final String commandLabel, final String[] args) {
 +    private static @NotNull TextComponent getTextComponent(ObjectArrayList<ServerPlayer> players) {
 +        TextComponent.@NotNull Builder builder = Component.text();
-+        builder.append(Component.text("Region Player List: "));
++        builder.append(Component.text("Region Player List: ", NamedTextColor.GREEN));
 +        for (final ServerPlayer player : players) {
 +            builder.append(Component.text("\n")).
-+                    append(Component.text(player.gameProfile.getName()))
-+                    .append(Component.text(" | In "))
-+                    .append(Component.text(player.getOnPos().getX()))
-+                    .append(Component.text(", "))
-+                    .append(Component.text(player.getOnPos().getY()))
-+                    .append(Component.text(", "))
-+                    .append(Component.text(player.getOnPos().getZ()));
++                    append(Component.text(player.gameProfile.getName(), NamedTextColor.YELLOW))
++                    .append(Component.text(" | In ", NamedTextColor.WHITE))
++                    .append(Component.text(player.getOnPos().getX() + ", " + player.getOnPos().getY() + ", " + player.getOnPos().getZ(), NamedTextColor.AQUA));
 +        }
 +        return builder.build();
-     }
++    }
 +    // Sewlia end
- 
-     private static boolean executeRegion(final CommandSender sender, final String commandLabel, final String[] args) {
++
++    private static boolean executeRegion(final CommandSender sender) {
          final ThreadedRegionizer.ThreadedRegion<TickRegions.TickRegionData, TickRegions.TickRegionSectionData> region =
-@@ -120,7 +150,7 @@ public final class CommandServerHealth extends Command {
-                 formatRegionInfo("1m: ", util1m, mspt1m, tps1m, true)
-             )
-             .append(
--                formatRegionStats(region.getData().getRegionStats(), false)
-+                formatRegionStats(region.getData().getRegionStats(), false, (sender instanceof Player && sender.hasPermission("minecraft.sewlia.tpslocation"))) // Sewlia - Show Region Player Location
-             )
+-            TickRegionScheduler.getCurrentRegion();
++                TickRegionScheduler.getCurrentRegion();
+         if (region == null) {
+             sender.sendMessage(Component.text("You are not in a region currently", NamedTextColor.RED));
+             return true;
+@@ -109,28 +124,28 @@ public final class CommandServerHealth extends Command {
+         final String location = "[w:'" + world.getWorld().getName() + "'," + centerBlockX + "," + yLoc + "," + centerBlockZ + "]";
  
-             .build();
-@@ -214,7 +244,7 @@ public final class CommandServerHealth extends Command {
+         final Component line = Component.text()
+-            .append(Component.text("Region around block ", PRIMARY))
+-            .append(Component.text(location, INFORMATION))
+-            .append(Component.text(":\n", PRIMARY))
+-
+-            .append(
+-                formatRegionInfo("15s: ", util15s, mspt15s, tps15s, true)
+-            )
+-            .append(
+-                formatRegionInfo("1m: ", util1m, mspt1m, tps1m, true)
+-            )
+-            .append(
+-                formatRegionStats(region.getData().getRegionStats(), false)
+-            )
+-
+-            .build();
++                .append(Component.text("Region around block ", PRIMARY))
++                .append(Component.text(location, INFORMATION))
++                .append(Component.text(":\n", PRIMARY))
++
++                .append(
++                        formatRegionInfo("15s: ", util15s, mspt15s, tps15s, true)
++                )
++                .append(
++                        formatRegionInfo("1m: ", util1m, mspt1m, tps1m, true)
++                )
++                .append(
++                        formatRegionStats(region.getData().getRegionStats(), false, (sender instanceof Player && sender.hasPermission("minecraft.sewlia.feature.tpslocation"))) // Sewlia - Show Region Player Location
++                )
++
++                .build();
+ 
+         sender.sendMessage(line);
+ 
+         return true;
+     }
+ 
+-    private static boolean executeServer(final CommandSender sender, final String commandLabel, final String[] args) {
++    private static boolean executeServer(final CommandSender sender, final String[] args) {
+         final int lowestRegionsCount;
+         if (args.length < 2) {
+             lowestRegionsCount = 3;
+@@ -144,10 +159,10 @@ public final class CommandServerHealth extends Command {
+         }
+ 
+         final List<ThreadedRegionizer.ThreadedRegion<TickRegions.TickRegionData, TickRegions.TickRegionSectionData>> regions =
+-            new ArrayList<>();
++                new ObjectArrayList<>();
+ 
+         for (final World bukkitWorld : Bukkit.getWorlds()) {
+-            final ServerLevel world = ((CraftWorld)bukkitWorld).getHandle();
++            final ServerLevel world = ((CraftWorld) bukkitWorld).getHandle();
+             world.regioniser.computeForAllRegions(regions::add);
+         }
+ 
+@@ -157,7 +172,7 @@ public final class CommandServerHealth extends Command {
+         double totalUtil = 0.0;
+ 
+         final DoubleArrayList tpsByRegion = new DoubleArrayList();
+-        final List<TickData.TickReportData> reportsByRegion = new ArrayList<>();
++        final List<TickData.TickReportData> reportsByRegion = new ObjectArrayList<>();
+         final int maxThreadCount = TickRegions.getScheduler().getTotalThreadCount();
+ 
+         final long currTime = System.nanoTime();
+@@ -194,7 +209,7 @@ public final class CommandServerHealth extends Command {
+         }
+ 
+         final List<ObjectObjectImmutablePair<ThreadedRegionizer.ThreadedRegion<TickRegions.TickRegionData, TickRegions.TickRegionSectionData>, TickData.TickReportData>>
+-            regionsBelowThreshold = new ArrayList<>();
++                regionsBelowThreshold = new ObjectArrayList<>();
+ 
+         for (int i = 0, len = regions.size(); i < len; ++i) {
+             final TickData.TickReportData report = reportsByRegion.get(i);
+@@ -214,16 +229,16 @@ public final class CommandServerHealth extends Command {
  
          final TextComponent.Builder lowestRegionsBuilder = Component.text();
  
@@ -174,12 +282,259 @@ index 012d3a7da7fe483393a0888c823bd2e78f5c3908..b1dd19d46156e49395ffc44ab960166e
              lowestRegionsBuilder.append(Component.text(" Click to teleport\n", SECONDARY));
          }
          for (int i = 0, len = Math.min(lowestRegionsCount, regionsBelowThreshold.size()); i < len; ++i) {
-@@ -259,7 +289,7 @@ public final class CommandServerHealth extends Command {
-                 .append(Component.text(" TPS\n", PRIMARY))
+             final ObjectObjectImmutablePair<ThreadedRegionizer.ThreadedRegion<TickRegions.TickRegionData, TickRegions.TickRegionSectionData>, TickData.TickReportData>
+-                pair = regionsBelowThreshold.get(i);
++                    pair = regionsBelowThreshold.get(i);
  
-                 .append(Component.text("    ", PRIMARY))
+             final TickData.TickReportData report = pair.right();
+             final ThreadedRegionizer.ThreadedRegion<TickRegions.TickRegionData, TickRegions.TickRegionSectionData> region =
+-                pair.left();
++                    pair.left();
+ 
+             if (report == null) {
+                 // skip regions with no data
+@@ -244,81 +259,86 @@ public final class CommandServerHealth extends Command {
+ 
+             final int yLoc = 80;
+             final String location = "[w:'" + world.getWorld().getName() + "'," + centerBlockX + "," + yLoc + "," + centerBlockZ + "]";
+-            final Component line = Component.text()
+-                .append(Component.text(" - ", LIST, TextDecoration.BOLD))
+-                .append(Component.text("Region around block ", PRIMARY))
+-                .append(Component.text(location, INFORMATION))
+-                .append(Component.text(":\n", PRIMARY))
+-
+-                .append(Component.text("    ", PRIMARY))
+-                .append(Component.text(ONE_DECIMAL_PLACES.get().format(util * 100.0), CommandUtil.getUtilisationColourRegion(util)))
+-                .append(Component.text("% util at ", PRIMARY))
+-                .append(Component.text(TWO_DECIMAL_PLACES.get().format(mspt), CommandUtil.getColourForMSPT(mspt)))
+-                .append(Component.text(" MSPT at ", PRIMARY))
+-                .append(Component.text(TWO_DECIMAL_PLACES.get().format(tps), CommandUtil.getColourForTPS(tps)))
+-                .append(Component.text(" TPS\n", PRIMARY))
+-
+-                .append(Component.text("    ", PRIMARY))
 -                .append(formatRegionStats(region.getData().getRegionStats(), (i + 1) != len))
-+                .append(formatRegionStats(region.getData().getRegionStats(), (i + 1) != len, (sender instanceof Player && sender.hasPermission("minecraft.sewlia.tpslocation")))) // Sewlia - Show Region Player Location
-                 .build()
+-                .build()
+-
+-                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/minecraft:execute as @s in " + world.getWorld().getKey().toString() + " run tp " + centerBlockX + ".5 " + yLoc + " " + centerBlockZ + ".5"))
+-                .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("Click to teleport to " + location, SECONDARY)));
++            TextComponent.@NotNull Builder builder = Component.text();
++            builder.append(Component.text(" - ", LIST, TextDecoration.BOLD))
++                    .append(Component.text("Region around block ", PRIMARY))
++                    .append(Component.text(location, INFORMATION))
++                    .append(Component.text(":\n", PRIMARY))
++
++                    .append(Component.text("    ", PRIMARY))
++                    .append(Component.text(ONE_DECIMAL_PLACES.get().format(util * 100.0), CommandUtil.getUtilisationColourRegion(util)))
++                    .append(Component.text("% util at ", PRIMARY))
++                    .append(Component.text(TWO_DECIMAL_PLACES.get().format(mspt), CommandUtil.getColourForMSPT(mspt)))
++                    .append(Component.text(" MSPT at ", PRIMARY))
++                    .append(Component.text(TWO_DECIMAL_PLACES.get().format(tps), CommandUtil.getColourForTPS(tps)))
++                    .append(Component.text(" TPS\n", PRIMARY))
++
++                    .append(Component.text("    ", PRIMARY))
++                    .append(formatRegionStats(region.getData().getRegionStats(), (i + 1) != len, (sender instanceof Player && sender.hasPermission("minecraft.sewlia.tpslocation")))); // Sewlia - Show Region Player Location
++
++            final Component line;
++            if (sender instanceof Player && sender.hasPermission("minecraft.command.execute")) {
++                line = builder.build()
++                        .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/minecraft:execute as @s in " + world.getWorld().getKey().toString() + " run tp " + centerBlockX + ".5 " + yLoc + " " + centerBlockZ + ".5"))
++                        .hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("Click to teleport to " + location, SECONDARY)));
++            } else {
++                line = builder.build();
++            }
  
-                 .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/minecraft:execute as @s in " + world.getWorld().getKey().toString() + " run tp " + centerBlockX + ".5 " + yLoc + " " + centerBlockZ + ".5"))
+             lowestRegionsBuilder.append(line);
+         }
+ 
+         sender.sendMessage(
+-            Component.text()
+-                .append(Component.text("Server Health Report\n", HEADER, TextDecoration.BOLD))
++                Component.text()
++                        .append(Component.text("Server Health Report\n", HEADER, TextDecoration.BOLD))
+ 
+-                .append(Component.text(" - ", LIST, TextDecoration.BOLD))
+-                .append(Component.text("Online Players: ", PRIMARY))
+-                .append(Component.text(Bukkit.getOnlinePlayers().size() + "\n", INFORMATION))
++                        .append(Component.text(" - ", LIST, TextDecoration.BOLD))
++                        .append(Component.text("Online Players: ", PRIMARY))
++                        .append(Component.text(Bukkit.getOnlinePlayers().size() + "\n", INFORMATION))
+ 
+-                .append(Component.text(" - ", LIST, TextDecoration.BOLD))
+-                .append(Component.text("Total regions: ", PRIMARY))
+-                .append(Component.text(regions.size() + "\n", INFORMATION))
++                        .append(Component.text(" - ", LIST, TextDecoration.BOLD))
++                        .append(Component.text("Total regions: ", PRIMARY))
++                        .append(Component.text(regions.size() + "\n", INFORMATION))
+ 
+-                .append(Component.text(" - ", LIST, TextDecoration.BOLD))
+-                .append(Component.text("Utilisation: ", PRIMARY))
+-                .append(Component.text(ONE_DECIMAL_PLACES.get().format(totalUtil * 100.0), CommandUtil.getUtilisationColourRegion(totalUtil / (double)maxThreadCount)))
+-                .append(Component.text("% / ", PRIMARY))
+-                .append(Component.text(ONE_DECIMAL_PLACES.get().format(maxThreadCount * 100.0), INFORMATION))
+-                .append(Component.text("%\n", PRIMARY))
++                        .append(Component.text(" - ", LIST, TextDecoration.BOLD))
++                        .append(Component.text("Utilisation: ", PRIMARY))
++                        .append(Component.text(ONE_DECIMAL_PLACES.get().format(totalUtil * 100.0), CommandUtil.getUtilisationColourRegion(totalUtil / (double) maxThreadCount)))
++                        .append(Component.text("% / ", PRIMARY))
++                        .append(Component.text(ONE_DECIMAL_PLACES.get().format(maxThreadCount * 100.0), INFORMATION))
++                        .append(Component.text("%\n", PRIMARY))
+ 
+-                .append(Component.text(" - ", LIST, TextDecoration.BOLD))
+-                .append(Component.text("Load rate: ", PRIMARY))
+-                .append(Component.text(TWO_DECIMAL_PLACES.get().format(loadRate) + ", ", INFORMATION))
+-                .append(Component.text("Gen rate: ", PRIMARY))
+-                .append(Component.text(TWO_DECIMAL_PLACES.get().format(genRate) + "\n", INFORMATION))
++                        .append(Component.text(" - ", LIST, TextDecoration.BOLD))
++                        .append(Component.text("Load rate: ", PRIMARY))
++                        .append(Component.text(TWO_DECIMAL_PLACES.get().format(loadRate) + ", ", INFORMATION))
++                        .append(Component.text("Gen rate: ", PRIMARY))
++                        .append(Component.text(TWO_DECIMAL_PLACES.get().format(genRate) + "\n", INFORMATION))
+ 
+-                .append(Component.text(" - ", LIST, TextDecoration.BOLD))
+-                .append(Component.text("Lowest Region TPS: ", PRIMARY))
+-                .append(Component.text(TWO_DECIMAL_PLACES.get().format(minTps) + "\n", CommandUtil.getColourForTPS(minTps)))
++                        .append(Component.text(" - ", LIST, TextDecoration.BOLD))
++                        .append(Component.text("Lowest Region TPS: ", PRIMARY))
++                        .append(Component.text(TWO_DECIMAL_PLACES.get().format(minTps) + "\n", CommandUtil.getColourForTPS(minTps)))
+ 
+ 
+-                .append(Component.text(" - ", LIST, TextDecoration.BOLD))
+-                .append(Component.text("Median Region TPS: ", PRIMARY))
+-                .append(Component.text(TWO_DECIMAL_PLACES.get().format(medianTps) + "\n", CommandUtil.getColourForTPS(medianTps)))
++                        .append(Component.text(" - ", LIST, TextDecoration.BOLD))
++                        .append(Component.text("Median Region TPS: ", PRIMARY))
++                        .append(Component.text(TWO_DECIMAL_PLACES.get().format(medianTps) + "\n", CommandUtil.getColourForTPS(medianTps)))
+ 
+-                .append(Component.text(" - ", LIST, TextDecoration.BOLD))
+-                .append(Component.text("Highest Region TPS: ", PRIMARY))
+-                .append(Component.text(TWO_DECIMAL_PLACES.get().format(maxTps) + "\n", CommandUtil.getColourForTPS(maxTps)))
++                        .append(Component.text(" - ", LIST, TextDecoration.BOLD))
++                        .append(Component.text("Highest Region TPS: ", PRIMARY))
++                        .append(Component.text(TWO_DECIMAL_PLACES.get().format(maxTps) + "\n", CommandUtil.getColourForTPS(maxTps)))
+ 
+-                .append(Component.text("Highest ", HEADER, TextDecoration.BOLD))
+-                .append(Component.text(Integer.toString(lowestRegionsCount), INFORMATION, TextDecoration.BOLD))
+-                .append(Component.text(" utilisation regions\n", HEADER, TextDecoration.BOLD))
++                        .append(Component.text("Highest ", HEADER, TextDecoration.BOLD))
++                        .append(Component.text(Integer.toString(lowestRegionsCount), INFORMATION, TextDecoration.BOLD))
++                        .append(Component.text(" utilisation regions\n", HEADER, TextDecoration.BOLD))
+ 
+-                .append(lowestRegionsBuilder.build())
+-                .build()
++                        .append(lowestRegionsBuilder.build())
++                        .build()
+         );
+ 
+         return true;
+     }
+ 
+     @Override
+-    public boolean execute(final CommandSender sender, final String commandLabel, final String[] args) {
++    public boolean execute(final @NotNull CommandSender sender, final @NotNull String commandLabel, final String[] args) {
+         final String type;
+         if (args.length < 1) {
+             type = "server";
+@@ -326,39 +346,37 @@ public final class CommandServerHealth extends Command {
+             type = args[0];
+         }
+ 
+-        switch (type.toLowerCase(Locale.ROOT)) {
+-            case "server": {
+-                return executeServer(sender, commandLabel, args);
+-            }
+-            case "region": {
++        return switch (type.toLowerCase(Locale.ROOT)) {
++            case "server" -> executeServer(sender, args);
++            case "region" -> {
+                 if (!(sender instanceof Entity)) {
+                     sender.sendMessage(Component.text("Cannot see current region information as console", NamedTextColor.RED));
+-                    return true;
++                    yield true;
+                 }
+-                return executeRegion(sender, commandLabel, args);
++                yield executeRegion(sender);
+             }
+-            default: {
++            default -> {
+                 sender.sendMessage(Component.text("Type '" + args[0] + "' must be one of: [server, region]", NamedTextColor.RED));
+-                return true;
++                yield true;
+             }
+-        }
++        };
+     }
+ 
+     @Override
+-    public List<String> tabComplete(final CommandSender sender, final String alias, final String[] args) throws IllegalArgumentException {
++    public @NotNull List<String> tabComplete(final @NotNull CommandSender sender, final @NotNull String alias, final String[] args) throws IllegalArgumentException {
+         if (args.length == 0) {
+             if (sender instanceof Entity) {
+                 return CommandUtil.getSortedList(Arrays.asList("server", "region"));
+             } else {
+-                return CommandUtil.getSortedList(Arrays.asList("server"));
++                return CommandUtil.getSortedList(List.of("server"));
+             }
+         } else if (args.length == 1) {
+             if (sender instanceof Entity) {
+                 return CommandUtil.getSortedList(Arrays.asList("server", "region"), args[0]);
+             } else {
+-                return CommandUtil.getSortedList(Arrays.asList("server"), args[0]);
++                return CommandUtil.getSortedList(List.of("server"), args[0]);
+             }
+         }
+-        return new ArrayList<>();
++        return List.of();
+     }
+ }
+diff --git a/src/main/java/io/papermc/paper/threadedregions/commands/CommandUtil.java b/src/main/java/io/papermc/paper/threadedregions/commands/CommandUtil.java
+index d016294fc7eafbddf6d2a758e5803498dfa207b8..ac3051b70cfba99d870976cd5e70d4f5cdd1393f 100644
+--- a/src/main/java/io/papermc/paper/threadedregions/commands/CommandUtil.java
++++ b/src/main/java/io/papermc/paper/threadedregions/commands/CommandUtil.java
+@@ -1,18 +1,18 @@
+ package io.papermc.paper.threadedregions.commands;
+ 
++import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+ import net.kyori.adventure.text.format.NamedTextColor;
+ import net.kyori.adventure.text.format.TextColor;
+ import net.kyori.adventure.util.HSVLike;
+ import net.minecraft.server.MinecraftServer;
+ import net.minecraft.server.level.ServerPlayer;
+-import java.util.ArrayList;
+ import java.util.List;
+ import java.util.function.Function;
+ 
+ public final class CommandUtil {
+ 
+     public static List<String> getSortedList(final Iterable<String> iterable) {
+-        final List<String> ret = new ArrayList<>();
++        final List<String> ret = new ObjectArrayList<>();
+         for (final String val : iterable) {
+             ret.add(val);
+         }
+@@ -23,7 +23,7 @@ public final class CommandUtil {
+     }
+ 
+     public static List<String> getSortedList(final Iterable<String> iterable, final String prefix) {
+-        final List<String> ret = new ArrayList<>();
++        final List<String> ret = new ObjectArrayList<>();
+         for (final String val : iterable) {
+             if (val.regionMatches(0, prefix, 0, prefix.length())) {
+                 ret.add(val);
+@@ -36,7 +36,7 @@ public final class CommandUtil {
+     }
+ 
+     public static <T> List<String> getSortedList(final Iterable<T> iterable, final Function<T, String> transform) {
+-        final List<String> ret = new ArrayList<>();
++        final List<String> ret = new ObjectArrayList<>();
+         for (final T val : iterable) {
+             final String transformed = transform.apply(val);
+             if (transformed != null) {
+@@ -50,7 +50,7 @@ public final class CommandUtil {
+     }
+ 
+     public static <T> List<String> getSortedList(final Iterable<T> iterable, final Function<T, String> transform, final String prefix) {
+-        final List<String> ret = new ArrayList<>();
++        final List<String> ret = new ObjectArrayList<>();
+         for (final T val : iterable) {
+             final String string = transform.apply(val);
+             if (string != null && string.regionMatches(0, prefix, 0, prefix.length())) {
