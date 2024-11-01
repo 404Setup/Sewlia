@@ -57,3 +57,4 @@ Sewlia-Server
 paper-api-generator
 .kotlin/
 *.jar
+.xcodemap/
