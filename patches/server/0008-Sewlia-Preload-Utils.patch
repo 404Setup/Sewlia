@@ -1,0 +1,61 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Fri, 1 Nov 2024 11:14:17 +0800
+Subject: [PATCH] Sewlia Preload Utils
+
+
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index f81f7954f512ac9c22370a78d26a2e1eb7a47f05..34331ef213e4b0e062afcb20a6f503a299656016 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -1312,6 +1312,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+             org.spigotmc.WatchdogThread.tick();
+             // Paper end - Improved Watchdog Support
+             org.spigotmc.WatchdogThread.hasStarted = true; // Paper
++            new one.tranic.sewlia.preload.Preload(); // Sewlia
+             Arrays.fill( this.recentTps, 20 );
+             // Paper start - further improve server tick loop
+             long tickSection = Util.getNanos();
+diff --git a/src/main/java/one/tranic/sewlia/preload/Preload.java b/src/main/java/one/tranic/sewlia/preload/Preload.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..d67a9a4f271a8fc47f5fcb51543880c03297fc1a
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/preload/Preload.java
+@@ -0,0 +1,26 @@
++package one.tranic.sewlia.preload;
++
++import net.intelie.tinymap.TinySet;
++import one.tranic.sewlia.Reflect;
++import org.jetbrains.annotations.Nullable;
++
++import java.lang.reflect.InvocationTargetException;
++import java.lang.reflect.Method;
++import java.lang.reflect.Modifier;
++
++public class Preload {
++    public Preload() {
++        @Nullable TinySet<Class<PreloadImpl>> set = Reflect.scanPackage(PreloadImpl.class, "one.tranic.sewlia.reload.mod");
++        if (set == null || set.isEmpty()) return;
++        try {
++            for (Class<PreloadImpl> clazz : set) {
++                Method pre = clazz.getMethod("doPreload");
++                if (!Modifier.isStatic(pre.getModifiers())) continue;
++                pre.setAccessible(true);
++                pre.invoke(null);
++            }
++        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
++            throw new RuntimeException(e);
++        }
++    }
++}
+diff --git a/src/main/java/one/tranic/sewlia/preload/PreloadImpl.java b/src/main/java/one/tranic/sewlia/preload/PreloadImpl.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..2dacb2445673b6d3536f8169c3c11b2bf6f12ab0
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/preload/PreloadImpl.java
+@@ -0,0 +1,5 @@
++package one.tranic.sewlia.preload;
++
++public interface PreloadImpl {
++    void doPreload();
++}

@@ -1,0 +1,61 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Fri, 1 Nov 2024 10:48:14 +0800
+Subject: [PATCH] Sewlia Permission
+
+
+diff --git a/src/main/java/one/tranic/sewlia/Permission.java b/src/main/java/one/tranic/sewlia/Permission.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..d776f0dd6e4f78d4b8928f496ddb218a60ccc13b
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/Permission.java
+@@ -0,0 +1,29 @@
++package one.tranic.sewlia;
++
++import org.bukkit.permissions.PermissionDefault;
++import org.bukkit.util.permissions.DefaultPermissions;
++import org.jetbrains.annotations.NotNull;
++
++public class Permission {
++    private final static String ROOT = "minecraft.sewlia";
++
++    public static void registerCorePermissions() {
++        org.bukkit.permissions.@NotNull Permission parent = DefaultPermissions.registerPermission(
++                ROOT,
++                "Gives the user the ability to use all Sewlia utilities and commands"
++        );
++
++        setPermission(
++                "commands.reload",
++                "Reload Sewlia Config Command",
++                PermissionDefault.OP,
++                parent
++        );
++
++        parent.recalculatePermissibles();
++    }
++
++    private static void setPermission(@NotNull String permission, @NotNull String desc, @NotNull PermissionDefault def, org.bukkit.permissions.@NotNull Permission parent) {
++        DefaultPermissions.registerPermission(ROOT + "." + permission, desc, def, parent);
++    }
++}
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+index dee23b4b96b7f2c6af54a6affe385b183479f8cc..821f6412384e392beca84d7eac03cf395a45c94a 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+@@ -607,6 +607,7 @@ public final class CraftServer implements Server {
+             DefaultPermissions.registerCorePermissions();
+             CraftDefaultPermissions.registerCorePermissions();
+             if (!io.papermc.paper.configuration.GlobalConfiguration.get().misc.loadPermissionsYmlBeforePlugins) this.loadCustomPermissions(); // Paper
++            one.tranic.sewlia.Permission.registerCorePermissions(); // Sewlia
+             this.helpMap.initializeCommands();
+             this.syncCommands();
+         }
+@@ -3166,6 +3167,7 @@ public final class CraftServer implements Server {
+         if (!io.papermc.paper.configuration.GlobalConfiguration.get().misc.loadPermissionsYmlBeforePlugins) loadCustomPermissions();
+         DefaultPermissions.registerCorePermissions();
+         CraftDefaultPermissions.registerCorePermissions();
++        one.tranic.sewlia.Permission.registerCorePermissions(); // Sewlia
+     }
+ 
+     @Override

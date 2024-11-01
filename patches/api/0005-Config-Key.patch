@@ -18,3 +18,32 @@ index 0000000000000000000000000000000000000000..80c80347b9c4a8a00b6c52b92ac0ef5f
 +    @Comment("test comment")
 +    public static Boolean value = false;
 +}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/fix/entity_moving/Enable.java b/src/main/java/one/tranic/sewlia/config/mod/fix/entity_moving/Enable.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..c3727409b6bd4541831bf3fe0a18a5a793007e30
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/fix/entity_moving/Enable.java
+@@ -0,0 +1,12 @@
++package one.tranic.sewlia.config.mod.fix.entity_moving;
++
++import one.tranic.sewlia.config.annotation.Comments;
++
++public class Enable {
++    @Comments({"A simple fix of a issue on folia",
++            "Some times the entity would",
++            "have a large moment that cross the",
++            "different tick regions and it would",
++            "make the server crashed)  but sometimes it might doesn't work"})
++    public static boolean value = true;
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/fix/entity_moving/WarnOnDetected.java b/src/main/java/one/tranic/sewlia/config/mod/fix/entity_moving/WarnOnDetected.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..54d5ac1138baa45f35e6b110112dcae022f9e873
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/fix/entity_moving/WarnOnDetected.java
+@@ -0,0 +1,5 @@
++package one.tranic.sewlia.config.mod.fix.entity_moving;
++
++public class WarnOnDetected {
++    public static boolean value = true;
++}

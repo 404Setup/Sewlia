@@ -1,0 +1,58 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Thu, 31 Oct 2024 17:57:34 +0800
+Subject: [PATCH] Add Sewlia Command
+
+
+diff --git a/src/main/java/one/tranic/sewlia/command/mod/SewliaCommands.java b/src/main/java/one/tranic/sewlia/command/mod/SewliaCommands.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..1fc273799229ba17cbb5c84651de8b945aec1b5a
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/command/mod/SewliaCommands.java
+@@ -0,0 +1,46 @@
++package one.tranic.sewlia.command.mod;
++
++import it.unimi.dsi.fastutil.objects.ObjectArrayList;
++import net.kyori.adventure.text.Component;
++import net.kyori.adventure.text.format.NamedTextColor;
++import one.tranic.sewlia.config.ConfigUtils;
++import org.bukkit.command.Command;
++import org.bukkit.command.CommandSender;
++import org.bukkit.entity.Player;
++import org.jetbrains.annotations.NotNull;
++
++import java.util.List;
++
++public class SewliaCommands extends Command {
++
++    SewliaCommands() {
++        super("sewlia");
++    }
++
++    @Override
++    public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
++        boolean isConsole = (!(sender instanceof Player)) || sender.isOp();
++        if (args.length == 1) {
++            if (args[0].equalsIgnoreCase("reload")) {
++                if (sender.hasPermission("minecraft.sewlia.commands.reload") || isConsole) {
++                    ConfigUtils.reloadConfiguration(true);
++                    sender.sendMessage(Component.text("Configuration reload has been completed. Some configurations require a restart to take effect.", NamedTextColor.AQUA));
++                } else sender.sendMessage(Component.text("Access Denied!", NamedTextColor.RED));
++                return true;
++            }
++        }
++        return false;
++    }
++
++    @Override
++    public @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
++        ObjectArrayList<String> tabs = new ObjectArrayList<>();
++        boolean isConsole = (!(sender instanceof Player)) || sender.isOp();
++        if (args.length == 1) {
++            if (sender.hasPermission("minecraft.sewlia.commands.reload") || isConsole) {
++                tabs.add("reload"); // Reload the configuration file
++            }
++        }
++        return tabs;
++    }
++}

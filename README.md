@@ -9,3 +9,6 @@ Sewlia. 1.21.1
 [![Discord](https://badgen.net/discord/online-members/dBbSbv2Vuz?icon=discord&label=Discord&list=what)](https://discord.gg/dBbSbv2Vuz)
 
 ----
+
+## Features
+- It just has some basic utilities right now, which means it's basically identical to Folia, so you won't see it built for a while.
