@@ -1,0 +1,20 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Sat, 2 Nov 2024 15:27:12 +0800
+Subject: [PATCH] Disable the `reload` command
+
+It shouldn't be available in folia, and when you really need it you should use a plugin like PlugManX, or restart the server.
+
+diff --git a/src/main/java/org/bukkit/command/SimpleCommandMap.java b/src/main/java/org/bukkit/command/SimpleCommandMap.java
+index d526ecc949e192dfbec96b7fe10b970aeee6a04b..46ea7018cf85d89a1badba7d583a035c239079e0 100644
+--- a/src/main/java/org/bukkit/command/SimpleCommandMap.java
++++ b/src/main/java/org/bukkit/command/SimpleCommandMap.java
+@@ -37,7 +37,7 @@ public class SimpleCommandMap implements CommandMap {
+ 
+     private void setDefaultCommands() {
+         register("bukkit", new VersionCommand("version"));
+-        register("bukkit", new ReloadCommand("reload"));
++        //register("bukkit", new ReloadCommand("reload"));
+         //register("bukkit", new PluginsCommand("plugins")); // Paper
+         // register("bukkit", new co.aikar.timings.TimingsCommand("timings")); // Paper // Sewlia - Remove Timings
+     }
