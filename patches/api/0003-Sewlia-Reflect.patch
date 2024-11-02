@@ -6,10 +6,10 @@ Subject: [PATCH] Sewlia Reflect
 
 diff --git a/src/main/java/one/tranic/sewlia/Reflect.java b/src/main/java/one/tranic/sewlia/Reflect.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..3e16e1bef38514cf11c2a4636c9f4d31a59b367d
+index 0000000000000000000000000000000000000000..439433730f0c3c0e72b8c7c68ed116b1fdefc10b
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/Reflect.java
-@@ -0,0 +1,46 @@
+@@ -0,0 +1,102 @@
 +package one.tranic.sewlia;
 +
 +import com.google.common.collect.ImmutableSet;
@@ -18,6 +18,8 @@ index 0000000000000000000000000000000000000000..3e16e1bef38514cf11c2a4636c9f4d31
 +import net.intelie.tinymap.TinySetBuilder;
 +import org.jetbrains.annotations.NotNull;
 +import org.jetbrains.annotations.Nullable;
++
++import java.io.IOException;
 +
 +public class Reflect {
 +    public static <T extends Class<?>> @Nullable TinySet<T> scanPackage(@Nullable T clazz, @NotNull String packageName) {
@@ -54,5 +56,59 @@ index 0000000000000000000000000000000000000000..3e16e1bef38514cf11c2a4636c9f4d31
 +
 +    public static @Nullable TinySet<String> scanPackageString(@NotNull String packageName) {
 +        return scanPackageString(null, packageName);
++    }
++
++    public static <T> @Nullable TinySet<T> findObjectClass(String packageName, Class<T> type) throws IOException {
++        return findClass(packageName, type, true, false);
++    }
++
++    public static <T> @Nullable TinySet<T> findAllObjectClass(String packageName, Class<T> type) throws IOException {
++        return findClass(packageName, type, true, true);
++    }
++
++    public static <T> @Nullable TinySet<T> findClass(String packageName, Class<T> type) throws IOException {
++        return findClass(packageName, type, false, false);
++    }
++
++    public static <T> @Nullable TinySet<T> findAllClass(String packageName, Class<T> type) throws IOException {
++        return findClass(packageName, type, false, true);
++    }
++
++    private static <T> @Nullable TinySet<T> findClass(String packageName, Class<T> type, boolean isObject, boolean allClass) throws IOException {
++        TinySetBuilder<T> implSet = TinySet.builder();
++        ClassPath classPath = ClassPath.from(Thread.currentThread().getContextClassLoader());
++        Iterable<ClassPath.ClassInfo> classes = allClass ? classPath.getTopLevelClassesRecursive(packageName) : classPath.getTopLevelClasses(packageName);
++
++        for (ClassPath.ClassInfo classInfo : classes) {
++            try {
++                Class<?> clazz = Class.forName(classInfo.getName());
++                if (!type.isAssignableFrom(clazz)) continue;
++
++                T objInstance = null;
++                if (isObject) {
++                    objInstance = getObjectInstance(clazz, type);
++                } else {
++                    if (!clazz.isAnnotation() && !clazz.isEnum() && !clazz.isInterface()) {
++                        objInstance = (T) clazz.getDeclaredConstructor().newInstance();
++                    }
++                }
++
++                if (objInstance != null) {
++                    implSet.add(objInstance);
++                }
++            } catch (Exception e) {
++                // Handle exceptions (logging or ignoring based on requirements)
++            }
++        }
++        return implSet.build();
++    }
++
++    @SuppressWarnings("unchecked")
++    private static <T> T getObjectInstance(Class<?> clazz, Class<T> type) {
++        try {
++            return (T) clazz.getField("INSTANCE").get(null);
++        } catch (Exception e) {
++            return null;
++        }
 +    }
 +}

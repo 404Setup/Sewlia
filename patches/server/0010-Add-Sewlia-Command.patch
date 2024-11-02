@@ -6,10 +6,10 @@ Subject: [PATCH] Add Sewlia Command
 
 diff --git a/src/main/java/one/tranic/sewlia/command/mod/SewliaCommands.java b/src/main/java/one/tranic/sewlia/command/mod/SewliaCommands.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..1fc273799229ba17cbb5c84651de8b945aec1b5a
+index 0000000000000000000000000000000000000000..2bb047519c6f6e1d88556a04b9b992521ec7eb0d
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/command/mod/SewliaCommands.java
-@@ -0,0 +1,46 @@
+@@ -0,0 +1,48 @@
 +package one.tranic.sewlia.command.mod;
 +
 +import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -25,8 +25,9 @@ index 0000000000000000000000000000000000000000..1fc273799229ba17cbb5c84651de8b94
 +
 +public class SewliaCommands extends Command {
 +
-+    SewliaCommands() {
++    public SewliaCommands() {
 +        super("sewlia");
++        this.setUsage("/sewlia [reload]");
 +    }
 +
 +    @Override
@@ -41,7 +42,8 @@ index 0000000000000000000000000000000000000000..1fc273799229ba17cbb5c84651de8b94
 +                return true;
 +            }
 +        }
-+        return false;
++        sender.sendMessage(Component.text("Usage: " + this.getUsage(), NamedTextColor.AQUA));
++        return true;
 +    }
 +
 +    @Override

@@ -18,10 +18,10 @@ index 5dcf2d844435b4a17e6b3136f9aea4e3af332366..ee393297fc69b22058feb60057494430
          if (this.convertOldUsers()) {
 diff --git a/src/main/java/one/tranic/sewlia/command/CommandUtil.java b/src/main/java/one/tranic/sewlia/command/CommandUtil.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..42e9e37c99f20fef38903ed7af6c6ec0934e05c3
+index 0000000000000000000000000000000000000000..d53dcdf04784a31b5571f420f6b2e6eea88faf83
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/command/CommandUtil.java
-@@ -0,0 +1,22 @@
+@@ -0,0 +1,23 @@
 +package one.tranic.sewlia.command;
 +
 +import net.intelie.tinymap.TinySet;
@@ -30,16 +30,17 @@ index 0000000000000000000000000000000000000000..42e9e37c99f20fef38903ed7af6c6ec0
 +import org.bukkit.command.Command;
 +import org.jetbrains.annotations.Nullable;
 +
++import java.io.IOException;
++
 +public class CommandUtil {
 +    public static void register() {
-+        @Nullable TinySet<Class<Command>> set = Reflect.scanPackage(Command.class, "one.tranic.sewlia.command.mod");
-+        if (set == null || set.isEmpty()) return;
 +        try {
-+            for (Class<Command> clazz : set) {
-+                Command cmd = clazz.newInstance();
-+                Bukkit.getCommandMap().register(cmd.getName(),"sewlia", cmd);
++            @Nullable TinySet<Command> set = Reflect.findAllClass("one.tranic.sewlia.command.mod", Command.class);
++            if (set == null || set.isEmpty()) return;
++            for (Command clazz : set) {
++                Bukkit.getCommandMap().register(clazz.getName(), "minecraft", clazz);
 +            }
-+        } catch (InstantiationException | IllegalAccessException e) {
++        } catch (IOException e) {
 +            throw new RuntimeException(e);
 +        }
 +    }
