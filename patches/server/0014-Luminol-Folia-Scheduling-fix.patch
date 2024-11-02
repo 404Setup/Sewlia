@@ -1,0 +1,244 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Sat, 2 Nov 2024 22:59:44 +0800
+Subject: [PATCH] Luminol: Folia Scheduling fix
+
+
+diff --git a/src/main/java/io/papermc/paper/threadedregions/RegionizedTaskQueue.java b/src/main/java/io/papermc/paper/threadedregions/RegionizedTaskQueue.java
+index a1e1782d87403ca8934d37361be7ba66ddba133f..2737f234022a22470ca375d9a8238e29a33ab7e8 100644
+--- a/src/main/java/io/papermc/paper/threadedregions/RegionizedTaskQueue.java
++++ b/src/main/java/io/papermc/paper/threadedregions/RegionizedTaskQueue.java
+@@ -48,8 +48,26 @@ public final class RegionizedTaskQueue {
+ 
+     public PrioritisedExecutor.PrioritisedTask queueChunkTask(final ServerLevel world, final int chunkX, final int chunkZ,
+                                                               final Runnable run, final PrioritisedExecutor.Priority priority) {
+-        final PrioritisedExecutor.PrioritisedTask ret = this.createChunkTask(world, chunkX, chunkZ, run, priority);
+-        ret.queue();
++        PrioritisedExecutor.PrioritisedTask ret = new PrioritisedQueue.ChunkBasedPriorityTask(world.taskQueueRegionData, chunkX, chunkZ, true, run, priority, one.tranic.sewlia.config.mod.fix.TaskQueue.value); // Luminol
++        // Luminol start
++        if (!one.tranic.sewlia.config.mod.fix.TaskQueue.value){
++            ret.queue();
++            return ret;
++        }
++
++        for (;;) {
++            boolean result;
++
++            try {
++                result = ret.queue();
++            } catch (patch.me.earthme.luminol.utils.TaskCancelledException ignored) {
++                result = true;
++            }
++
++            if (result) break;
++            ret = new PrioritisedQueue.ChunkBasedPriorityTask(world.taskQueueRegionData, chunkX, chunkZ, true, run, priority, one.tranic.sewlia.config.mod.fix.TaskQueue.value);
++        }
++        // Luminol end
+         return ret;
+     }
+ 
+@@ -60,8 +78,26 @@ public final class RegionizedTaskQueue {
+ 
+     public PrioritisedExecutor.PrioritisedTask queueTickTaskQueue(final ServerLevel world, final int chunkX, final int chunkZ,
+                                                                   final Runnable run, final PrioritisedExecutor.Priority priority) {
+-        final PrioritisedExecutor.PrioritisedTask ret = this.createTickTaskQueue(world, chunkX, chunkZ, run, priority);
+-        ret.queue();
++        PrioritisedExecutor.PrioritisedTask ret = new PrioritisedQueue.ChunkBasedPriorityTask(world.taskQueueRegionData, chunkX, chunkZ, false, run, priority, one.tranic.sewlia.config.mod.fix.TaskQueue.value); // Luminol
++        // Luminol start
++        if (!one.tranic.sewlia.config.mod.fix.TaskQueue.value){
++            ret.queue();
++            return ret;
++        }
++
++        for (;;) {
++            boolean result;
++
++            try {
++                result = ret.queue();
++            } catch (patch.me.earthme.luminol.utils.TaskCancelledException ignored) {
++                result = true;
++            }
++
++            if (result) break;
++            ret = new PrioritisedQueue.ChunkBasedPriorityTask(world.taskQueueRegionData, chunkX, chunkZ, false, run, priority, one.tranic.sewlia.config.mod.fix.TaskQueue.value);
++        }
++        // Luminol end
+         return ret;
+     }
+ 
+@@ -136,6 +172,78 @@ public final class RegionizedTaskQueue {
+             }
+         }
+ 
++        // Luminol start - Try fixing scheduling
++        private final java.util.concurrent.locks.Lock referenceCountersLock = new java.util.concurrent.locks.ReentrantLock(true);
++
++        private void luminolReplaced$decrementReference(final AtomicLong reference, final long coord) {
++            final int chunkX = CoordinateUtils.getChunkX(coord);
++            final int chunkZ = CoordinateUtils.getChunkZ(coord);
++
++            this.referenceCountersLock.lock();
++            boolean shouldRemove = false;
++            try {
++                final long val = reference.decrementAndGet();
++                if (val == 0L) {
++                    shouldRemove = this.referenceCounters.remove(coord, reference) == reference;
++                } else if (val < 0L) {
++                    throw new IllegalStateException("Reference count < 0: " + val);
++                }
++            } finally {
++                this.referenceCountersLock.unlock();
++            }
++
++            if (shouldRemove) {
++                final ca.spottedleaf.concurrentutil.lock.ReentrantAreaLock.Node ticketLock = this.world.moonrise$getChunkTaskScheduler().chunkHolderManager.ticketLockArea.lock(chunkX, chunkZ);
++                try {
++                    WorldRegionTaskData.this.removeTicket(coord);
++                } finally {
++                    this.world.moonrise$getChunkTaskScheduler().chunkHolderManager.ticketLockArea.unlock(ticketLock);
++                }
++            }
++        }
++
++        private AtomicLong luminolReplaced$incrementReference(final long coord){
++            final AtomicLong result;
++
++            final int chunkX = CoordinateUtils.getChunkX(coord);
++            final int chunkZ = CoordinateUtils.getChunkZ(coord);
++
++            final boolean processTicketUpdates;
++
++            final AtomicLong replace = new AtomicLong(1L);
++
++            this.referenceCountersLock.lock();
++            try {
++                final AtomicLong valueInMap = this.referenceCounters.putIfAbsent(coord, replace);
++
++                if (valueInMap == null) {
++                    result = replace;
++                    processTicketUpdates = true;
++                } else {
++                    processTicketUpdates = false;
++                    valueInMap.getAndIncrement();
++                    result = valueInMap;
++                }
++            } finally {
++                this.referenceCountersLock.unlock();
++            }
++
++            if (processTicketUpdates) {
++                // Add the ticket so that we could create the tickregion
++                final ca.spottedleaf.concurrentutil.lock.ReentrantAreaLock.Node ticketLock = this.world.moonrise$getChunkTaskScheduler().chunkHolderManager.ticketLockArea.lock(chunkX, chunkZ);
++                try {
++                    this.addTicket(coord);
++                } finally {
++                    this.world.moonrise$getChunkTaskScheduler().chunkHolderManager.ticketLockArea.unlock(ticketLock);
++                }
++
++                this.processTicketUpdates(coord); // Notify an update
++            }
++
++            return result;
++        }
++        // Luminol end
++
+         private AtomicLong incrementReference(final long coord) {
+             final AtomicLong ret = this.referenceCounters.get(coord);
+             if (ret != null) {
+@@ -428,7 +536,13 @@ public final class RegionizedTaskQueue {
+             try {
+                 task.executeInternal();
+             } finally {
+-                task.world.decrementReference(referenceCounter, task.sectionLowerLeftCoord);
++                // Luminol start - Try fixing schedule
++                if (one.tranic.sewlia.config.mod.fix.TaskQueue.value) {
++                    task.world.luminolReplaced$decrementReference(referenceCounter, task.sectionLowerLeftCoord);
++                } else {
++                    task.world.decrementReference(referenceCounter, task.sectionLowerLeftCoord);
++                }
++                // Luminol end
+             }
+ 
+             return true;
+@@ -449,6 +563,13 @@ public final class RegionizedTaskQueue {
+             private Runnable run;
+             private volatile PrioritisedExecutor.Priority priority;
+             private static final VarHandle PRIORITY_HANDLE = ConcurrentUtil.getVarHandle(ChunkBasedPriorityTask.class, "priority", PrioritisedExecutor.Priority.class);
++            private boolean softThrowWhenCancelled = false; // Luminol
++
++            ChunkBasedPriorityTask(final WorldRegionTaskData world, final int chunkX, final int chunkZ, final boolean isChunkTask,
++                                   final Runnable run, final PrioritisedExecutor.Priority priority, boolean sft) { // Luminol
++                this(world, chunkX, chunkZ, isChunkTask, run, priority);
++                this.softThrowWhenCancelled = sft;
++            }
+ 
+             ChunkBasedPriorityTask(final WorldRegionTaskData world, final int chunkX, final int chunkZ, final boolean isChunkTask,
+                                    final Runnable run, final PrioritisedExecutor.Priority priority) {
+@@ -533,7 +654,13 @@ public final class RegionizedTaskQueue {
+                         }
+                     } finally {
+                         if (curr != REFERENCE_COUNTER_NOT_SET) {
+-                            this.world.decrementReference(curr, this.sectionLowerLeftCoord);
++                            // Luminol start - Try fixing scheduling
++                            if (one.tranic.sewlia.config.mod.fix.TaskQueue.value) {
++                                this.world.luminolReplaced$decrementReference(curr, this.sectionLowerLeftCoord);
++                            } else {
++                                this.world.decrementReference(curr, this.sectionLowerLeftCoord);
++                            }
++                            // Luminol end
+                         }
+                     }
+ 
+@@ -547,10 +674,16 @@ public final class RegionizedTaskQueue {
+                     return false;
+                 }
+ 
+-                final AtomicLong referenceCounter = this.world.incrementReference(this.sectionLowerLeftCoord);
++                final AtomicLong referenceCounter = one.tranic.sewlia.config.mod.fix.TaskQueue.value ? this.world.luminolReplaced$incrementReference(this.sectionLowerLeftCoord) : this.world.incrementReference(this.sectionLowerLeftCoord);
+                 if (this.compareAndExchangeReferenceCounter(REFERENCE_COUNTER_NOT_SET, referenceCounter) != REFERENCE_COUNTER_NOT_SET) {
+                     // we don't expect race conditions here, so it is OK if we have to needlessly reference count
+-                    this.world.decrementReference(referenceCounter, this.sectionLowerLeftCoord);
++                    // Luminol start - Try fixing scheduling
++                    if (one.tranic.sewlia.config.mod.fix.TaskQueue.value) {
++                        this.world.luminolReplaced$decrementReference(referenceCounter, this.sectionLowerLeftCoord);
++                    } else {
++                        this.world.decrementReference(referenceCounter, this.sectionLowerLeftCoord);
++                    }
++                    // Luminol end
+                     return false;
+                 }
+ 
+@@ -574,7 +707,12 @@ public final class RegionizedTaskQueue {
+                         // the task never could be polled from the queue, so we return false
+                         // don't decrement reference count, as we were certainly cancelled by another thread, which
+                         // will decrement the reference count
++                        // Luminol start
++                        if (this.softThrowWhenCancelled) {
++                            throw new patch.me.earthme.luminol.utils.TaskCancelledException();
++                        }
+                         return false;
++                        // Luminol end
+                     }
+ 
+                     synchronise = true;
+@@ -584,6 +722,9 @@ public final class RegionizedTaskQueue {
+                         // we were cancelled
+                         // don't decrement reference count, as we were certainly cancelled by another thread, which
+                         // will decrement the reference count
++                        if (this.softThrowWhenCancelled) {
++                            throw new patch.me.earthme.luminol.utils.TaskCancelledException();
++                        }
+                         return false;
+                     }
+ 
+diff --git a/src/main/java/patch/me/earthme/luminol/utils/TaskCancelledException.java b/src/main/java/patch/me/earthme/luminol/utils/TaskCancelledException.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..a56ca393259c270eeff5bd330a2a2481baeb4b7d
+--- /dev/null
++++ b/src/main/java/patch/me/earthme/luminol/utils/TaskCancelledException.java
+@@ -0,0 +1,4 @@
++package patch.me.earthme.luminol.utils;
++
++public class TaskCancelledException extends RuntimeException{
++}
+\ No newline at end of file

@@ -4,6 +4,17 @@ Date: Wed, 30 Oct 2024 17:23:42 +0800
 Subject: [PATCH] Config Key
 
 
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/fix/TaskQueue.java b/src/main/java/one/tranic/sewlia/config/mod/fix/TaskQueue.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..3c8d00ba18018be4aec347494285294390a348e9
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/fix/TaskQueue.java
+@@ -0,0 +1,5 @@
++package one.tranic.sewlia.config.mod.fix;
++
++public class TaskQueue {
++    public static boolean value = true;
++}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/fix/VillagersDontReleaseMemory.java b/src/main/java/one/tranic/sewlia/config/mod/fix/VillagersDontReleaseMemory.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..80c80347b9c4a8a00b6c52b92ac0ef5f0e79c4b3
