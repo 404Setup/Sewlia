@@ -19,7 +19,7 @@ index 581bd217304e0f9e0b2113c335694805dfb4e2a1..ec4c3c8045488fc8083c77cbf53bd89e
              Bootstrap.validate();
 diff --git a/src/main/java/one/tranic/sewlia/config/ConfigScanner.java b/src/main/java/one/tranic/sewlia/config/ConfigScanner.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..7314f510b0d1c52acafb3ae63dbbf1a46da91a55
+index 0000000000000000000000000000000000000000..1ad4b47ebeeb5749229b71c3179976259fee853e
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/config/ConfigScanner.java
 @@ -0,0 +1,82 @@
@@ -61,11 +61,11 @@ index 0000000000000000000000000000000000000000..7314f510b0d1c52acafb3ae63dbbf1a4
 +                valueField.setAccessible(true);
 +                Object value = valueField.get(null);
 +                switch (value) {
-+                    case Boolean ignored -> ConfigUtils.getConfiguration().set(key, value);
-+                    case String ignored -> ConfigUtils.getConfiguration().set(key, value);
-+                    case Integer ignored -> ConfigUtils.getConfiguration().set(key, value);
-+                    case Double ignored -> ConfigUtils.getConfiguration().set(key, value);
-+                    case List ignored -> ConfigUtils.getConfiguration().set(key, value);
++                    case Boolean ignored -> ConfigUtils.getConfiguration().addDefault(key, value);
++                    case String ignored -> ConfigUtils.getConfiguration().addDefault(key, value);
++                    case Integer ignored -> ConfigUtils.getConfiguration().addDefault(key, value);
++                    case Double ignored -> ConfigUtils.getConfiguration().addDefault(key, value);
++                    case List ignored -> ConfigUtils.getConfiguration().addDefault(key, value);
 +                    case null, default -> {
 +                        return;
 +                    }
