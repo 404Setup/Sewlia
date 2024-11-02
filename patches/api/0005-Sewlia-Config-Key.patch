@@ -4,6 +4,55 @@ Date: Wed, 30 Oct 2024 17:23:42 +0800
 Subject: [PATCH] Sewlia Config Key
 
 
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/maven/Designation.java b/src/main/java/one/tranic/sewlia/config/mod/feature/maven/Designation.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..f9f11e48f4d214636652f7e9907947f1ab259777
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/maven/Designation.java
+@@ -0,0 +1,10 @@
++package one.tranic.sewlia.config.mod.feature.maven;
++
++import one.tranic.sewlia.config.annotation.Comment;
++import one.tranic.sewlia.config.annotation.DisableReload;
++
++public class Designation {
++    @DisableReload
++    @Comment("Manually specify a repository")
++    public static String value = "";
++}
+\ No newline at end of file
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/maven/Enable.java b/src/main/java/one/tranic/sewlia/config/mod/feature/maven/Enable.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..25b2632665eb933feff710bb30a015341bb381cb
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/maven/Enable.java
+@@ -0,0 +1,10 @@
++package one.tranic.sewlia.config.mod.feature.maven;
++
++import one.tranic.sewlia.config.annotation.Comment;
++import one.tranic.sewlia.config.annotation.DisableReload;
++
++public class Enable {
++    @DisableReload
++    @Comment("Maven Central Repository Acceleration")
++    public static boolean value = true;
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/maven/UserRepository.java b/src/main/java/one/tranic/sewlia/config/mod/feature/maven/UserRepository.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..aa673e7c22f4780bec656d1506b48d7b0eee67be
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/maven/UserRepository.java
+@@ -0,0 +1,10 @@
++package one.tranic.sewlia.config.mod.feature.maven;
++
++import one.tranic.sewlia.config.annotation.Comment;
++import one.tranic.sewlia.config.annotation.DisableReload;
++
++public class UserRepository {
++    @DisableReload
++    @Comment("Users add a central repository mirror")
++    public static String value = "";
++}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/fix/POIAccessOffRegion.java b/src/main/java/one/tranic/sewlia/config/mod/fix/POIAccessOffRegion.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..bda476a96f551ea1d303d85d425968e112f118ee
