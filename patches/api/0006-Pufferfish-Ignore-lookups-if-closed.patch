@@ -1,0 +1,45 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Sat, 2 Nov 2024 11:53:41 +0800
+Subject: [PATCH] Pufferfish: Ignore lookups if closed
+
+
+diff --git a/src/main/java/org/bukkit/plugin/java/PluginClassLoader.java b/src/main/java/org/bukkit/plugin/java/PluginClassLoader.java
+index 7e4f7cb2afbc145e532285c793573ad107bc3033..ac96e2690718500976e52e5a90705dd1c27f1179 100644
+--- a/src/main/java/org/bukkit/plugin/java/PluginClassLoader.java
++++ b/src/main/java/org/bukkit/plugin/java/PluginClassLoader.java
+@@ -50,6 +50,8 @@ public final class PluginClassLoader extends URLClassLoader implements io.paperm
+     private io.papermc.paper.plugin.provider.classloader.PluginClassLoaderGroup classLoaderGroup; // Paper
+     public io.papermc.paper.plugin.provider.entrypoint.DependencyContext dependencyContext; // Paper
+ 
++    private boolean closed = false; // Pufferfish
++
+     static {
+         ClassLoader.registerAsParallelCapable();
+     }
+@@ -204,7 +206,7 @@ public final class PluginClassLoader extends URLClassLoader implements io.paperm
+         }
+         Class<?> result = classes.get(name);
+ 
+-        if (result == null) {
++        if (result == null && !this.closed) { // Pufferfish
+             String path = name.replace('.', '/').concat(".class");
+             JarEntry entry = jar.getJarEntry(path);
+ 
+@@ -251,6 +253,8 @@ public final class PluginClassLoader extends URLClassLoader implements io.paperm
+             this.setClass(name, result); // Paper
+         }
+ 
++        if (result == null) throw new ClassNotFoundException(name); // Pufferfish
++
+         return result;
+     }
+ 
+@@ -265,6 +269,7 @@ public final class PluginClassLoader extends URLClassLoader implements io.paperm
+             // Paper end
+             super.close();
+         } finally {
++            this.closed = true; // Pufferfish
+             jar.close();
+         }
+     }
