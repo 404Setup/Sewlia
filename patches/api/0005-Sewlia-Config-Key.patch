@@ -21,16 +21,33 @@ index 0000000000000000000000000000000000000000..bda476a96f551ea1d303d85d425968e1
 +            "mind the side effect(currently unknown), you can enable this"})
 +    public static boolean value = false;
 +}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/fix/SpectorTeleportation.java b/src/main/java/one/tranic/sewlia/config/mod/fix/SpectorTeleportation.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..2600c7215a47df59d5cc1220fbf59bdf34c715ca
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/fix/SpectorTeleportation.java
+@@ -0,0 +1,11 @@
++package one.tranic.sewlia.config.mod.fix;
++
++import one.tranic.sewlia.config.annotation.Comments;
++
++public class SpectorTeleportation {
++    @Comments({"The teleportation of spector players would call absMoveTo directly.",
++            "And when the camera teleported to another region,this would call absMoveTo",
++            "to let the spector player move to another region without any checks, which ",
++            "would trigger the async catcher and crash the server"})
++    public static boolean value = false;
++}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/fix/TaskQueue.java b/src/main/java/one/tranic/sewlia/config/mod/fix/TaskQueue.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..3c8d00ba18018be4aec347494285294390a348e9
+index 0000000000000000000000000000000000000000..51c24fa14f56f5f19fa528189a6a01e40b00879f
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/config/mod/fix/TaskQueue.java
 @@ -0,0 +1,5 @@
 +package one.tranic.sewlia.config.mod.fix;
 +
 +public class TaskQueue {
-+    public static boolean value = true;
++    public static boolean value = false;
 +}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/fix/VillagersDontReleaseMemory.java b/src/main/java/one/tranic/sewlia/config/mod/fix/VillagersDontReleaseMemory.java
 new file mode 100644
@@ -77,20 +94,18 @@ index 0000000000000000000000000000000000000000..8234a65d2aa6b5b3d607cec95453efe4
 +}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/fix/entity_moving/Enable.java b/src/main/java/one/tranic/sewlia/config/mod/fix/entity_moving/Enable.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..c3727409b6bd4541831bf3fe0a18a5a793007e30
+index 0000000000000000000000000000000000000000..8fac641a45325f0f5b7c03497e1ce6abed731e94
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/config/mod/fix/entity_moving/Enable.java
-@@ -0,0 +1,12 @@
+@@ -0,0 +1,10 @@
 +package one.tranic.sewlia.config.mod.fix.entity_moving;
 +
 +import one.tranic.sewlia.config.annotation.Comments;
 +
 +public class Enable {
-+    @Comments({"A simple fix of a issue on folia",
-+            "Some times the entity would",
-+            "have a large moment that cross the",
-+            "different tick regions and it would",
-+            "make the server crashed)  but sometimes it might doesn't work"})
++    @Comments({"A simple fix of a issue on folia.",
++            "Some times the entity would have a large moment that cross the different tick regions and it would",
++            "make the server crashed)  but sometimes it might doesn't work."})
 +    public static boolean value = true;
 +}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/fix/entity_moving/WarnOnDetected.java b/src/main/java/one/tranic/sewlia/config/mod/fix/entity_moving/WarnOnDetected.java

@@ -111,7 +111,7 @@ index 7accad9d29a614eae14b2e8848895808d2e297cf..814d59ce8dd59df24acfcf95d5d4526b
          } else {
              passenger.stopRiding();
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index e4a68f43c1a48fe8193623c646eb40bc5f664c76..6710b0e5ee8d433fe362ac7e34304547432bac9b 100644
+index 304ef2fe3da8794c66af8c4bba6c2c8ebc282b28..7694bd8f01d705d001c6548eefe7d312aaeb1bc8 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -334,6 +334,26 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
@@ -141,7 +141,7 @@ index e4a68f43c1a48fe8193623c646eb40bc5f664c76..6710b0e5ee8d433fe362ac7e34304547
      public ServerPlayer(MinecraftServer server, ServerLevel world, GameProfile profile, ClientInformation clientOptions) {
          super(world, world.getSharedSpawnPos(), world.getSharedSpawnAngle(), profile);
          this.chatVisibility = ChatVisiblity.FULL;
-@@ -950,6 +970,12 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -965,6 +985,12 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
          this.trackEnteredOrExitedLavaOnVehicle();
          this.updatePlayerAttributes();
          this.advancements.flushDirty(this);
