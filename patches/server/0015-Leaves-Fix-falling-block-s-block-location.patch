@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Sat, 2 Nov 2024 12:04:26 +0800
+Subject: [PATCH] Leaves: Fix falling block's block location
+
+
+diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
+index e61cec9aec2d5d313ff1936ab685956527a28977..f6746305b8ae71fa430de4b693c28a359053a81c 100644
+--- a/src/main/java/net/minecraft/world/entity/Entity.java
++++ b/src/main/java/net/minecraft/world/entity/Entity.java
+@@ -5508,6 +5508,14 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+             int j = Mth.floor(y);
+             int k = Mth.floor(z);
+ 
++            // Leaves start - fix falling block location
++            if (this instanceof net.minecraft.world.entity.item.FallingBlockEntity) {
++                if (y < 0.0 && y + 1e-10 > 0.0) {
++                    j = 0;
++                }
++            }
++            // Leaves end - fix falling block location
++
+             if (i != this.blockPosition.getX() || j != this.blockPosition.getY() || k != this.blockPosition.getZ()) {
+                 this.blockPosition = new BlockPos(i, j, k);
+                 this.inBlockState = null;
