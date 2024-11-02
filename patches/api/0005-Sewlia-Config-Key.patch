@@ -119,3 +119,14 @@ index 0000000000000000000000000000000000000000..54d5ac1138baa45f35e6b110112dcae0
 +public class WarnOnDetected {
 +    public static boolean value = true;
 +}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/RunExtraTasksDuringWaiting.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/RunExtraTasksDuringWaiting.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..7549383deabee9b461becdd308d9c8708bf4c91d
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/optimization/RunExtraTasksDuringWaiting.java
+@@ -0,0 +1,5 @@
++package one.tranic.sewlia.config.mod.optimization;
++
++public class RunExtraTasksDuringWaiting {
++    public static boolean value = false;
++}
