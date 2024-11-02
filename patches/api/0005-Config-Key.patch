@@ -18,6 +18,35 @@ index 0000000000000000000000000000000000000000..80c80347b9c4a8a00b6c52b92ac0ef5f
 +    @Comment("test comment")
 +    public static Boolean value = false;
 +}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/fix/anvil_drop/Debug.java b/src/main/java/one/tranic/sewlia/config/mod/fix/anvil_drop/Debug.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..90260a1b65a0ca88d84b82ab6a9e92bfe6ae72a8
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/fix/anvil_drop/Debug.java
+@@ -0,0 +1,8 @@
++package one.tranic.sewlia.config.mod.fix.anvil_drop;
++
++import one.tranic.sewlia.config.annotation.Comment;
++
++public class Debug {
++    @Comment("Whether to print detailed information to the console when this issue is triggered")
++    public static boolean value = false;
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/fix/anvil_drop/Enable.java b/src/main/java/one/tranic/sewlia/config/mod/fix/anvil_drop/Enable.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..8234a65d2aa6b5b3d607cec95453efe41e9f82d9
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/fix/anvil_drop/Enable.java
+@@ -0,0 +1,9 @@
++package one.tranic.sewlia.config.mod.fix.anvil_drop;
++
++import one.tranic.sewlia.config.annotation.Comments;
++
++public class Enable {
++    @Comments({"This fix will attempt to prevent the bug in https://github.com/PaperMC/Folia/issues/217, ",
++            "it may cause some unexpected effects but should be harmless."})
++    public static boolean value = true;
++}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/fix/entity_moving/Enable.java b/src/main/java/one/tranic/sewlia/config/mod/fix/entity_moving/Enable.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..c3727409b6bd4541831bf3fe0a18a5a793007e30
