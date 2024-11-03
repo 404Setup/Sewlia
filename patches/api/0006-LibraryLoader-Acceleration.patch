@@ -28,10 +28,10 @@ index 107705db2d82b7c191e5e625ec888e0bc3b03831..2c66ae4d0ac3b29c886f7d1f3ff47743
      /**
 diff --git a/src/main/java/one/tranic/sewlia/maven/Accelerate.java b/src/main/java/one/tranic/sewlia/maven/Accelerate.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..49948e1945a8a1fae357a59f7812959271651409
+index 0000000000000000000000000000000000000000..4dffbfd5f35943b3a3723fb95109734634281ba4
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/maven/Accelerate.java
-@@ -0,0 +1,229 @@
+@@ -0,0 +1,238 @@
 +package one.tranic.sewlia.maven;
 +
 +import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -48,6 +48,7 @@ index 0000000000000000000000000000000000000000..49948e1945a8a1fae357a59f78129592
 +import java.util.Map;
 +import java.util.Objects;
 +import java.util.concurrent.*;
++import java.util.concurrent.locks.ReentrantLock;
 +
 +/**
 + * The {@code Accelerate} class is responsible for selecting the fastest available Maven repository mirror.
@@ -64,24 +65,32 @@ index 0000000000000000000000000000000000000000..49948e1945a8a1fae357a59f78129592
 +    protected static final URI centralUri = URI.create(central);
 +    protected static final URI central2Uri = URI.create(central2);
 +    protected static String maven = "";
++    protected static ReentrantLock lock = new ReentrantLock();
 +
 +    public static void ping() {
 +        if (!maven.isEmpty()) return;
-+        if (!one.tranic.sewlia.config.mod.feature.maven.Enable.value) {
-+            maven = central;
-+            return;
-+        }
-+        TinyMap<String, String> mirrors = getMirrors();
-+        if (!one.tranic.sewlia.config.mod.feature.maven.Designation.value.isEmpty()) {
-+            String repo = mirrors.get(one.tranic.sewlia.config.mod.feature.maven.Designation.value);
-+            if (repo == null || repo.isEmpty()) {
-+                logger.warn("The repository {} is not a valid repository", one.tranic.sewlia.config.mod.feature.maven.Designation.value);
++        lock.lock();
++        try {
++            if (!one.tranic.sewlia.config.mod.feature.maven.Enable.value) {
 +                maven = central;
-+            } else
-+                logger.info("The mirror {} ({}) has been selected", one.tranic.sewlia.config.mod.feature.maven.Designation.value, repo);
-+            return;
++                return;
++            }
++            TinyMap<String, String> mirrors = getMirrors();
++            if (!one.tranic.sewlia.config.mod.feature.maven.Designation.value.isEmpty()) {
++                String repo = mirrors.get(one.tranic.sewlia.config.mod.feature.maven.Designation.value);
++                if (repo == null || repo.isEmpty()) {
++                    maven = central;
++                    logger.warn("The repository {} is not a valid repository", one.tranic.sewlia.config.mod.feature.maven.Designation.value);
++                } else {
++                    maven = repo;
++                    logger.info("The mirror {} ({}) has been selected", one.tranic.sewlia.config.mod.feature.maven.Designation.value, repo);
++                }
++                return;
++            }
++            selectMirror(mirrors);
++        } finally {
++            lock.unlock();
 +        }
-+        selectMirror(mirrors);
 +    }
 +
 +    protected static TinyMap<String, String> getMirrors() {
@@ -261,6 +270,18 @@ index 0000000000000000000000000000000000000000..49948e1945a8a1fae357a59f78129592
 +        }
 +    }
 +}
+diff --git a/src/main/java/org/bukkit/plugin/SimplePluginManager.java b/src/main/java/org/bukkit/plugin/SimplePluginManager.java
+index 09cb65d6fd675a1ae12aa1a9a30c9fdbee3de3dd..f5c64b8d92222b2055e161cdcb7e3f94e7a7b63b 100644
+--- a/src/main/java/org/bukkit/plugin/SimplePluginManager.java
++++ b/src/main/java/org/bukkit/plugin/SimplePluginManager.java
+@@ -153,6 +153,7 @@ public final class SimplePluginManager implements PluginManager {
+      */
+     @NotNull
+     public Plugin[] loadPlugins(@NotNull File[] files) {
++        one.tranic.sewlia.maven.Accelerate.ping(); // Sewlia - Start a ping in advance
+         // TODO Replace with Paper plugin loader
+         Preconditions.checkArgument(files != null, "File list cannot be null");
+ 
 diff --git a/src/main/java/org/bukkit/plugin/java/LibraryLoader.java b/src/main/java/org/bukkit/plugin/java/LibraryLoader.java
 index c66252802c51174bc26f266cb5cdecdd856ff220..f83c8dea8620bfa9b3c838fab29ad8a439eacefa 100644
 --- a/src/main/java/org/bukkit/plugin/java/LibraryLoader.java
