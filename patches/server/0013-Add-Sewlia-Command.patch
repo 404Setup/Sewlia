@@ -4,11 +4,11 @@ Date: Thu, 31 Oct 2024 17:57:34 +0800
 Subject: [PATCH] Add Sewlia Command
 
 
-diff --git a/src/main/java/one/tranic/sewlia/command/mod/SewliaCommands.java b/src/main/java/one/tranic/sewlia/command/mod/SewliaCommands.java
+diff --git a/src/main/java/one/tranic/sewlia/command/mod/SewliaCommand.java b/src/main/java/one/tranic/sewlia/command/mod/SewliaCommand.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..2bb047519c6f6e1d88556a04b9b992521ec7eb0d
+index 0000000000000000000000000000000000000000..c38769ed2849d7d14940c0ba20ce45320710b5c5
 --- /dev/null
-+++ b/src/main/java/one/tranic/sewlia/command/mod/SewliaCommands.java
++++ b/src/main/java/one/tranic/sewlia/command/mod/SewliaCommand.java
 @@ -0,0 +1,48 @@
 +package one.tranic.sewlia.command.mod;
 +
@@ -23,9 +23,9 @@ index 0000000000000000000000000000000000000000..2bb047519c6f6e1d88556a04b9b99252
 +
 +import java.util.List;
 +
-+public class SewliaCommands extends Command {
++public class SewliaCommand extends Command {
 +
-+    public SewliaCommands() {
++    public SewliaCommand() {
 +        super("sewlia");
 +        this.setUsage("/sewlia [reload]");
 +    }
@@ -35,10 +35,10 @@ index 0000000000000000000000000000000000000000..2bb047519c6f6e1d88556a04b9b99252
 +        boolean isConsole = (!(sender instanceof Player)) || sender.isOp();
 +        if (args.length == 1) {
 +            if (args[0].equalsIgnoreCase("reload")) {
-+                if (sender.hasPermission("minecraft.sewlia.commands.reload") || isConsole) {
++                if (isConsole || sender.hasPermission("sewlia.command.reload")) {
 +                    ConfigUtils.reloadConfiguration(true);
 +                    sender.sendMessage(Component.text("Configuration reload has been completed. Some configurations require a restart to take effect.", NamedTextColor.AQUA));
-+                } else sender.sendMessage(Component.text("Access Denied!", NamedTextColor.RED));
++                } else sender.sendMessage(Component.text("You do not have permission to use this command!", NamedTextColor.RED));
 +                return true;
 +            }
 +        }
@@ -51,7 +51,7 @@ index 0000000000000000000000000000000000000000..2bb047519c6f6e1d88556a04b9b99252
 +        ObjectArrayList<String> tabs = new ObjectArrayList<>();
 +        boolean isConsole = (!(sender instanceof Player)) || sender.isOp();
 +        if (args.length == 1) {
-+            if (sender.hasPermission("minecraft.sewlia.commands.reload") || isConsole) {
++            if (isConsole || sender.hasPermission("sewlia.command.reload")) {
 +                tabs.add("reload"); // Reload the configuration file
 +            }
 +        }

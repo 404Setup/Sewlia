@@ -69,7 +69,7 @@ index 988fe74578065c9464f5639e5cc6af79619edef5..a1d10bac4a1343516bbf8a9f508c9691
  
          static void updateCurrentRegion() {
 diff --git a/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java b/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java
-index 012d3a7da7fe483393a0888c823bd2e78f5c3908..1e19f50d2b2bd402870a1483092eac94f351360f 100644
+index 012d3a7da7fe483393a0888c823bd2e78f5c3908..19ea65dae262ee2b8210375c6111015d5b4f41c1 100644
 --- a/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java
 +++ b/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java
 @@ -1,12 +1,8 @@
@@ -227,7 +227,7 @@ index 012d3a7da7fe483393a0888c823bd2e78f5c3908..1e19f50d2b2bd402870a1483092eac94
 +                        formatRegionInfo("1m: ", util1m, mspt1m, tps1m, true)
 +                )
 +                .append(
-+                        formatRegionStats(region.getData().getRegionStats(), false, (sender instanceof Player && sender.hasPermission("minecraft.sewlia.feature.tpslocation"))) // Sewlia - Show Region Player Location
++                        formatRegionStats(region.getData().getRegionStats(), false, (sender instanceof Player && sender.hasPermission("sewlia.feature.tpslocation"))) // Sewlia - Show Region Player Location
 +                )
 +
 +                .build();
@@ -332,7 +332,7 @@ index 012d3a7da7fe483393a0888c823bd2e78f5c3908..1e19f50d2b2bd402870a1483092eac94
 +                    .append(Component.text(" TPS\n", PRIMARY))
 +
 +                    .append(Component.text("    ", PRIMARY))
-+                    .append(formatRegionStats(region.getData().getRegionStats(), (i + 1) != len, (sender instanceof Player && sender.hasPermission("minecraft.sewlia.tpslocation")))); // Sewlia - Show Region Player Location
++                    .append(formatRegionStats(region.getData().getRegionStats(), (i + 1) != len, (sender instanceof Player && sender.hasPermission("sewlia.feature.tpslocation")))); // Sewlia - Show Region Player Location
 +
 +            final Component line;
 +            if (sender instanceof Player && sender.hasPermission("minecraft.command.execute")) {

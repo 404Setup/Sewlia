@@ -48,10 +48,10 @@ index e4a68f43c1a48fe8193623c646eb40bc5f664c76..fb21572eecb512bdb5ecafcda44f404c
  }
 diff --git a/src/main/java/one/tranic/sewlia/command/mod/TPSBarCommand.java b/src/main/java/one/tranic/sewlia/command/mod/TPSBarCommand.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..ff354c8fb35e9a078f1816151c496ba320b69b6e
+index 0000000000000000000000000000000000000000..bb6d703664df363f7644bd3c71c3fb73cb7b3997
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/command/mod/TPSBarCommand.java
-@@ -0,0 +1,60 @@
+@@ -0,0 +1,66 @@
 +package one.tranic.sewlia.command.mod;
 +
 +import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -75,22 +75,28 @@ index 0000000000000000000000000000000000000000..ff354c8fb35e9a078f1816151c496ba3
 +public class TPSBarCommand extends Command {
 +    public TPSBarCommand() {
 +        super("tpsbar");
-+        this.setPermission("minecraft.command.tpsbar");
++        this.setPermission("sewlia.command.tpsbar.self");
 +    }
 +
 +    @Override
 +    public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
-+        if (args.length == 0) args = new String[]{sender.getName()};
++        if (args.length == 0) {
++            if (!(sender instanceof Player)) {
++                sender.sendMessage(Component.text("Only players can use this command", NamedTextColor.RED));
++                return true;
++            }
++            args = new String[]{sender.getName()};
++        } else {
++            if (!sender.hasPermission("sewlia.command.tpsbar.another")) {
++                sender.sendMessage(Component.text("You do not have permission to switch other people's display!", NamedTextColor.RED));
++                return true;
++            }
++        }
 +        for (String target: args) {
 +            @Nullable Player player = Bukkit.getPlayer(target);
-+            Component output;
-+            if (player != null) {
-+                output = updateTarget(player);
-+            } else {
-+                output = Component.text("Player "+target+" not found");
-+            }
-+
++            Component output = player != null ? updateTarget(player) : Component.text("Player "+target+" not found");
 +            sender.sendMessage(output);
++            if (player != null) player.sendMessage(output);
 +        }
 +        return true;
 +    }
@@ -107,13 +113,13 @@ index 0000000000000000000000000000000000000000..ff354c8fb35e9a078f1816151c496ba3
 +
 +    @Override
 +    public @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
-+        if (args.length < 1) return List.of();
++        if (args.length < 1 || !sender.hasPermission("sewlia.command.tpsbar.another")) return List.of();
 +        List<String> completion = Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
 +        return StringUtil.copyPartialMatches(args[0], completion, new ObjectArrayList<>(completion.size()));
 +    }
 +}
 diff --git a/src/main/java/one/tranic/sewlia/task/BossBarTask.java b/src/main/java/one/tranic/sewlia/task/BossBarTask.java
-index edb2e97e50d773ddf0b236cd48d1227ce361f27c..e134eeacbb769fbab843efb934bec019028ad0e6 100644
+index 4f48c55833e408bc4cf4163ad25c22b81a3b44ea..e2c248d824f9ef59ab423a8feef9fffe5dda16e5 100644
 --- a/src/main/java/one/tranic/sewlia/task/BossBarTask.java
 +++ b/src/main/java/one/tranic/sewlia/task/BossBarTask.java
 @@ -86,15 +86,19 @@ public abstract class BossBarTask implements Runnable {

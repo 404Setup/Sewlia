@@ -6,10 +6,10 @@ Subject: [PATCH] Sewlia Permission
 
 diff --git a/src/main/java/one/tranic/sewlia/Permission.java b/src/main/java/one/tranic/sewlia/Permission.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..f0982f440912f8d2182356221cb3b4aa9ee8da7d
+index 0000000000000000000000000000000000000000..e71e86b41f622b905f996a96c96f1cfb3a078773
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/Permission.java
-@@ -0,0 +1,35 @@
+@@ -0,0 +1,47 @@
 +package one.tranic.sewlia;
 +
 +import org.bukkit.permissions.PermissionDefault;
@@ -17,7 +17,7 @@ index 0000000000000000000000000000000000000000..f0982f440912f8d2182356221cb3b4aa
 +import org.jetbrains.annotations.NotNull;
 +
 +public class Permission {
-+    private final static String ROOT = "minecraft.sewlia";
++    private final static String ROOT = "sewlia";
 +
 +    public static void registerCorePermissions() {
 +        org.bukkit.permissions.@NotNull Permission parent = DefaultPermissions.registerPermission(
@@ -26,8 +26,20 @@ index 0000000000000000000000000000000000000000..f0982f440912f8d2182356221cb3b4aa
 +        );
 +
 +        setPermission(
-+                "commands.reload",
-+                "Reload Sewlia Config Command",
++                "command.reload",
++                "Reload Sewlia Config",
++                PermissionDefault.OP,
++                parent
++        );
++        setPermission(
++                "command.tpsbar.self",
++                "Show tpsbar for yourself",
++                PermissionDefault.TRUE,
++                parent
++        );
++        setPermission(
++                "command.tpsbar.another",
++                "Show tpsbar to others",
 +                PermissionDefault.OP,
 +                parent
 +        );
