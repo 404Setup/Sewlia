@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Sun, 3 Nov 2024 10:39:20 +0800
+Subject: [PATCH] Ignore compile time warnings
+
+
+diff --git a/build.gradle.kts b/build.gradle.kts
+index bad513122bcffe01d0d46898f7366fffeb8e4f26..a8473d0c95a16c7c0d52c30e268438f01d9bd13d 100644
+--- a/build.gradle.kts
++++ b/build.gradle.kts
+@@ -192,6 +192,7 @@ tasks.withType<Javadoc> {
+             into("build/docs/javadoc")
+         }
+     }
++    options.addStringOption("-add-modules", "jdk.incubator.vector")
+ }
+ 
+ tasks.test {
+@@ -200,7 +201,11 @@ tasks.test {
+ 
+ // Paper start - compile tests with -parameters for better junit parameterized test names
+ tasks.compileTestJava {
++    val compilerArgs = options.compilerArgs
+     options.compilerArgs.add("-parameters")
++    compilerArgs.add("--add-modules=jdk.incubator.vector")
++    compilerArgs.add("-Xlint:-deprecation") // Sewlia
++    options.isWarnings = false // Sewlia
+ }
+ // Paper end
+ 
