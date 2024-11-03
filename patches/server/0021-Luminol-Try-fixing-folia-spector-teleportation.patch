@@ -5,10 +5,10 @@ Subject: [PATCH] Luminol: Try fixing folia spector teleportation
 
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index e4a68f43c1a48fe8193623c646eb40bc5f664c76..304ef2fe3da8794c66af8c4bba6c2c8ebc282b28 100644
+index fb21572eecb512bdb5ecafcda44f404c2a0e6cde..d6c9163afd99dadc02fa50770d77cce9dc74eda2 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-@@ -928,9 +928,24 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -932,9 +932,24 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
          }
  
          Entity entity = this.getCamera();

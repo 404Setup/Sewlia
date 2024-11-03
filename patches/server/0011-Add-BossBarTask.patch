@@ -1,0 +1,152 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Sun, 3 Nov 2024 11:37:46 +0800
+Subject: [PATCH] Add BossBarTask
+
+This patch is inspired by Purpur.
+
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index 34331ef213e4b0e062afcb20a6f503a299656016..d2dce1348068d43e54ce2aa23a179f7ec480c851 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -1200,6 +1200,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+         this.safeShutdown(waitForShutdown, false);
+     }
+     public void safeShutdown(boolean waitForShutdown, boolean isRestarting) {
++        one.tranic.sewlia.task.BossBarTask.stopAll(); //Sewlia
+         this.isRestarting = isRestarting;
+         this.hasLoggedStop = true; // Paper - Debugging
+         if (isDebugging()) io.papermc.paper.util.TraceUtil.dumpTraceForThread("Server stopped"); // Paper - Debugging
+diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
+index ee393297fc69b22058feb60057494430a72f2475..ab3c1af40ea2de7dee7d4080e1738c762a6f46d1 100644
+--- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
++++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
+@@ -360,6 +360,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+                 DedicatedServer.LOGGER.info("JMX monitoring enabled");
+             }
+ 
++            one.tranic.sewlia.task.BossBarTask.startAll();
+             return true;
+         }
+     }
+diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
+index c7b4f288a9076975573e2a5e746a9e7a8a721ceb..0f333b01e89e631a60370cf3c1d12e521fc76ab7 100644
+--- a/src/main/java/net/minecraft/server/players/PlayerList.java
++++ b/src/main/java/net/minecraft/server/players/PlayerList.java
+@@ -578,6 +578,7 @@ public abstract class PlayerList {
+             scoreboard.addPlayerToTeam(player.getScoreboardName(), collideRuleTeam);
+         }
+         // Paper end - Configurable player collision
++        one.tranic.sewlia.task.BossBarTask.addToAll(player); // Sewlia
+         PlayerList.LOGGER.info("{}[{}] logged in with entity id {} at ([{}]{}, {}, {})", player.getName().getString(), s1, player.getId(), worldserver1.serverLevelData.getLevelName(), player.getX(), player.getY(), player.getZ());
+     }
+ 
+@@ -689,6 +690,7 @@ public abstract class PlayerList {
+     }
+     public net.kyori.adventure.text.Component remove(ServerPlayer entityplayer, net.kyori.adventure.text.Component leaveMessage) {
+         // Paper end - Fix kick event leave message not being sent
++        one.tranic.sewlia.task.BossBarTask.removeFromAll(entityplayer.getBukkitEntity()); // Sewlia
+         ServerLevel worldserver = entityplayer.serverLevel();
+ 
+         entityplayer.awardStat(Stats.LEAVE_GAME);
+diff --git a/src/main/java/one/tranic/sewlia/task/BossBarTask.java b/src/main/java/one/tranic/sewlia/task/BossBarTask.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..2ac2ff05bb42d904f02d7cdba03f79f0fd1720a1
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/task/BossBarTask.java
+@@ -0,0 +1,95 @@
++package one.tranic.sewlia.task;
++
++import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
++import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
++import it.unimi.dsi.fastutil.objects.ObjectIterator;
++import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
++import net.kyori.adventure.bossbar.BossBar;
++import net.minecraft.server.level.ServerPlayer;
++import one.tranic.sewlia.InternalServerPlugin;
++import org.bukkit.Bukkit;
++import org.bukkit.entity.Player;
++
++import java.util.*;
++
++public abstract class BossBarTask implements Runnable {
++    private final Object2ObjectOpenHashMap<UUID, BossBar> listBossbar = new Object2ObjectOpenHashMap<>();
++    private ScheduledTask task = null;
++
++    abstract BossBar createBossBar();
++
++    abstract void updateBossBar(BossBar bossbar, Player player);
++
++    @Override
++    public void run() {
++        ObjectIterator<Map.Entry<UUID, BossBar>> iter = listBossbar.entrySet().iterator();
++        while (iter.hasNext()) {
++            Map.Entry<UUID, BossBar> entry = iter.next();
++            Player player = Bukkit.getPlayer(entry.getKey());
++            if (player == null) {
++                iter.remove();
++                continue;
++            }
++            updateBossBar(entry.getValue(), player);
++        }
++    }
++
++    private void cancel() {
++        task.cancel();
++        task = null;
++        new ObjectOpenHashSet<>(this.listBossbar.keySet()).forEach(uuid -> {
++            Player player = Bukkit.getPlayer(uuid);
++            if (player != null) removePlayer(player);
++        });
++        this.listBossbar.clear();
++    }
++
++    public boolean removePlayer(Player player) {
++        BossBar bossbar = this.listBossbar.remove(player.getUniqueId());
++        if (bossbar != null) {
++            player.hideBossBar(bossbar);
++            return true;
++        }
++        return false;
++    }
++
++    public void addPlayer(Player player) {
++        removePlayer(player);
++        BossBar bossbar = createBossBar();
++        this.listBossbar.put(player.getUniqueId(), bossbar);
++        this.updateBossBar(bossbar, player);
++        player.showBossBar(bossbar);
++    }
++
++    public boolean hasPlayer(UUID uuid) {
++        return this.listBossbar.containsKey(uuid);
++    }
++
++    public boolean togglePlayer(Player player) {
++        if (removePlayer(player)) return false;
++        addPlayer(player);
++        return true;
++    }
++
++    public void start() {
++        stop();
++        task = Bukkit.getGlobalRegionScheduler().runAtFixedRate(new InternalServerPlugin(),c -> this.run(),1, 1);
++    }
++
++    public void stop() {
++        if (task != null) cancel();
++    }
++
++    public static void startAll() {
++    }
++
++    public static void stopAll() {
++    }
++
++    public static void addToAll(ServerPlayer player) {
++        Player bukkit = player.getBukkitEntity();
++    }
++
++    public static void removeFromAll(Player player) {
++    }
++}

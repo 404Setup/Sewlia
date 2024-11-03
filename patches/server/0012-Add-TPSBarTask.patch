@@ -1,0 +1,298 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Sun, 3 Nov 2024 12:24:49 +0800
+Subject: [PATCH] Add TPSBarTask
+
+
+diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+index e4a68f43c1a48fe8193623c646eb40bc5f664c76..fb21572eecb512bdb5ecafcda44f404c2a0e6cde 100644
+--- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
++++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+@@ -303,6 +303,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+     public com.destroystokyo.paper.event.entity.PlayerNaturallySpawnCreaturesEvent playerNaturallySpawnedEvent; // Paper - PlayerNaturallySpawnCreaturesEvent
+     public @Nullable String clientBrandName = null; // Paper - Brand support
+     public org.bukkit.event.player.PlayerQuitEvent.QuitReason quitReason = null; // Paper - Add API for quit reason; there are a lot of changes to do if we change all methods leading to the event
++    private boolean tpsBar = false; // Sewlia
+ 
+     // Paper start - rewrite chunk system
+     private ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
+@@ -745,6 +746,8 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+             });
+         }
+ 
++        if (nbt.contains("Sewlia.TPSBar")) { this.tpsBar = nbt.getBoolean("Sewlia.TPSBar"); } // Sewlia
++
+     }
+ 
+     @Override
+@@ -821,6 +824,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+             });
+         }
+ 
++        nbt.putBoolean("Sewlia.TPSBar", this.tpsBar); // Sewlia
+     }
+ 
+     // CraftBukkit start - World fallback code, either respawn location or global spawn
+@@ -3426,4 +3430,12 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+         return (CraftPlayer) super.getBukkitEntity();
+     }
+     // CraftBukkit end
++
++    public boolean tpsBar() {
++        return this.tpsBar;
++    }
++
++    public void tpsBar(boolean tpsBar) {
++        this.tpsBar = tpsBar;
++    }
+ }
+diff --git a/src/main/java/one/tranic/sewlia/command/mod/TPSBarCommand.java b/src/main/java/one/tranic/sewlia/command/mod/TPSBarCommand.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..ff354c8fb35e9a078f1816151c496ba320b69b6e
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/command/mod/TPSBarCommand.java
+@@ -0,0 +1,60 @@
++package one.tranic.sewlia.command.mod;
++
++import it.unimi.dsi.fastutil.objects.ObjectArrayList;
++import net.kyori.adventure.text.Component;
++import net.kyori.adventure.text.format.NamedTextColor;
++import net.kyori.adventure.text.minimessage.MiniMessage;
++import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
++import one.tranic.sewlia.task.TPSBarTask;
++import org.bukkit.Bukkit;
++import org.bukkit.command.Command;
++import org.bukkit.command.CommandSender;
++import org.bukkit.craftbukkit.entity.CraftPlayer;
++import org.bukkit.entity.Player;
++import org.bukkit.util.StringUtil;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++import java.util.List;
++import java.util.stream.Collectors;
++
++public class TPSBarCommand extends Command {
++    public TPSBarCommand() {
++        super("tpsbar");
++        this.setPermission("minecraft.command.tpsbar");
++    }
++
++    @Override
++    public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
++        if (args.length == 0) args = new String[]{sender.getName()};
++        for (String target: args) {
++            @Nullable Player player = Bukkit.getPlayer(target);
++            Component output;
++            if (player != null) {
++                output = updateTarget(player);
++            } else {
++                output = Component.text("Player "+target+" not found");
++            }
++
++            sender.sendMessage(output);
++        }
++        return true;
++    }
++
++    private Component updateTarget(Player player) {
++        boolean result = TPSBarTask.instance().togglePlayer(player);
++        ((CraftPlayer) player).getHandle().tpsBar(result);
++
++        return MiniMessage.miniMessage().deserialize("<green>Tpsbar toggled <onoff> for <target>",
++                Placeholder.component("onoff", Component.translatable(result ? "options.on" : "options.off")
++                        .color(result ? NamedTextColor.GREEN : NamedTextColor.RED)),
++                Placeholder.parsed("target", player.getName()));
++    }
++
++    @Override
++    public @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
++        if (args.length < 1) return List.of();
++        List<String> completion = Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
++        return StringUtil.copyPartialMatches(args[0], completion, new ObjectArrayList<>(completion.size()));
++    }
++}
+diff --git a/src/main/java/one/tranic/sewlia/task/BossBarTask.java b/src/main/java/one/tranic/sewlia/task/BossBarTask.java
+index 2ac2ff05bb42d904f02d7cdba03f79f0fd1720a1..237e5d02d787d413442677e903b4754a1557e5f5 100644
+--- a/src/main/java/one/tranic/sewlia/task/BossBarTask.java
++++ b/src/main/java/one/tranic/sewlia/task/BossBarTask.java
+@@ -81,15 +81,19 @@ public abstract class BossBarTask implements Runnable {
+     }
+ 
+     public static void startAll() {
++        TPSBarTask.instance().start();
+     }
+ 
+     public static void stopAll() {
++        TPSBarTask.instance().stop();
+     }
+ 
+     public static void addToAll(ServerPlayer player) {
+         Player bukkit = player.getBukkitEntity();
++        if (player.tpsBar()) TPSBarTask.instance().addPlayer(bukkit);
+     }
+ 
+     public static void removeFromAll(Player player) {
++        TPSBarTask.instance().removePlayer(player);
+     }
+ }
+diff --git a/src/main/java/one/tranic/sewlia/task/TPSBarTask.java b/src/main/java/one/tranic/sewlia/task/TPSBarTask.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..158869fceb91416eedcb7699bdd5083e55567ec3
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/task/TPSBarTask.java
+@@ -0,0 +1,154 @@
++package one.tranic.sewlia.task;
++
++import io.papermc.paper.threadedregions.ThreadedRegionizer;
++import io.papermc.paper.threadedregions.TickData;
++import io.papermc.paper.threadedregions.TickRegions;
++import net.kyori.adventure.bossbar.BossBar;
++import net.kyori.adventure.text.Component;
++import net.kyori.adventure.text.minimessage.MiniMessage;
++import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
++import net.minecraft.server.level.ServerLevel;
++import net.minecraft.server.level.ServerPlayer;
++import org.bukkit.Bukkit;
++import org.bukkit.craftbukkit.entity.CraftPlayer;
++import org.bukkit.entity.Player;
++
++public class TPSBarTask extends BossBarTask {
++    private static final BossBar.Overlay commandTPSBarProgressOverlay = BossBar.Overlay.NOTCHED_20;
++    private static final TPSBarTask.FillMode commandTPSBarProgressFillMode = TPSBarTask.FillMode.MSPT;
++    private static final BossBar.Color commandTPSBarProgressColorGood = BossBar.Color.GREEN;
++    private static final BossBar.Color commandTPSBarProgressColorMedium = BossBar.Color.YELLOW;
++    private static final BossBar.Color commandTPSBarProgressColorLow = BossBar.Color.RED;
++    private static final String commandTPSBarTextColorGood = "<gradient:#55ff55:#00aa00><text></gradient>";
++    private static final String commandTPSBarTextColorMedium = "<gradient:#ffff55:#ffaa00><text></gradient>";
++    private static final String commandTPSBarTextColorLow = "<gradient:#ff5555:#aa0000><text></gradient>";
++    private static TPSBarTask instance;
++    private int tick = 0;
++
++    public static TPSBarTask instance() {
++        if (instance == null) {
++            instance = new TPSBarTask();
++        }
++        return instance;
++    }
++
++    @Override
++    BossBar createBossBar() {
++        return BossBar.bossBar(Component.text(""), 0.0F, instance().getBossBarColor(Bukkit.getTPS()[0], Bukkit.getAverageTickTime()), commandTPSBarProgressOverlay);
++    }
++
++    @Override
++    void updateBossBar(BossBar bossbar, Player player) {
++        String commandTPSBarTitle = "<gray>TPS<yellow>:</yellow> <tps> MSPT<yellow>:</yellow> <mspt> Ping<yellow>:</yellow> <ping>ms";
++        final ServerPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
++        final ThreadedRegionizer.ThreadedRegion<TickRegions.TickRegionData, TickRegions.TickRegionSectionData> region = ((ServerLevel) nmsPlayer.level()).regioniser.getRegionAtUnsynchronised(nmsPlayer.moonrise$getSectionX(), nmsPlayer.moonrise$getSectionZ()); // With Luminol
++
++        if (region == null) return;
++        final TickData.TickReportData reportData = region.getData().getRegionSchedulingHandle().getTickReport5s(System.nanoTime());
++        if (reportData != null) {
++            final TickData.SegmentData tpsData = reportData.tpsData().segmentAll();
++            final double mspt = reportData.timePerTickData().segmentAll().average() / 1.0E6;
++
++            bossbar.progress(getBossBarProgress(mspt, tpsData.average()));
++            bossbar.color(getBossBarColor(tpsData.average(), mspt));
++
++            bossbar.name(MiniMessage.miniMessage().deserialize(commandTPSBarTitle,
++                    Placeholder.component("tps", getTPSColor(tpsData.average())),
++                    Placeholder.component("mspt", getMSPTColor(mspt)),
++                    Placeholder.component("ping", getPingColor(player.getPing()))
++            ));
++        }
++    }
++
++    @Override
++    public void run() {
++        if (++tick < 20) {
++            return;
++        }
++        tick = 0;
++
++        super.run();
++    }
++
++    private float getBossBarProgress(double mspt, double tps) {
++        if (commandTPSBarProgressFillMode == FillMode.MSPT) {
++            return Math.max(Math.min((float) mspt / 50.0F, 1.0F), 0.0F);
++        } else {
++            return Math.max(Math.min((float) tps / 20.0F, 1.0F), 0.0F);
++        }
++    }
++
++    private BossBar.Color getBossBarColor(double tps, double mspt) {
++        if (isGood(commandTPSBarProgressFillMode, tps)) {
++            return commandTPSBarProgressColorGood;
++        } else if (isMedium(commandTPSBarProgressFillMode, mspt)) {
++            return commandTPSBarProgressColorMedium;
++        } else {
++            return commandTPSBarProgressColorLow;
++        }
++    }
++
++    private boolean isGood(FillMode mode, double percent) {
++        if (mode == FillMode.MSPT) {
++            return percent < 40;
++        } else if (mode == FillMode.TPS) {
++            return percent >= 19;
++        } else if (mode == FillMode.PING) {
++            return percent < 100;
++        } else {
++            return false;
++        }
++    }
++
++    private boolean isMedium(FillMode mode, double percent) {
++        if (mode == FillMode.MSPT) {
++            return percent < 50;
++        } else if (mode == FillMode.TPS) {
++            return percent >= 15;
++        } else if (mode == FillMode.PING) {
++            return percent < 200;
++        } else {
++            return false;
++        }
++    }
++
++    private Component getTPSColor(double tps) {
++        String color;
++        if (isGood(FillMode.TPS, tps)) {
++            color = commandTPSBarTextColorGood;
++        } else if (isMedium(FillMode.TPS, tps)) {
++            color = commandTPSBarTextColorMedium;
++        } else {
++            color = commandTPSBarTextColorLow;
++        }
++        return MiniMessage.miniMessage().deserialize(color, Placeholder.parsed("text", String.format("%.2f", tps)));
++    }
++
++    private Component getMSPTColor(double mspt) {
++        String color;
++        if (isGood(FillMode.MSPT, mspt)) {
++            color = commandTPSBarTextColorGood;
++        } else if (isMedium(FillMode.MSPT, mspt)) {
++            color = commandTPSBarTextColorMedium;
++        } else {
++            color = commandTPSBarTextColorLow;
++        }
++        return MiniMessage.miniMessage().deserialize(color, Placeholder.parsed("text", String.format("%.2f", mspt)));
++    }
++
++    private Component getPingColor(int ping) {
++        String color;
++        if (isGood(FillMode.PING, ping)) {
++            color = commandTPSBarTextColorGood;
++        } else if (isMedium(FillMode.PING, ping)) {
++            color = commandTPSBarTextColorMedium;
++        } else {
++            color = commandTPSBarTextColorLow;
++        }
++        return MiniMessage.miniMessage().deserialize(color, Placeholder.parsed("text", String.format("%s", ping)));
++    }
++
++    public enum FillMode {
++        TPS, MSPT, PING
++    }
++}

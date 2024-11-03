@@ -17,10 +17,10 @@ index 83b052dbf6d21775664b286518f3cef1d86e87d1..c6c5292e96ef610b6edbb9341fda97d4
      }
  
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 34331ef213e4b0e062afcb20a6f503a299656016..3c9bd4de85df9582832cf72667c45edf331faf2e 100644
+index d2dce1348068d43e54ce2aa23a179f7ec480c851..8897369c7fa2daaa9971c720481f794a6025d30e 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1716,6 +1716,30 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1717,6 +1717,30 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          }
          // Folia end - region threading
  
@@ -51,7 +51,7 @@ index 34331ef213e4b0e062afcb20a6f503a299656016..3c9bd4de85df9582832cf72667c45edf
          // Folia - region threading
          if (region == null) this.tickRateManager.tick(); // Folia - region threading
          this.tickChildren(shouldKeepTicking, region); // Folia - region threading
-@@ -1725,6 +1749,20 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1726,6 +1750,20 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          }
  
          // Folia - region threading
@@ -111,10 +111,10 @@ index 7accad9d29a614eae14b2e8848895808d2e297cf..814d59ce8dd59df24acfcf95d5d4526b
          } else {
              passenger.stopRiding();
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 304ef2fe3da8794c66af8c4bba6c2c8ebc282b28..7694bd8f01d705d001c6548eefe7d312aaeb1bc8 100644
+index d6c9163afd99dadc02fa50770d77cce9dc74eda2..15a1712a8664c9bb23716c48235e96bd5ec9d18b 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-@@ -334,6 +334,26 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -335,6 +335,26 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
      }
      // Paper end - rewrite chunk system
  
@@ -141,7 +141,7 @@ index 304ef2fe3da8794c66af8c4bba6c2c8ebc282b28..7694bd8f01d705d001c6548eefe7d312
      public ServerPlayer(MinecraftServer server, ServerLevel world, GameProfile profile, ClientInformation clientOptions) {
          super(world, world.getSharedSpawnPos(), world.getSharedSpawnAngle(), profile);
          this.chatVisibility = ChatVisiblity.FULL;
-@@ -965,6 +985,12 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -969,6 +989,12 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
          this.trackEnteredOrExitedLavaOnVehicle();
          this.updatePlayerAttributes();
          this.advancements.flushDirty(this);
@@ -326,6 +326,48 @@ index e679b40b9628b0eb7152978ef641f9c918c4c8b2..bf9ae765242bb61d3e279893b0355d12
              // Spigot Start
          } catch (StackOverflowError ex) {
              world.lastPhysicsProblem = new BlockPos(pos);
+diff --git a/src/main/java/one/tranic/sewlia/task/TPSBarTask.java b/src/main/java/one/tranic/sewlia/task/TPSBarTask.java
+index 158869fceb91416eedcb7699bdd5083e55567ec3..0bd668e594c475f92fc8d945a795559787b3239e 100644
+--- a/src/main/java/one/tranic/sewlia/task/TPSBarTask.java
++++ b/src/main/java/one/tranic/sewlia/task/TPSBarTask.java
+@@ -39,7 +39,7 @@ public class TPSBarTask extends BossBarTask {
+ 
+     @Override
+     void updateBossBar(BossBar bossbar, Player player) {
+-        String commandTPSBarTitle = "<gray>TPS<yellow>:</yellow> <tps> MSPT<yellow>:</yellow> <mspt> Ping<yellow>:</yellow> <ping>ms";
++        String commandTPSBarTitle = "<gray>TPS<yellow>:</yellow> <tps> MSPT<yellow>:</yellow> <mspt> Ping<yellow>:</yellow> <ping>ms ChunkHot<yellow>:</yellow> <chunkhot>";
+         final ServerPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
+         final ThreadedRegionizer.ThreadedRegion<TickRegions.TickRegionData, TickRegions.TickRegionSectionData> region = ((ServerLevel) nmsPlayer.level()).regioniser.getRegionAtUnsynchronised(nmsPlayer.moonrise$getSectionX(), nmsPlayer.moonrise$getSectionZ()); // With Luminol
+ 
+@@ -55,7 +55,8 @@ public class TPSBarTask extends BossBarTask {
+             bossbar.name(MiniMessage.miniMessage().deserialize(commandTPSBarTitle,
+                     Placeholder.component("tps", getTPSColor(tpsData.average())),
+                     Placeholder.component("mspt", getMSPTColor(mspt)),
+-                    Placeholder.component("ping", getPingColor(player.getPing()))
++                    Placeholder.component("ping", getPingColor(player.getPing())),
++                    Placeholder.component("chunkhot", getChunkHotComponent(player.getNearbyChunkHot()))
+             ));
+         }
+     }
+@@ -148,6 +149,18 @@ public class TPSBarTask extends BossBarTask {
+         return MiniMessage.miniMessage().deserialize(color, Placeholder.parsed("text", String.format("%s", ping)));
+     }
+ 
++    private static Component getChunkHotComponent(long chunkHot){
++        final String color = barColorFromChunkHot(chunkHot);
++        return MiniMessage.miniMessage().deserialize(color, Placeholder.parsed("text", String.valueOf(chunkHot)));
++    }
++
++    private static String barColorFromChunkHot(long chunkHot){
++        if (chunkHot == -1) return commandTPSBarTextColorLow;
++        if (chunkHot <= 300000L) return commandTPSBarTextColorGood;
++        if (chunkHot <= 500000L) return commandTPSBarTextColorMedium;
++        return commandTPSBarTextColorLow;
++    }
++
+     public enum FillMode {
+         TPS, MSPT, PING
+     }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
 index 45e262308aebafa377a2353661acdd122933b99e..10b2261169d3cd10d736273fe7703f509fe2dffc 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
