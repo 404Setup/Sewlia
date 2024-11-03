@@ -51,19 +51,17 @@ index c7b4f288a9076975573e2a5e746a9e7a8a721ceb..0f333b01e89e631a60370cf3c1d12e52
          entityplayer.awardStat(Stats.LEAVE_GAME);
 diff --git a/src/main/java/one/tranic/sewlia/task/BossBarTask.java b/src/main/java/one/tranic/sewlia/task/BossBarTask.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..2ac2ff05bb42d904f02d7cdba03f79f0fd1720a1
+index 0000000000000000000000000000000000000000..edb2e97e50d773ddf0b236cd48d1227ce361f27c
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/task/BossBarTask.java
-@@ -0,0 +1,95 @@
+@@ -0,0 +1,100 @@
 +package one.tranic.sewlia.task;
 +
-+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 +import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 +import it.unimi.dsi.fastutil.objects.ObjectIterator;
 +import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 +import net.kyori.adventure.bossbar.BossBar;
 +import net.minecraft.server.level.ServerPlayer;
-+import one.tranic.sewlia.InternalServerPlugin;
 +import org.bukkit.Bukkit;
 +import org.bukkit.entity.Player;
 +
@@ -71,7 +69,7 @@ index 0000000000000000000000000000000000000000..2ac2ff05bb42d904f02d7cdba03f79f0
 +
 +public abstract class BossBarTask implements Runnable {
 +    private final Object2ObjectOpenHashMap<UUID, BossBar> listBossbar = new Object2ObjectOpenHashMap<>();
-+    private ScheduledTask task = null;
++    private boolean running = false;
 +
 +    abstract BossBar createBossBar();
 +
@@ -92,8 +90,7 @@ index 0000000000000000000000000000000000000000..2ac2ff05bb42d904f02d7cdba03f79f0
 +    }
 +
 +    private void cancel() {
-+        task.cancel();
-+        task = null;
++        running = false;
 +        new ObjectOpenHashSet<>(this.listBossbar.keySet()).forEach(uuid -> {
 +            Player player = Bukkit.getPlayer(uuid);
 +            if (player != null) removePlayer(player);
@@ -130,11 +127,19 @@ index 0000000000000000000000000000000000000000..2ac2ff05bb42d904f02d7cdba03f79f0
 +
 +    public void start() {
 +        stop();
-+        task = Bukkit.getGlobalRegionScheduler().runAtFixedRate(new InternalServerPlugin(),c -> this.run(),1, 1);
++        running = true;
++        Thread.ofVirtual().name("Sewlia Bossbar Task Thread").unstarted(() -> {
++            try {
++                while (running) {
++                    this.run();
++                    Thread.sleep(80);
++                }
++            } catch (InterruptedException ignored) {}
++        }).start();
 +    }
 +
 +    public void stop() {
-+        if (task != null) cancel();
++        if (running) cancel();
 +    }
 +
 +    public static void startAll() {
