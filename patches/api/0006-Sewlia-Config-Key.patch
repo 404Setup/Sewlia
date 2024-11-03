@@ -4,6 +4,22 @@ Date: Wed, 30 Oct 2024 17:23:42 +0800
 Subject: [PATCH] Sewlia Config Key
 
 
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/TpsCatchup.java b/src/main/java/one/tranic/sewlia/config/mod/feature/TpsCatchup.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..aa1258afdcddce20875aa2c8fa687e46a8dc2df3
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/TpsCatchup.java
+@@ -0,0 +1,10 @@
++package one.tranic.sewlia.config.mod.feature;
++
++import one.tranic.sewlia.config.annotation.Comments;
++
++public class TpsCatchup {
++    @Comments({"If this setting is true, the server will run faster after a lag spike in",
++            "an attempt to maintain 20 TPS. This option (defaults to true per",
++            "spigot/paper) can cause mobs to move fast after a lag spike."})
++    public static boolean value = false;
++}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/maven/Designation.java b/src/main/java/one/tranic/sewlia/config/mod/feature/maven/Designation.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..f9f11e48f4d214636652f7e9907947f1ab259777

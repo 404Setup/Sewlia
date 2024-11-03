@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Sun, 3 Nov 2024 10:44:48 +0800
+Subject: [PATCH] Pufferfish: TPSCatchup
+
+
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index 3c9bd4de85df9582832cf72667c45edf331faf2e..3671a1b28ace6379b54dfd65ec8694a89bf5ddbb 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -1390,6 +1390,12 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+                 this.profiler.popPush("nextTickWait");
+                 this.mayHaveDelayedTasks = true;
+                 this.delayedTasksMaxNextTickTimeNanos = Math.max(Util.getNanos() + i, this.nextTickTimeNanos);
++                // Pufferfish start - tps catchup
++                if (!one.tranic.sewlia.config.mod.feature.TpsCatchup.value) {
++                    this.nextTickTimeNanos = currentTime + i;
++                    this.delayedTasksMaxNextTickTimeNanos = nextTickTimeNanos;
++                }
++                // Pufferfish end
+                 this.startMeasuringTaskExecutionTime();
+                 this.waitUntilNextTick();
+                 this.finishMeasuringTaskExecutionTime();
