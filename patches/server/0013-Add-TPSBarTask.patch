@@ -119,10 +119,10 @@ index 0000000000000000000000000000000000000000..bb6d703664df363f7644bd3c71c3fb73
 +    }
 +}
 diff --git a/src/main/java/one/tranic/sewlia/task/BossBarTask.java b/src/main/java/one/tranic/sewlia/task/BossBarTask.java
-index 4f48c55833e408bc4cf4163ad25c22b81a3b44ea..e2c248d824f9ef59ab423a8feef9fffe5dda16e5 100644
+index cbc4002ff2b865d5c5a528b1d15c4244caa7720c..9029450e11bd1436b0b861db0c5279ffa5d26d47 100644
 --- a/src/main/java/one/tranic/sewlia/task/BossBarTask.java
 +++ b/src/main/java/one/tranic/sewlia/task/BossBarTask.java
-@@ -86,15 +86,19 @@ public abstract class BossBarTask implements Runnable {
+@@ -108,15 +108,19 @@ public abstract class BossBarTask implements Runnable {
      }
  
      public static void startAll() {
