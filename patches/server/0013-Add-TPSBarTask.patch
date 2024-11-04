@@ -48,10 +48,10 @@ index e4a68f43c1a48fe8193623c646eb40bc5f664c76..fb21572eecb512bdb5ecafcda44f404c
  }
 diff --git a/src/main/java/one/tranic/sewlia/command/mod/TPSBarCommand.java b/src/main/java/one/tranic/sewlia/command/mod/TPSBarCommand.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..bb6d703664df363f7644bd3c71c3fb73cb7b3997
+index 0000000000000000000000000000000000000000..6519342360cdcff78eab74c77266691f3bd4983f
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/command/mod/TPSBarCommand.java
-@@ -0,0 +1,66 @@
+@@ -0,0 +1,67 @@
 +package one.tranic.sewlia.command.mod;
 +
 +import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -94,9 +94,10 @@ index 0000000000000000000000000000000000000000..bb6d703664df363f7644bd3c71c3fb73
 +        }
 +        for (String target: args) {
 +            @Nullable Player player = Bukkit.getPlayer(target);
++            boolean self = (sender instanceof Player) && player != null && player.getUniqueId() == ((Player) sender).getUniqueId();
 +            Component output = player != null ? updateTarget(player) : Component.text("Player "+target+" not found");
 +            sender.sendMessage(output);
-+            if (player != null) player.sendMessage(output);
++            if (player != null && !self) player.sendMessage(output);
 +        }
 +        return true;
 +    }
