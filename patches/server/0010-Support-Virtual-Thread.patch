@@ -150,6 +150,19 @@ index 34331ef213e4b0e062afcb20a6f503a299656016..7050c6e01f28b0daf3134cafd0983185
  
      public final ChatDecorator improvedChatDecorator = new io.papermc.paper.adventure.ImprovedChatDecorator(this); // Paper - adventure
      public ChatDecorator getChatDecorator() {
+diff --git a/src/main/java/net/minecraft/server/chase/ChaseClient.java b/src/main/java/net/minecraft/server/chase/ChaseClient.java
+index 2ea987a115cca2240035e0bc80b85521811fc938..4b0429cf53efde051c88be4eff32442539b1c7cf 100644
+--- a/src/main/java/net/minecraft/server/chase/ChaseClient.java
++++ b/src/main/java/net/minecraft/server/chase/ChaseClient.java
+@@ -51,7 +51,7 @@ public class ChaseClient {
+         }
+ 
+         this.wantsToRun = true;
+-        this.thread = new Thread(this::run, "chase-client");
++        this.thread = one.tranic.sewlia.config.mod.feature.virtual_thread.chase.Client.getThread(this::run, "chase-client");
+         this.thread.setDaemon(true);
+         this.thread.start();
+     }
 diff --git a/src/main/java/net/minecraft/server/chase/ChaseServer.java b/src/main/java/net/minecraft/server/chase/ChaseServer.java
 index d6da342d3df9c05a596bda9930581ee4034e4e4a..022393a27c6ce52286f94f2b5e6249ffcb94e14f 100644
 --- a/src/main/java/net/minecraft/server/chase/ChaseServer.java
