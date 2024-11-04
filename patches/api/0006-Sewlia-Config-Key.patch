@@ -131,10 +131,10 @@ index 0000000000000000000000000000000000000000..7e23ddb5b13355aa5728ce80dfd00124
 +}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/chase/Client.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/chase/Client.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..0359b085cb67f6e21b05584f5a0b890504414bb3
+index 0000000000000000000000000000000000000000..cde297f3c3ce4bf7b98ec4a9310fdb98ca83c0ea
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/chase/Client.java
-@@ -0,0 +1,8 @@
+@@ -0,0 +1,12 @@
 +package one.tranic.sewlia.config.mod.feature.virtual_thread.chase;
 +
 +import one.tranic.sewlia.config.annotation.DisableReload;
@@ -142,13 +142,17 @@ index 0000000000000000000000000000000000000000..0359b085cb67f6e21b05584f5a0b8905
 +public class Client {
 +    @DisableReload
 +    public static boolean value = false;
++
++    public static Thread getThread(final Runnable runnable, final String name) {
++        return value ? Thread.ofVirtual().name(name).unstarted(runnable) : new Thread(runnable, name);
++    }
 +}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/chase/ServerAcceptor.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/chase/ServerAcceptor.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..4eda5db208134df25c7a5def8bc391bc891f95f3
+index 0000000000000000000000000000000000000000..1b82eaf05d07c25189f2b7cf88d1b35ec841467c
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/chase/ServerAcceptor.java
-@@ -0,0 +1,8 @@
+@@ -0,0 +1,12 @@
 +package one.tranic.sewlia.config.mod.feature.virtual_thread.chase;
 +
 +import one.tranic.sewlia.config.annotation.DisableReload;
@@ -156,13 +160,17 @@ index 0000000000000000000000000000000000000000..4eda5db208134df25c7a5def8bc391bc
 +public class ServerAcceptor {
 +    @DisableReload
 +    public static boolean value = false;
++
++    public static Thread getThread(final Runnable runnable, final String name) {
++        return value ? Thread.ofVirtual().name(name).unstarted(runnable) : new Thread(runnable, name);
++    }
 +}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/chase/ServerSender.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/chase/ServerSender.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..d615525671129fac3838ce35883c745cc06dd1c6
+index 0000000000000000000000000000000000000000..1e5ebedb1e5d4a01a3c82933c292064da740615e
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/chase/ServerSender.java
-@@ -0,0 +1,8 @@
+@@ -0,0 +1,12 @@
 +package one.tranic.sewlia.config.mod.feature.virtual_thread.chase;
 +
 +import one.tranic.sewlia.config.annotation.DisableReload;
@@ -170,6 +178,10 @@ index 0000000000000000000000000000000000000000..d615525671129fac3838ce35883c745c
 +public class ServerSender {
 +    @DisableReload
 +    public static boolean value = false;
++
++    public static Thread getThread(final Runnable runnable, final String name) {
++        return value ? Thread.ofVirtual().name(name).unstarted(runnable) : new Thread(runnable, name);
++    }
 +}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/folia/AsyncScheduler.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/folia/AsyncScheduler.java
 new file mode 100644
@@ -226,20 +238,6 @@ index 0000000000000000000000000000000000000000..6005d96b0c3a7f26f55d95dc29c0655a
 +    public static Thread getThread(final Runnable r) {
 +        return value ? Thread.ofVirtual().unstarted(r) : new Thread(r);
 +    }
-+}
-diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/ChatFilterClient.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/ChatFilterClient.java
-new file mode 100644
-index 0000000000000000000000000000000000000000..2b92d76fe37e5e9651a022724ba109f7d6312a11
---- /dev/null
-+++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/ChatFilterClient.java
-@@ -0,0 +1,8 @@
-+package one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft;
-+
-+import one.tranic.sewlia.config.annotation.DisableReload;
-+
-+public class ChatFilterClient {
-+    @DisableReload
-+    public static boolean value = false;
 +}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/Console.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/Console.java
 new file mode 100644
@@ -299,31 +297,23 @@ index 0000000000000000000000000000000000000000..f4deb7fb7987f0d94599f1e790ed8fad
 +}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/NamedThread.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/NamedThread.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..b5b5775cfe9a35a2e770d345fec8f72c99b016bb
+index 0000000000000000000000000000000000000000..b2d3d47ea7b458b418c600a532d4dd77306a65d2
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/NamedThread.java
-@@ -0,0 +1,8 @@
+@@ -0,0 +1,14 @@
 +package one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft;
 +
 +import one.tranic.sewlia.config.annotation.DisableReload;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
 +
 +public class NamedThread {
 +    @DisableReload
 +    public static boolean value = false;
-+}
-diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/RconGeneric.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/RconGeneric.java
-new file mode 100644
-index 0000000000000000000000000000000000000000..1165a730356533739468870b905fe631badf1b26
---- /dev/null
-+++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/RconGeneric.java
-@@ -0,0 +1,8 @@
-+package one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft;
 +
-+import one.tranic.sewlia.config.annotation.DisableReload;
-+
-+public class RconGeneric {
-+    @DisableReload
-+    public static boolean value = false;
++    public static Thread getThread(@Nullable ThreadGroup group, Runnable task, @NotNull String name, long stackSize) {
++        return value ? Thread.ofVirtual().name(name).unstarted(task) : new Thread(group, task, name, stackSize);
++    }
 +}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/ServerWatchdog.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/ServerWatchdog.java
 new file mode 100644
@@ -413,6 +403,24 @@ index 0000000000000000000000000000000000000000..1a66347a61c952a8392eab167e9ad5af
 +        return value ? Thread.ofVirtual().factory() : Thread.ofPlatform().factory();
 +    }
 +}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/network/ChatFilterClient.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/network/ChatFilterClient.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..3df1bc7e5703e1805b086cd39595ec46de64ccc4
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/network/ChatFilterClient.java
+@@ -0,0 +1,12 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.network;
++
++import one.tranic.sewlia.config.annotation.DisableReload;
++
++public class ChatFilterClient {
++    @DisableReload
++    public static boolean value = false;
++
++    public static Thread getThread(final Runnable runnable) {
++        return value ? Thread.ofVirtual().unstarted(runnable) : new Thread(runnable);
++    }
++}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/network/Download.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/network/Download.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..d8bdae9408fc366e8cedb9d94a445326d455b754
@@ -443,6 +451,24 @@ index 0000000000000000000000000000000000000000..94a97342f21b2449617e43472836cfb2
 +
 +    public static Thread getThread(final Runnable runnable) {
 +        return value ? Thread.ofVirtual().unstarted(runnable) : new Thread(runnable);
++    }
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/network/RconGeneric.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/network/RconGeneric.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..e6d4f97404d538780cecd609b5aab59707924f90
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/network/RconGeneric.java
+@@ -0,0 +1,12 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.network;
++
++import one.tranic.sewlia.config.annotation.DisableReload;
++
++public class RconGeneric {
++    @DisableReload
++    public static boolean value = false;
++
++    public static Thread getThread(final Runnable r, final String name) {
++        return value ? Thread.ofVirtual().name(name).unstarted(r) : new Thread(r, name);
 +    }
 +}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/network/YggdrasilServices.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/network/YggdrasilServices.java

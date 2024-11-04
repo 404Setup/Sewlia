@@ -7,6 +7,18 @@ All options can be turned on individually, with more detailed control than Vine.
 
 The Noise part comes from Canvas.
 
+diff --git a/src/main/java/com/mojang/authlib/yggdrasil/YggdrasilServicesKeyInfo.java b/src/main/java/com/mojang/authlib/yggdrasil/YggdrasilServicesKeyInfo.java
+index 5dbaf7689363719501d9b41f9537ebd4677e32a6..3eaa893b44e4370bcb04582d08958645a6c57316 100644
+--- a/src/main/java/com/mojang/authlib/yggdrasil/YggdrasilServicesKeyInfo.java
++++ b/src/main/java/com/mojang/authlib/yggdrasil/YggdrasilServicesKeyInfo.java
+@@ -34,6 +34,7 @@ public class YggdrasilServicesKeyInfo implements ServicesKeyInfo {
+     private static final Logger LOGGER = LoggerFactory.getLogger(YggdrasilServicesKeyInfo.class);
+ 
+     private static final ScheduledExecutorService FETCHER_EXECUTOR = Executors.newScheduledThreadPool(1, new ThreadFactoryBuilder()
++        .setThreadFactory(one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.network.YggdrasilServices.getThreadFactory())
+         .setNameFormat("Yggdrasil Key Fetcher")
+         .setDaemon(true)
+         .build()
 diff --git a/src/main/java/io/papermc/paper/pluginremap/PluginRemapper.java b/src/main/java/io/papermc/paper/pluginremap/PluginRemapper.java
 index 28857d0c9b53f2068d51b8f09ef40df7a2b97502..b46133e6a37a9547e31a1b2a14946d4504086698 100644
 --- a/src/main/java/io/papermc/paper/pluginremap/PluginRemapper.java
@@ -138,6 +150,23 @@ index 34331ef213e4b0e062afcb20a6f503a299656016..7050c6e01f28b0daf3134cafd0983185
  
      public final ChatDecorator improvedChatDecorator = new io.papermc.paper.adventure.ImprovedChatDecorator(this); // Paper - adventure
      public ChatDecorator getChatDecorator() {
+diff --git a/src/main/java/net/minecraft/server/chase/ChaseServer.java b/src/main/java/net/minecraft/server/chase/ChaseServer.java
+index d6da342d3df9c05a596bda9930581ee4034e4e4a..022393a27c6ce52286f94f2b5e6249ffcb94e14f 100644
+--- a/src/main/java/net/minecraft/server/chase/ChaseServer.java
++++ b/src/main/java/net/minecraft/server/chase/ChaseServer.java
+@@ -44,10 +44,10 @@ public class ChaseServer {
+         } else {
+             this.wantsToRun = true;
+             this.serverSocket = new ServerSocket(this.serverPort, 50, InetAddress.getByName(this.serverBindAddress));
+-            Thread thread = new Thread(this::runAcceptor, "chase-server-acceptor");
++            Thread thread = one.tranic.sewlia.config.mod.feature.virtual_thread.chase.ServerAcceptor.getThread(this::runAcceptor, "chase-server-acceptor");
+             thread.setDaemon(true);
+             thread.start();
+-            Thread thread2 = new Thread(this::runSender, "chase-server-sender");
++            Thread thread2 = one.tranic.sewlia.config.mod.feature.virtual_thread.chase.ServerSender.getThread(this::runSender, "chase-server-sender");
+             thread2.setDaemon(true);
+             thread2.start();
+         }
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 index ee393297fc69b22058feb60057494430a72f2475..381afd249404c5d1b4896a961fb821845ccfe17f 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
@@ -254,6 +283,32 @@ index ae88c6e2635b1608383f8c74813d723f7c6ffaf8..54002e8f13642771e976328e0baee7e0
      });
      final MinecraftServer server;
      public volatile boolean running;
+diff --git a/src/main/java/net/minecraft/server/network/TextFilterClient.java b/src/main/java/net/minecraft/server/network/TextFilterClient.java
+index 63eab023e11440cb0cb1af6861e2deb0676ae709..032fee2ad68528c6d6e323d5d59a193c704525a9 100644
+--- a/src/main/java/net/minecraft/server/network/TextFilterClient.java
++++ b/src/main/java/net/minecraft/server/network/TextFilterClient.java
+@@ -38,7 +38,7 @@ public class TextFilterClient implements AutoCloseable {
+     private static final Logger LOGGER = LogUtils.getLogger();
+     private static final AtomicInteger WORKER_COUNT = new AtomicInteger(1);
+     private static final ThreadFactory THREAD_FACTORY = runnable -> {
+-        Thread thread = new Thread(runnable);
++        Thread thread = one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.network.ChatFilterClient.getThread(runnable);
+         thread.setName("Chat-Filter-Worker-" + WORKER_COUNT.getAndIncrement());
+         return thread;
+     };
+diff --git a/src/main/java/net/minecraft/server/rcon/thread/GenericThread.java b/src/main/java/net/minecraft/server/rcon/thread/GenericThread.java
+index 3691e97e83e4f4883adc85ec2d8aa789812bd474..6120d2d6f49c971c367d92921fe33788787391e0 100644
+--- a/src/main/java/net/minecraft/server/rcon/thread/GenericThread.java
++++ b/src/main/java/net/minecraft/server/rcon/thread/GenericThread.java
+@@ -24,7 +24,7 @@ public abstract class GenericThread implements Runnable {
+             return true;
+         } else {
+             this.running = true;
+-            this.thread = new Thread(this, this.name + " #" + UNIQUE_THREAD_ID.incrementAndGet());
++            this.thread = one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.network.RconGeneric.getThread(this, this.name + " #" + UNIQUE_THREAD_ID.incrementAndGet());
+             this.thread.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandlerWithName(LOGGER));
+             this.thread.start();
+             LOGGER.info("Thread {} started", this.name);
 diff --git a/src/main/java/net/minecraft/util/datafix/DataFixers.java b/src/main/java/net/minecraft/util/datafix/DataFixers.java
 index 4cc1a63770ee7430ac3f8c10ef8965693fb3fbcc..0197d52b0004ddbc9abb236d1d4497d3f64eb202 100644
 --- a/src/main/java/net/minecraft/util/datafix/DataFixers.java
@@ -267,6 +322,19 @@ index 4cc1a63770ee7430ac3f8c10ef8965693fb3fbcc..0197d52b0004ddbc9abb236d1d4497d3
  
              return DataFixers.DATA_FIXER.optimize(requiredTypes, executorservice);
          }
+diff --git a/src/main/java/net/minecraft/util/thread/NamedThreadFactory.java b/src/main/java/net/minecraft/util/thread/NamedThreadFactory.java
+index 04460b81d6351f63103199a980e463070c233300..11ef161dd06b4f2cbd8e3b51abe7842cb886bbc5 100644
+--- a/src/main/java/net/minecraft/util/thread/NamedThreadFactory.java
++++ b/src/main/java/net/minecraft/util/thread/NamedThreadFactory.java
+@@ -19,7 +19,7 @@ public class NamedThreadFactory implements ThreadFactory {
+ 
+     @Override
+     public Thread newThread(Runnable runnable) {
+-        Thread thread = new Thread(this.group, runnable, this.namePrefix + this.threadNumber.getAndIncrement(), 0L);
++        Thread thread = one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.NamedThread.getThread(this.group, runnable, this.namePrefix + this.threadNumber.getAndIncrement(), 0L);
+         thread.setUncaughtExceptionHandler((threadx, throwable) -> {
+             LOGGER.error("Caught exception in thread {} from {}", threadx, runnable);
+             LOGGER.error("", throwable);
 diff --git a/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java b/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
 index cb39c629af1827078f35904a373d35a63fea17ff..da39f6d798f06f4ec9fb93b6aba5dece09eb0ca1 100644
 --- a/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
