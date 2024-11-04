@@ -1,0 +1,373 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Mon, 4 Nov 2024 13:59:32 +0800
+Subject: [PATCH] Support Virtual Thread
+
+All options can be turned on individually, with more detailed control than Vine.
+
+The Noise part comes from Canvas.
+
+diff --git a/src/main/java/io/papermc/paper/pluginremap/PluginRemapper.java b/src/main/java/io/papermc/paper/pluginremap/PluginRemapper.java
+index 28857d0c9b53f2068d51b8f09ef40df7a2b97502..b46133e6a37a9547e31a1b2a14946d4504086698 100644
+--- a/src/main/java/io/papermc/paper/pluginremap/PluginRemapper.java
++++ b/src/main/java/io/papermc/paper/pluginremap/PluginRemapper.java
+@@ -429,6 +429,7 @@ public final class PluginRemapper {
+             TimeUnit.SECONDS,
+             ScalingThreadPool.createUnboundedQueue(),
+             new ThreadFactoryBuilder()
++                .setThreadFactory(one.tranic.sewlia.config.mod.feature.virtual_thread.paper.PluginRemapper.getThreadFactory())
+                 .setNameFormat("Paper Plugin Remapper Thread - %1$d")
+                 .setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandlerWithName(LOGGER))
+                 .build(),
+diff --git a/src/main/java/io/papermc/paper/threadedregions/scheduler/FoliaAsyncScheduler.java b/src/main/java/io/papermc/paper/threadedregions/scheduler/FoliaAsyncScheduler.java
+index 374abffb9f1ce1a308822aed13038e77fe9ca08b..77be3946a5561c77cf5e2f38868fc800b6afc3e2 100644
+--- a/src/main/java/io/papermc/paper/threadedregions/scheduler/FoliaAsyncScheduler.java
++++ b/src/main/java/io/papermc/paper/threadedregions/scheduler/FoliaAsyncScheduler.java
+@@ -31,7 +31,7 @@ public final class FoliaAsyncScheduler implements AsyncScheduler {
+ 
+             @Override
+             public Thread newThread(final Runnable run) {
+-                final Thread ret = new Thread(run);
++                final Thread ret = one.tranic.sewlia.config.mod.feature.virtual_thread.folia.AsyncScheduler.getThread(run);
+ 
+                 ret.setName("Folia Async Scheduler Thread #" + this.idGenerator.getAndIncrement());
+                 ret.setPriority(Thread.NORM_PRIORITY - 1);
+@@ -47,7 +47,7 @@ public final class FoliaAsyncScheduler implements AsyncScheduler {
+     private final ScheduledExecutorService timerThread = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
+         @Override
+         public Thread newThread(final Runnable run) {
+-            final Thread ret = new Thread(run);
++            final Thread ret = one.tranic.sewlia.config.mod.feature.virtual_thread.folia.AsyncScheduler.getThread(run);
+ 
+             ret.setName("Folia Async Scheduler Thread Timer");
+             ret.setPriority(Thread.NORM_PRIORITY + 1);
+diff --git a/src/main/java/io/papermc/paper/util/MCUtil.java b/src/main/java/io/papermc/paper/util/MCUtil.java
+index 5931afeccc17733103641c9d84390617fc9f62c0..828ec91591eb102d3ab9c0163f8b332fc67e8419 100644
+--- a/src/main/java/io/papermc/paper/util/MCUtil.java
++++ b/src/main/java/io/papermc/paper/util/MCUtil.java
+@@ -34,6 +34,7 @@ public final class MCUtil {
+         2, 2, 60L, TimeUnit.SECONDS,
+         new LinkedBlockingQueue<>(),
+         new ThreadFactoryBuilder()
++            .setThreadFactory(one.tranic.sewlia.config.mod.feature.virtual_thread.paper.AsyncTaskHandler.getThreadFactory())
+             .setNameFormat("Paper Async Task Handler Thread - %1$d")
+             .setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(MinecraftServer.LOGGER))
+             .build()
+diff --git a/src/main/java/net/minecraft/Util.java b/src/main/java/net/minecraft/Util.java
+index 0e38a641d8e537750166b56c57aca4a90d418af1..2f1fbbf546d294a17cbb94d0cdb4d86ccc11fd9e 100644
+--- a/src/main/java/net/minecraft/Util.java
++++ b/src/main/java/net/minecraft/Util.java
+@@ -90,8 +90,8 @@ public class Util {
+     private static final int DEFAULT_SAFE_FILE_OPERATION_RETRIES = 10;
+     private static final String MAX_THREADS_SYSTEM_PROPERTY = "max.bg.threads";
+     private static final ExecutorService BACKGROUND_EXECUTOR = makeExecutor("Main", -1); // Paper - Perf: add priority
+-    private static final ExecutorService IO_POOL = makeIoExecutor("IO-Worker-", false);
+-    private static final ExecutorService DOWNLOAD_POOL = makeIoExecutor("Download-", true);
++    private static final ExecutorService IO_POOL = makeIoExecutor("IO-Worker-", false, one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.io.Worker.value);
++    private static final ExecutorService DOWNLOAD_POOL = makeIoExecutor("Download-", true, one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.network.Download.value);
+     // Paper start - don't submit BLOCKING PROFILE LOOKUPS to the world gen thread
+     public static final ExecutorService PROFILE_EXECUTOR = Executors.newFixedThreadPool(2, new java.util.concurrent.ThreadFactory() {
+ 
+@@ -99,7 +99,7 @@ public class Util {
+ 
+         @Override
+         public Thread newThread(Runnable run) {
+-            Thread ret = new Thread(run);
++            Thread ret = one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.network.ProfileLookup.getThread(run);
+             ret.setName("Profile Lookup Executor #" + this.count.getAndIncrement());
+             ret.setUncaughtExceptionHandler((Thread thread, Throwable throwable) -> {
+                 LOGGER.error("Uncaught exception in thread " + thread.getName(), throwable);
+@@ -253,9 +253,13 @@ public class Util {
+     }
+ 
+     private static ExecutorService makeIoExecutor(String namePrefix, boolean daemon) {
++        return makeIoExecutor(namePrefix, daemon, false);
++    }
++
++    private static ExecutorService makeIoExecutor(String namePrefix, boolean daemon, boolean virtual) {
+         AtomicInteger atomicInteger = new AtomicInteger(1);
+         return Executors.newCachedThreadPool(runnable -> {
+-            Thread thread = new Thread(runnable);
++            Thread thread = virtual ? Thread.ofVirtual().unstarted(runnable) : new Thread(runnable);
+             thread.setName(namePrefix + atomicInteger.getAndIncrement());
+             thread.setDaemon(daemon);
+             thread.setUncaughtExceptionHandler(Util::onThreadException);
+diff --git a/src/main/java/net/minecraft/commands/Commands.java b/src/main/java/net/minecraft/commands/Commands.java
+index 442a5b557e5867038fcddf597951584faeedda80..3cd1d0405beb2745dd6d103bb399235de79d1fb0 100644
+--- a/src/main/java/net/minecraft/commands/Commands.java
++++ b/src/main/java/net/minecraft/commands/Commands.java
+@@ -480,6 +480,7 @@ public class Commands {
+         0, 2, 60L, java.util.concurrent.TimeUnit.SECONDS,
+         new java.util.concurrent.LinkedBlockingQueue<>(),
+         new com.google.common.util.concurrent.ThreadFactoryBuilder()
++            .setThreadFactory(one.tranic.sewlia.config.mod.feature.virtual_thread.paper.AsyncCommandBuilder.getThreadFactory())
+             .setNameFormat("Paper Async Command Builder Thread Pool - %1$d")
+             .setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(net.minecraft.server.MinecraftServer.LOGGER))
+             .build(),
+diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
+index cf160825199374f2c99ac200b371da95c612043c..289d42a802ffd21ea152a5e7428ab7dbd2beae9c 100644
+--- a/src/main/java/net/minecraft/network/Connection.java
++++ b/src/main/java/net/minecraft/network/Connection.java
+@@ -82,13 +82,13 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+         marker.add(Connection.PACKET_MARKER);
+     });
+     public static final Supplier<NioEventLoopGroup> NETWORK_WORKER_GROUP = Suppliers.memoize(() -> {
+-        return new NioEventLoopGroup(0, (new ThreadFactoryBuilder()).setNameFormat("Netty Client IO #%d").setDaemon(true).setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(LOGGER)).build()); // Paper
++        return new NioEventLoopGroup(0, (new ThreadFactoryBuilder()).setThreadFactory(one.tranic.sewlia.config.mod.feature.virtual_thread.netty.Client.getThreadFactory()).setNameFormat("Netty Client IO #%d").setDaemon(true).setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(LOGGER)).build()); // Paper
+     });
+     public static final Supplier<EpollEventLoopGroup> NETWORK_EPOLL_WORKER_GROUP = Suppliers.memoize(() -> {
+-        return new EpollEventLoopGroup(0, (new ThreadFactoryBuilder()).setNameFormat("Netty Epoll Client IO #%d").setDaemon(true).setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(LOGGER)).build()); // Paper
++        return new EpollEventLoopGroup(0, (new ThreadFactoryBuilder()).setThreadFactory(one.tranic.sewlia.config.mod.feature.virtual_thread.netty.EpollClient.getThreadFactory()).setNameFormat("Netty Epoll Client IO #%d").setDaemon(true).setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(LOGGER)).build()); // Paper
+     });
+     public static final Supplier<DefaultEventLoopGroup> LOCAL_WORKER_GROUP = Suppliers.memoize(() -> {
+-        return new DefaultEventLoopGroup(0, (new ThreadFactoryBuilder()).setNameFormat("Netty Local Client IO #%d").setDaemon(true).setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(LOGGER)).build()); // Paper
++        return new DefaultEventLoopGroup(0, (new ThreadFactoryBuilder()).setThreadFactory(one.tranic.sewlia.config.mod.feature.virtual_thread.netty.LocalClient.getThreadFactory()).setNameFormat("Netty Local Client IO #%d").setDaemon(true).setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(LOGGER)).build()); // Paper
+     });
+     private static final ProtocolInfo<ServerHandshakePacketListener> INITIAL_PROTOCOL = HandshakeProtocols.SERVERBOUND;
+     private final PacketFlow receiving;
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index 34331ef213e4b0e062afcb20a6f503a299656016..7050c6e01f28b0daf3134cafd09831851fbf4d07 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -3052,7 +3052,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+     }
+ 
+     public final java.util.concurrent.ExecutorService chatExecutor = java.util.concurrent.Executors.newCachedThreadPool(
+-            new com.google.common.util.concurrent.ThreadFactoryBuilder().setDaemon(true).setNameFormat("Async Chat Thread - #%d").setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(net.minecraft.server.MinecraftServer.LOGGER)).build()); // Paper
++            new com.google.common.util.concurrent.ThreadFactoryBuilder().setThreadFactory(one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.AsyncChat.getThreadFactory()).setDaemon(true).setNameFormat("Async Chat Thread - #%d").setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(net.minecraft.server.MinecraftServer.LOGGER)).build()); // Paper
+ 
+     public final ChatDecorator improvedChatDecorator = new io.papermc.paper.adventure.ImprovedChatDecorator(this); // Paper - adventure
+     public ChatDecorator getChatDecorator() {
+diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
+index ee393297fc69b22058feb60057494430a72f2475..381afd249404c5d1b4896a961fb821845ccfe17f 100644
+--- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
++++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
+@@ -107,58 +107,12 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+ 
+     @Override
+     public boolean initServer() throws IOException {
+-        Thread thread = new Thread("Server console handler") {
+-            public void run() {
+-                // CraftBukkit start
+-                if (!org.bukkit.craftbukkit.Main.useConsole) {
+-                    return;
+-                }
+-                // Paper start - Use TerminalConsoleAppender
+-                new com.destroystokyo.paper.console.PaperConsole(DedicatedServer.this).start();
+-                /*
+-                jline.console.ConsoleReader bufferedreader = DedicatedServer.this.reader;
+-
+-                // MC-33041, SPIGOT-5538: if System.in is not valid due to javaw, then return
+-                try {
+-                    System.in.available();
+-                } catch (IOException ex) {
+-                    return;
+-                }
+-                // CraftBukkit end
+-
+-                String s;
+-
+-                try {
+-                    // CraftBukkit start - JLine disabling compatibility
+-                    while (!DedicatedServer.this.isStopped() && DedicatedServer.this.isRunning()) {
+-                        if (org.bukkit.craftbukkit.Main.useJline) {
+-                            s = bufferedreader.readLine(">", null);
+-                        } else {
+-                            s = bufferedreader.readLine();
+-                        }
+-
+-                        // SPIGOT-5220: Throttle if EOF (ctrl^d) or stdin is /dev/null
+-                        if (s == null) {
+-                            try {
+-                                Thread.sleep(50L);
+-                            } catch (InterruptedException ex) {
+-                                Thread.currentThread().interrupt();
+-                            }
+-                            continue;
+-                        }
+-                        if (s.trim().length() > 0) { // Trim to filter lines which are just spaces
+-                            DedicatedServer.this.issueCommand(s, DedicatedServer.this.getServerCommandListener());
+-                        }
+-                        // CraftBukkit end
+-                    }
+-                } catch (IOException ioexception) {
+-                    DedicatedServer.LOGGER.error("Exception handling console input", ioexception);
+-                }
+-
+-                */
+-                // Paper end
++        Thread thread = one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.Console.getThread("Server console handler" ,() -> {
++            if (!org.bukkit.craftbukkit.Main.useConsole) {
++                return;
+             }
+-        };
++            new com.destroystokyo.paper.console.PaperConsole(DedicatedServer.this).start();
++        });
+ 
+         // CraftBukkit start - TODO: handle command-line logging arguments
+         java.util.logging.Logger global = java.util.logging.Logger.getLogger("");
+@@ -347,7 +301,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+             }
+ 
+             if (false && this.getMaxTickLength() > 0L) {  // Spigot - disable
+-                Thread thread1 = new Thread(new ServerWatchdog(this));
++                Thread thread1 = one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.ServerWatchdog.getThread(new ServerWatchdog(this));
+ 
+                 thread1.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandlerWithName(DedicatedServer.LOGGER));
+                 thread1.setName("Server Watchdog");
+@@ -500,7 +454,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+                     sender.sendMessage(net.kyori.adventure.text.Component.text("Failed to dump chunk information, see console", net.kyori.adventure.text.format.NamedTextColor.RED));
+                 }
+             };
+-            Thread t = new Thread(run);
++            Thread t = one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.AsyncDebug.getThread(run);
+             t.setName("Async debug thread #" + ASYNC_DEBUG_CHUNKS_COUNT.getAndIncrement());
+             t.setDaemon(true);
+             t.start();
+diff --git a/src/main/java/net/minecraft/server/gui/MinecraftServerGui.java b/src/main/java/net/minecraft/server/gui/MinecraftServerGui.java
+index 759062d219ff490a3cb19e710c4d18e3e08288e0..a11779343186fad9f3298f3c3d87af3a29757ae3 100644
+--- a/src/main/java/net/minecraft/server/gui/MinecraftServerGui.java
++++ b/src/main/java/net/minecraft/server/gui/MinecraftServerGui.java
+@@ -181,7 +181,7 @@ public class MinecraftServerGui extends JComponent {
+         jpanel.add(jscrollpane, "Center");
+         jpanel.add(jtextfield, "South");
+         jpanel.setBorder(new TitledBorder(new EtchedBorder(), "Log and chat"));
+-        this.logAppenderThread = new Thread(() -> {
++        this.logAppenderThread = one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.Gui.getThread(() -> {
+             String s;
+ 
+             while ((s = LogQueues.getNextLogEvent("ServerGuiConsole")) != null) {
+diff --git a/src/main/java/net/minecraft/server/network/ServerConnectionListener.java b/src/main/java/net/minecraft/server/network/ServerConnectionListener.java
+index ae88c6e2635b1608383f8c74813d723f7c6ffaf8..54002e8f13642771e976328e0baee7e04c9637de 100644
+--- a/src/main/java/net/minecraft/server/network/ServerConnectionListener.java
++++ b/src/main/java/net/minecraft/server/network/ServerConnectionListener.java
+@@ -52,10 +52,10 @@ public class ServerConnectionListener {
+ 
+     private static final Logger LOGGER = LogUtils.getLogger();
+     public static final Supplier<NioEventLoopGroup> SERVER_EVENT_GROUP = Suppliers.memoize(() -> {
+-        return new NioEventLoopGroup(0, (new ThreadFactoryBuilder()).setNameFormat("Netty Server IO #%d").setDaemon(true).setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(LOGGER)).build()); // Paper
++        return new NioEventLoopGroup(0, (new ThreadFactoryBuilder()).setThreadFactory(one.tranic.sewlia.config.mod.feature.virtual_thread.netty.Server.getThreadFactory()).setNameFormat("Netty Server IO #%d").setDaemon(true).setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(LOGGER)).build()); // Paper
+     });
+     public static final Supplier<EpollEventLoopGroup> SERVER_EPOLL_EVENT_GROUP = Suppliers.memoize(() -> {
+-        return new EpollEventLoopGroup(0, (new ThreadFactoryBuilder()).setNameFormat("Netty Epoll Server IO #%d").setDaemon(true).setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(LOGGER)).build()); // Paper
++        return new EpollEventLoopGroup(0, (new ThreadFactoryBuilder()).setThreadFactory(one.tranic.sewlia.config.mod.feature.virtual_thread.netty.EpollServer.getThreadFactory()).setNameFormat("Netty Epoll Server IO #%d").setDaemon(true).setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(LOGGER)).build()); // Paper
+     });
+     final MinecraftServer server;
+     public volatile boolean running;
+diff --git a/src/main/java/net/minecraft/util/datafix/DataFixers.java b/src/main/java/net/minecraft/util/datafix/DataFixers.java
+index 4cc1a63770ee7430ac3f8c10ef8965693fb3fbcc..0197d52b0004ddbc9abb236d1d4497d3f64eb202 100644
+--- a/src/main/java/net/minecraft/util/datafix/DataFixers.java
++++ b/src/main/java/net/minecraft/util/datafix/DataFixers.java
+@@ -138,7 +138,7 @@ public class DataFixers {
+         if (requiredTypes.isEmpty()) {
+             return CompletableFuture.completedFuture((Object) null);
+         } else {
+-            ExecutorService executorservice = Executors.newSingleThreadExecutor((new ThreadFactoryBuilder()).setNameFormat("Datafixer Bootstrap").setDaemon(true).setPriority(1).build());
++            ExecutorService executorservice = Executors.newSingleThreadExecutor((new ThreadFactoryBuilder()).setThreadFactory(one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.Datafixer.getThreadFactory()).setNameFormat("Datafixer Bootstrap").setDaemon(true).setPriority(1).build());
+ 
+             return DataFixers.DATA_FIXER.optimize(requiredTypes, executorservice);
+         }
+diff --git a/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java b/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
+index cb39c629af1827078f35904a373d35a63fea17ff..da39f6d798f06f4ec9fb93b6aba5dece09eb0ca1 100644
+--- a/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
++++ b/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
+@@ -52,7 +52,7 @@ import org.slf4j.Logger;
+ public class WorldUpgrader {
+ 
+     static final Logger LOGGER = LogUtils.getLogger();
+-    private static final ThreadFactory THREAD_FACTORY = (new ThreadFactoryBuilder()).setDaemon(true).build();
++    private static final ThreadFactory THREAD_FACTORY = (new ThreadFactoryBuilder()).setThreadFactory(one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.io.WorldUpgrader.getThreadFactory()).setDaemon(true).build();
+     private static final String NEW_DIRECTORY_PREFIX = "new_";
+     static final MutableComponent STATUS_UPGRADING_POI = Component.translatable("optimizeWorld.stage.upgrading.poi");
+     static final MutableComponent STATUS_FINISHED_POI = Component.translatable("optimizeWorld.stage.finished.poi");
+diff --git a/src/main/java/net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator.java b/src/main/java/net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator.java
+index 68be0d51aa64b5d917fb53dbbbdf8966d4f4abd8..90a05c6c59c197dfd81938dbbf438a4408449ff4 100644
+--- a/src/main/java/net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator.java
++++ b/src/main/java/net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator.java
+@@ -13,6 +13,8 @@ import java.util.Objects;
+ import java.util.OptionalInt;
+ import java.util.Set;
+ import java.util.concurrent.CompletableFuture;
++import java.util.concurrent.ExecutorService;
++import java.util.concurrent.Executors;
+ import java.util.function.Predicate;
+ import java.util.function.Supplier;
+ import javax.annotation.Nullable;
+@@ -50,6 +52,7 @@ import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
+ import org.apache.commons.lang3.mutable.MutableObject;
+ 
+ public final class NoiseBasedChunkGenerator extends ChunkGenerator {
++    private static final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor(); // Canvas
+ 
+     public static final MapCodec<NoiseBasedChunkGenerator> CODEC = RecordCodecBuilder.mapCodec((instance) -> {
+         return instance.group(BiomeSource.CODEC.fieldOf("biome_source").forGetter((chunkgeneratorabstract) -> {
+@@ -269,7 +272,26 @@ public final class NoiseBasedChunkGenerator extends ChunkGenerator {
+         int j = Mth.floorDiv(i, noisesettings.getCellHeight());
+         int k = Mth.floorDiv(noisesettings.height(), noisesettings.getCellHeight());
+ 
+-        return k <= 0 ? CompletableFuture.completedFuture(chunk) : CompletableFuture.supplyAsync(Util.wrapThreadWithTaskName("wgen_fill_noise", () -> {
++        if (k <= 0) return CompletableFuture.completedFuture(chunk);
++
++        if (one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.io.Noise.value) {
++            // Canvas start
++            int startIndex = chunk.getSectionIndex(k * noisesettings.getCellHeight() - 1 + i);
++            int minYIndex = chunk.getSectionIndex(i);
++
++            LevelChunkSection[] sections = chunk.getSections();
++            for (int v = startIndex; v >= minYIndex; --v) sections[v].acquire();
++
++            return CompletableFuture.supplyAsync(Util.wrapThreadWithTaskName(
++                    "wgen_fill_noise",
++                    () -> this.doFill(blender, structureAccessor, noiseConfig, chunk, j, k)
++            ), Util.backgroundExecutor()).whenCompleteAsync((result, ignored) -> {
++                for (int v = startIndex; v >= minYIndex; --v) sections[v].release();
++            }, executorService);
++            // Canvas end
++        }
++
++        return CompletableFuture.supplyAsync(Util.wrapThreadWithTaskName("wgen_fill_noise", () -> {
+             int l = chunk.getSectionIndex(k * noisesettings.getCellHeight() - 1 + i);
+             int i1 = chunk.getSectionIndex(i);
+             Set<LevelChunkSection> set = Sets.newHashSet();
+diff --git a/src/main/java/net/minecraft/world/level/storage/DimensionDataStorage.java b/src/main/java/net/minecraft/world/level/storage/DimensionDataStorage.java
+index 2c086f1d4cbfc29a759a77e5c5f9f39d177e81ba..96d7a0ec86a5437b123c7c2daf4f2334a9c3502a 100644
+--- a/src/main/java/net/minecraft/world/level/storage/DimensionDataStorage.java
++++ b/src/main/java/net/minecraft/world/level/storage/DimensionDataStorage.java
+@@ -35,7 +35,7 @@ public class DimensionDataStorage implements java.io.Closeable { // Paper - Writ
+         this.fixerUpper = dataFixer;
+         this.dataFolder = directory;
+         this.registries = registryLookup;
+-        this.ioExecutor = java.util.concurrent.Executors.newSingleThreadExecutor(new com.google.common.util.concurrent.ThreadFactoryBuilder().setNameFormat("DimensionDataIO - " + dataFolder.getParent() + " - %d").setDaemon(true).build()); // Paper - Write SavedData IO async
++        this.ioExecutor = java.util.concurrent.Executors.newSingleThreadExecutor(new com.google.common.util.concurrent.ThreadFactoryBuilder().setThreadFactory(one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.io.DimensionData.getThreadFactory()).setNameFormat("DimensionDataIO - " + dataFolder.getParent() + " - %d").setDaemon(true).build()); // Paper - Write SavedData IO async
+     }
+ 
+     private File getDataFile(String id) {
+diff --git a/src/main/java/org/bukkit/craftbukkit/bootstrap/Main.java b/src/main/java/org/bukkit/craftbukkit/bootstrap/Main.java
+index 8a4f95049c63afb28bef6719c77b7a7092e75aae..3a7ba39c0bf59443392eacae547c7a58ed14f653 100644
+--- a/src/main/java/org/bukkit/craftbukkit/bootstrap/Main.java
++++ b/src/main/java/org/bukkit/craftbukkit/bootstrap/Main.java
+@@ -53,7 +53,7 @@ public class Main {
+             URLClassLoader classLoader = new URLClassLoader(extractedUrls.toArray(new URL[0]));
+ 
+             System.out.println("Starting server");
+-            Thread runThread = new Thread(() -> {
++            Thread runThread = one.tranic.sewlia.config.mod.feature.virtual_thread.bukkit.ServerMain.getThread(() -> {
+                 try {
+                     Class<?> mainClass = Class.forName(mainClassName, true, classLoader);
+                     MethodHandle mainHandle = MethodHandles.lookup().findStatic(mainClass, "main", MethodType.methodType(void.class, String[].class)).asFixedArity();
+diff --git a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftAsyncScheduler.java b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftAsyncScheduler.java
+index 3c1992e212a6d6f1db4d5b807b38d71913619fc0..6da1eced229dbb0811535772fd2da37c10524888 100644
+--- a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftAsyncScheduler.java
++++ b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftAsyncScheduler.java
+@@ -40,9 +40,9 @@ public class CraftAsyncScheduler extends CraftScheduler {
+ 
+     private final ThreadPoolExecutor executor = new ThreadPoolExecutor(
+             4, Integer.MAX_VALUE,30L, TimeUnit.SECONDS, new SynchronousQueue<>(),
+-            new ThreadFactoryBuilder().setNameFormat("Craft Scheduler Thread - %1$d").build());
++            new ThreadFactoryBuilder().setThreadFactory(one.tranic.sewlia.config.mod.feature.virtual_thread.bukkit.CraftScheduler.getThreadFactory()).setNameFormat("Craft Scheduler Thread - %1$d").build());
+     private final Executor management = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder()
+-            .setNameFormat("Craft Async Scheduler Management Thread").build());
++            .setThreadFactory(one.tranic.sewlia.config.mod.feature.virtual_thread.bukkit.AsyncScheduler.getThreadFactory()).setNameFormat("Craft Async Scheduler Management Thread").build());
+     private final List<CraftTask> temp = new ArrayList<>();
+ 
+     CraftAsyncScheduler() {

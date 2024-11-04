@@ -6,7 +6,7 @@ Subject: [PATCH] Add BossBarTask
 This patch is inspired by Purpur.
 
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 34331ef213e4b0e062afcb20a6f503a299656016..d2dce1348068d43e54ce2aa23a179f7ec480c851 100644
+index 7050c6e01f28b0daf3134cafd09831851fbf4d07..171930b1c67680fa86c6404b8df8229f0ea62fb1 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -1200,6 +1200,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -18,10 +18,10 @@ index 34331ef213e4b0e062afcb20a6f503a299656016..d2dce1348068d43e54ce2aa23a179f7e
          this.hasLoggedStop = true; // Paper - Debugging
          if (isDebugging()) io.papermc.paper.util.TraceUtil.dumpTraceForThread("Server stopped"); // Paper - Debugging
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index ee393297fc69b22058feb60057494430a72f2475..ab3c1af40ea2de7dee7d4080e1738c762a6f46d1 100644
+index 381afd249404c5d1b4896a961fb821845ccfe17f..99123594c8adda5cdac90d47114d2acfff2b7570 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -360,6 +360,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -314,6 +314,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
                  DedicatedServer.LOGGER.info("JMX monitoring enabled");
              }
  
@@ -51,7 +51,7 @@ index c7b4f288a9076975573e2a5e746a9e7a8a721ceb..0f333b01e89e631a60370cf3c1d12e52
          entityplayer.awardStat(Stats.LEAVE_GAME);
 diff --git a/src/main/java/one/tranic/sewlia/task/BossBarTask.java b/src/main/java/one/tranic/sewlia/task/BossBarTask.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..edb2e97e50d773ddf0b236cd48d1227ce361f27c
+index 0000000000000000000000000000000000000000..4f48c55833e408bc4cf4163ad25c22b81a3b44ea
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/task/BossBarTask.java
 @@ -0,0 +1,100 @@

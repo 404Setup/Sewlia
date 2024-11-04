@@ -69,6 +69,465 @@ index 0000000000000000000000000000000000000000..aa673e7c22f4780bec656d1506b48d7b
 +    @Comment("Users add a central repository mirror")
 +    public static String value = "";
 +}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/bukkit/AsyncScheduler.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/bukkit/AsyncScheduler.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..e310926423fd7b8a0d576c1aafb63d95d0377815
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/bukkit/AsyncScheduler.java
+@@ -0,0 +1,11 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.bukkit;
++
++import java.util.concurrent.ThreadFactory;
++
++public class AsyncScheduler {
++    public static boolean value = false;
++
++    public static ThreadFactory getThreadFactory() {
++        return value ? Thread.ofVirtual().factory() : Thread.ofPlatform().factory();
++    }
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/bukkit/CraftScheduler.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/bukkit/CraftScheduler.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..df7e63b6c2c941e590fd683df2a5c6fa0bbe13f5
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/bukkit/CraftScheduler.java
+@@ -0,0 +1,11 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.bukkit;
++
++import java.util.concurrent.ThreadFactory;
++
++public class CraftScheduler {
++    public static boolean value = false;
++
++    public static ThreadFactory getThreadFactory() {
++        return value ? Thread.ofVirtual().factory() : Thread.ofPlatform().factory();
++    }
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/bukkit/ServerMain.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/bukkit/ServerMain.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..3c1631a5d750bb9504a1faac441e94b164fcfabb
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/bukkit/ServerMain.java
+@@ -0,0 +1,9 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.bukkit;
++
++public class ServerMain {
++    public static boolean value = false;
++
++    public static Thread getThread(final Runnable runnable, final String name) {
++        return value ? Thread.ofVirtual().name(name).unstarted(runnable) : new Thread(runnable, name);
++    }
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/chase/Client.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/chase/Client.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..b92b9497794de3474183870569f88981961a9ca0
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/chase/Client.java
+@@ -0,0 +1,5 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.chase;
++
++public class Client {
++    public static boolean value = false;
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/chase/ServerAcceptor.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/chase/ServerAcceptor.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..9f859dcc619b349501cf5f145baa0f52bfd703cf
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/chase/ServerAcceptor.java
+@@ -0,0 +1,5 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.chase;
++
++public class ServerAcceptor {
++    public static boolean value = false;
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/chase/ServerSender.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/chase/ServerSender.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..1338ff6523deb3d1af959f07d925778085908136
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/chase/ServerSender.java
+@@ -0,0 +1,5 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.chase;
++
++public class ServerSender {
++    public static boolean value = false;
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/folia/AsyncScheduler.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/folia/AsyncScheduler.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..4e8461434e93e73e0976875fddbdfef154750b5f
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/folia/AsyncScheduler.java
+@@ -0,0 +1,9 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.folia;
++
++public class AsyncScheduler {
++    public static boolean value = false;
++
++    public static Thread getThread(final Runnable runnable) {
++        return value ? Thread.ofVirtual().unstarted(runnable) : new Thread(runnable);
++    }
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/AsyncChat.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/AsyncChat.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..d301f029dc10374bd1326c796048e001d8ffb8f1
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/AsyncChat.java
+@@ -0,0 +1,11 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft;
++
++import java.util.concurrent.ThreadFactory;
++
++public class AsyncChat {
++    public static boolean value = false;
++
++    public static ThreadFactory getThreadFactory() {
++        return value ? Thread.ofVirtual().factory() : Thread.ofPlatform().factory();
++    }
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/AsyncDebug.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/AsyncDebug.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..950559f7dd4db7352635f5e6c3fa16df6232c2c2
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/AsyncDebug.java
+@@ -0,0 +1,9 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft;
++
++public class AsyncDebug {
++    public static boolean value = false;
++
++    public static Thread getThread(final Runnable r) {
++        return value ? Thread.ofVirtual().unstarted(r) : new Thread(r);
++    }
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/ChatFilterClient.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/ChatFilterClient.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..5606f266d2a2af5481b1ee71ca9262775a928997
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/ChatFilterClient.java
+@@ -0,0 +1,5 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft;
++
++public class ChatFilterClient {
++    public static boolean value = false;
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/Console.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/Console.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..d03789dfc8bab806ee06832c0db9f556ee4e3471
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/Console.java
+@@ -0,0 +1,9 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft;
++
++public class Console {
++    public static boolean value = false;
++
++    public static Thread getThread(final String name, final Runnable r) {
++        return value ? Thread.ofVirtual().name(name).unstarted(r) : new Thread(r, name);
++    }
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/Datafixer.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/Datafixer.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..403531463c6576b9cdb2897b836849d51c1363d5
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/Datafixer.java
+@@ -0,0 +1,11 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft;
++
++import java.util.concurrent.ThreadFactory;
++
++public class Datafixer {
++    public static boolean value = false;
++
++    public static ThreadFactory getThreadFactory() {
++        return value ? Thread.ofVirtual().factory() : Thread.ofPlatform().factory();
++    }
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/Gui.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/Gui.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..3ef95d10742de590a21289d8b1942b224d1f8da3
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/Gui.java
+@@ -0,0 +1,9 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft;
++
++public class Gui {
++    public static boolean value = false;
++
++    public static Thread getThread(final Runnable r) {
++        return value ? Thread.ofVirtual().unstarted(r) : new Thread(r);
++    }
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/NamedThread.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/NamedThread.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..69d081dd3347947d3cb1c2069b35c2a5bede4834
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/NamedThread.java
+@@ -0,0 +1,5 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft;
++
++public class NamedThread {
++    public static boolean value = false;
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/RconGeneric.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/RconGeneric.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..e19582365e124924a263bfacf550682d410d5923
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/RconGeneric.java
+@@ -0,0 +1,5 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft;
++
++public class RconGeneric {
++    public static boolean value = false;
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/ServerWatchdog.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/ServerWatchdog.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..1546f6174d007524836d6a532de6ec1b5ecd5a94
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/ServerWatchdog.java
+@@ -0,0 +1,9 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft;
++
++public class ServerWatchdog {
++    public static boolean value = false;
++
++    public static Thread getThread(final Runnable r) {
++        return value ? Thread.ofVirtual().unstarted(r) : new Thread(r);
++    }
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/io/DimensionData.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/io/DimensionData.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..3992d233739f727a13410dae9a7247533fba3f82
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/io/DimensionData.java
+@@ -0,0 +1,11 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.io;
++
++import java.util.concurrent.ThreadFactory;
++
++public class DimensionData {
++    public static boolean value = false;
++
++    public static ThreadFactory getThreadFactory() {
++        return value ? Thread.ofVirtual().factory() : Thread.ofPlatform().factory();
++    }
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/io/Noise.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/io/Noise.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..81e9543c21d8067ad61cca91a3916c39f80a8189
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/io/Noise.java
+@@ -0,0 +1,5 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.io;
++
++public class Noise {
++    public static boolean value = false;
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/io/Worker.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/io/Worker.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..585765ac95c43d31a69c53a3208b94e59dcb4486
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/io/Worker.java
+@@ -0,0 +1,5 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.io;
++
++public class Worker {
++    public static boolean value = false;
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/io/WorldUpgrader.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/io/WorldUpgrader.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..dfd595a6177ea526126fb27c73b5a119d5e82b0d
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/io/WorldUpgrader.java
+@@ -0,0 +1,11 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.io;
++
++import java.util.concurrent.ThreadFactory;
++
++public class WorldUpgrader {
++    public static boolean value = false;
++
++    public static ThreadFactory getThreadFactory() {
++        return value ? Thread.ofVirtual().factory() : Thread.ofPlatform().factory();
++    }
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/network/Download.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/network/Download.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..b7ccab320619cdf2acece498a82c44cab5c2b953
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/network/Download.java
+@@ -0,0 +1,5 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.network;
++
++public class Download {
++    public static boolean value = false;
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/network/ProfileLookup.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/network/ProfileLookup.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..e8ea1bec3659b4278ed140c330fdfb41233ef78e
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/network/ProfileLookup.java
+@@ -0,0 +1,9 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.network;
++
++public class ProfileLookup {
++    public static boolean value = false;
++
++    public static Thread getThread(final Runnable runnable) {
++        return value ? Thread.ofVirtual().unstarted(runnable) : new Thread(runnable);
++    }
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/network/YggdrasilServices.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/network/YggdrasilServices.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..d15066a975c4cb5c76448a6ab55c71d88223e32d
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/minecraft/network/YggdrasilServices.java
+@@ -0,0 +1,11 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.network;
++
++import java.util.concurrent.ThreadFactory;
++
++public class YggdrasilServices {
++    public static boolean value = false;
++
++    public static ThreadFactory getThreadFactory() {
++        return value ? Thread.ofVirtual().factory() : Thread.ofPlatform().factory();
++    }
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/netty/Client.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/netty/Client.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..68634fd014279503e16f29614452eb2d1f45d3d7
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/netty/Client.java
+@@ -0,0 +1,11 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.netty;
++
++import java.util.concurrent.ThreadFactory;
++
++public class Client {
++    public static boolean value = false;
++
++    public static ThreadFactory getThreadFactory() {
++        return value ? Thread.ofVirtual().factory() : Thread.ofPlatform().factory();
++    }
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/netty/EpollClient.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/netty/EpollClient.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..76986889010689e1e15f5aaf370b8a089e52fd95
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/netty/EpollClient.java
+@@ -0,0 +1,11 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.netty;
++
++import java.util.concurrent.ThreadFactory;
++
++public class EpollClient {
++    public static boolean value = false;
++
++    public static ThreadFactory getThreadFactory() {
++        return value ? Thread.ofVirtual().factory() : Thread.ofPlatform().factory();
++    }
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/netty/EpollServer.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/netty/EpollServer.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..e19e007c742ad8b44ea60061493d84657b33e912
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/netty/EpollServer.java
+@@ -0,0 +1,11 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.netty;
++
++import java.util.concurrent.ThreadFactory;
++
++public class EpollServer {
++    public static boolean value = false;
++
++    public static ThreadFactory getThreadFactory() {
++        return value ? Thread.ofVirtual().factory() : Thread.ofPlatform().factory();
++    }
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/netty/LocalClient.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/netty/LocalClient.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..9f28c449fb560caec2216744ed3d4306641669a4
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/netty/LocalClient.java
+@@ -0,0 +1,11 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.netty;
++
++import java.util.concurrent.ThreadFactory;
++
++public class LocalClient {
++    public static boolean value = false;
++
++    public static ThreadFactory getThreadFactory() {
++        return value ? Thread.ofVirtual().factory() : Thread.ofPlatform().factory();
++    }
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/netty/Server.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/netty/Server.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..c818bff0095da91723f095a910a692b8137c6558
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/netty/Server.java
+@@ -0,0 +1,11 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.netty;
++
++import java.util.concurrent.ThreadFactory;
++
++public class Server {
++    public static boolean value = false;
++
++    public static ThreadFactory getThreadFactory() {
++        return value ? Thread.ofVirtual().factory() : Thread.ofPlatform().factory();
++    }
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/paper/AsyncCommandBuilder.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/paper/AsyncCommandBuilder.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..d2a4021754c92631b5c7a53a4ae4161977160675
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/paper/AsyncCommandBuilder.java
+@@ -0,0 +1,11 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.paper;
++
++import java.util.concurrent.ThreadFactory;
++
++public class AsyncCommandBuilder {
++    public static boolean value = false;
++
++    public static ThreadFactory getThreadFactory() {
++        return value ? Thread.ofVirtual().factory() : Thread.ofPlatform().factory();
++    }
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/paper/AsyncTaskHandler.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/paper/AsyncTaskHandler.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..7201834ccfedf2bc409843618ef6a1d61473e77d
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/paper/AsyncTaskHandler.java
+@@ -0,0 +1,11 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.paper;
++
++import java.util.concurrent.ThreadFactory;
++
++public class AsyncTaskHandler {
++    public static boolean value = false;
++
++    public static ThreadFactory getThreadFactory() {
++        return value ? Thread.ofVirtual().factory() : Thread.ofPlatform().factory();
++    }
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/paper/PluginRemapper.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/paper/PluginRemapper.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..63d8d66482f001c445bb732fa510a4f82f8236b3
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/paper/PluginRemapper.java
+@@ -0,0 +1,11 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.paper;
++
++import java.util.concurrent.ThreadFactory;
++
++public class PluginRemapper {
++    public static boolean value = false;
++
++    public static ThreadFactory getThreadFactory() {
++        return value ? Thread.ofVirtual().factory() : Thread.ofPlatform().factory();
++    }
++}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/fix/POIAccessOffRegion.java b/src/main/java/one/tranic/sewlia/config/mod/fix/POIAccessOffRegion.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..bda476a96f551ea1d303d85d425968e112f118ee
