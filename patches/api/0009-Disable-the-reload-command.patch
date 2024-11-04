@@ -6,9 +6,18 @@ Subject: [PATCH] Disable the `reload` command
 It shouldn't be available in folia, and when you really need it you should use a plugin like PlugManX, or restart the server.
 
 diff --git a/src/main/java/org/bukkit/command/SimpleCommandMap.java b/src/main/java/org/bukkit/command/SimpleCommandMap.java
-index d526ecc949e192dfbec96b7fe10b970aeee6a04b..46ea7018cf85d89a1badba7d583a035c239079e0 100644
+index d526ecc949e192dfbec96b7fe10b970aeee6a04b..870445f1656f37b8152b5f232f8b4c75f4aada99 100644
 --- a/src/main/java/org/bukkit/command/SimpleCommandMap.java
 +++ b/src/main/java/org/bukkit/command/SimpleCommandMap.java
+@@ -15,7 +15,7 @@ import org.bukkit.Server;
+ import org.bukkit.command.defaults.BukkitCommand;
+ import org.bukkit.command.defaults.HelpCommand;
+ // import org.bukkit.command.defaults.PluginsCommand;
+-import org.bukkit.command.defaults.ReloadCommand;
++// import org.bukkit.command.defaults.ReloadCommand; // Sewlia
+ import org.bukkit.command.defaults.VersionCommand;
+ import org.bukkit.entity.Player;
+ import org.bukkit.util.StringUtil;
 @@ -37,7 +37,7 @@ public class SimpleCommandMap implements CommandMap {
  
      private void setDefaultCommands() {
