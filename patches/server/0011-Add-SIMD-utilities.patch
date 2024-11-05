@@ -6,35 +6,39 @@ Subject: [PATCH] Add SIMD utilities
 
 diff --git a/src/main/java/one/tranic/sewlia/preload/mod/SIMDCheck.java b/src/main/java/one/tranic/sewlia/preload/mod/SIMDCheck.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..88432939aee4c3c3fd456ffa1686738895b29a90
+index 0000000000000000000000000000000000000000..d19b50ab772dd4a0e61af50b0a8c5d396118c8a4
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/preload/mod/SIMDCheck.java
-@@ -0,0 +1,28 @@
+@@ -0,0 +1,32 @@
 +package one.tranic.sewlia.preload.mod;
 +
 +import gg.pufferfish.pufferfish.simd.SIMDDetection;
-+import net.minecraft.server.MinecraftServer;
-+import one.tranic.sewlia.preload.PreloadImpl;
++import one.tranic.sewlia.preload.Preloads;
++import org.slf4j.Logger;
++import org.slf4j.LoggerFactory;
 +
-+public class SIMDCheck implements PreloadImpl {
++public class SIMDCheck extends Preloads {
++    private final Logger logger = LoggerFactory.getLogger("SIMDUtils");
++
++    @Override
 +    public void doPreload() {
 +        // Attempt to detect vectorization
 +        try {
-+            SIMDDetection.isEnabled = SIMDDetection.canEnable(MinecraftServer.LOGGER);
++            SIMDDetection.isEnabled = SIMDDetection.canEnable(logger);
 +            SIMDDetection.versionLimited = SIMDDetection.getJavaVersion() < 17;
 +        } catch (NoClassDefFoundError | Exception e) {
 +            e.printStackTrace();
 +        }
 +
 +        if (SIMDDetection.isEnabled) {
-+            MinecraftServer.LOGGER.info("SIMD operations detected as functional. Will replace some operations with faster versions.");
++            logger.info("SIMD operations detected as functional. Will replace some operations with faster versions.");
 +        } else if (SIMDDetection.versionLimited) {
-+            MinecraftServer.LOGGER.warn("Will not enable SIMD! These optimizations are only safely supported on Java 17-21.");
++            logger.warn("Will not enable SIMD! These optimizations are only safely supported on Java 17-21.");
 +        } else {
-+            MinecraftServer.LOGGER.warn("SIMD operations are available for your server, but are not configured!");
-+            MinecraftServer.LOGGER.warn("To enable additional optimizations, add \"--add-modules=jdk.incubator.vector\" to your startup flags, BEFORE the \"-jar\".");
-+            MinecraftServer.LOGGER.warn("If you have already added this flag, then SIMD operations are not supported on your JVM or CPU.");
-+            MinecraftServer.LOGGER.warn("Debug: Java: {}, test run: {}", System.getProperty("java.version"), SIMDDetection.testRun);
++            logger.warn("SIMD operations are available for your server, but are not configured!");
++            logger.warn("To enable additional optimizations, add \"--add-modules=jdk.incubator.vector\" to your startup flags, BEFORE the \"-jar\".");
++            logger.warn("If you have already added this flag, then SIMD operations are not supported on your JVM or CPU.");
++            logger.warn("Debug: Java: {}, test run: {}", System.getProperty("java.version"), SIMDDetection.testRun);
 +        }
 +    }
 +}

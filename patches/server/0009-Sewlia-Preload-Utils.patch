@@ -4,58 +4,57 @@ Date: Fri, 1 Nov 2024 11:14:17 +0800
 Subject: [PATCH] Sewlia Preload Utils
 
 
-diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index f81f7954f512ac9c22370a78d26a2e1eb7a47f05..34331ef213e4b0e062afcb20a6f503a299656016 100644
---- a/src/main/java/net/minecraft/server/MinecraftServer.java
-+++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1312,6 +1312,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
-             org.spigotmc.WatchdogThread.tick();
-             // Paper end - Improved Watchdog Support
-             org.spigotmc.WatchdogThread.hasStarted = true; // Paper
+diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
+index ec4c3c8045488fc8083c77cbf53bd89e7e22dd0c..7a4bfd4894a5782695569b2cd51ede88e1d6f603 100644
+--- a/src/main/java/net/minecraft/server/Main.java
++++ b/src/main/java/net/minecraft/server/Main.java
+@@ -121,6 +121,7 @@ public class Main {
+             }
+ 
+             one.tranic.sewlia.config.ConfigUtils.reloadConfiguration(false); // Sewlia
 +            new one.tranic.sewlia.preload.Preload(); // Sewlia
-             Arrays.fill( this.recentTps, 20 );
-             // Paper start - further improve server tick loop
-             long tickSection = Util.getNanos();
+ 
+             io.papermc.paper.plugin.PluginInitializerManager.load(optionset); // Paper
+             Bootstrap.bootStrap();
 diff --git a/src/main/java/one/tranic/sewlia/preload/Preload.java b/src/main/java/one/tranic/sewlia/preload/Preload.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..d67a9a4f271a8fc47f5fcb51543880c03297fc1a
+index 0000000000000000000000000000000000000000..2056586615947c21d9b3b744acbbcc8853a5955f
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/preload/Preload.java
-@@ -0,0 +1,26 @@
+@@ -0,0 +1,25 @@
 +package one.tranic.sewlia.preload;
 +
 +import net.intelie.tinymap.TinySet;
 +import one.tranic.sewlia.Reflect;
 +import org.jetbrains.annotations.Nullable;
++import org.slf4j.Logger;
++import org.slf4j.LoggerFactory;
 +
-+import java.lang.reflect.InvocationTargetException;
-+import java.lang.reflect.Method;
-+import java.lang.reflect.Modifier;
++import java.io.IOException;
 +
 +public class Preload {
++    private final Logger logger = LoggerFactory.getLogger("PreloadUtils");
 +    public Preload() {
-+        @Nullable TinySet<Class<PreloadImpl>> set = Reflect.scanPackage(PreloadImpl.class, "one.tranic.sewlia.reload.mod");
-+        if (set == null || set.isEmpty()) return;
 +        try {
-+            for (Class<PreloadImpl> clazz : set) {
-+                Method pre = clazz.getMethod("doPreload");
-+                if (!Modifier.isStatic(pre.getModifiers())) continue;
-+                pre.setAccessible(true);
-+                pre.invoke(null);
++            @Nullable TinySet<Preloads> set = Reflect.findAllClass("one.tranic.sewlia.preload.mod", Preloads.class);
++            if (set != null && !set.isEmpty()) {
++                for (Preloads preload : set) {
++                    preload.doPreload();
++                }
 +            }
-+        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-+            throw new RuntimeException(e);
++        } catch (IOException e) {
++            logger.error(e.getMessage());
 +        }
 +    }
 +}
-diff --git a/src/main/java/one/tranic/sewlia/preload/PreloadImpl.java b/src/main/java/one/tranic/sewlia/preload/PreloadImpl.java
+diff --git a/src/main/java/one/tranic/sewlia/preload/Preloads.java b/src/main/java/one/tranic/sewlia/preload/Preloads.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..2dacb2445673b6d3536f8169c3c11b2bf6f12ab0
+index 0000000000000000000000000000000000000000..dd5b919f67d7bfae26efea71d5388ae557177bf9
 --- /dev/null
-+++ b/src/main/java/one/tranic/sewlia/preload/PreloadImpl.java
++++ b/src/main/java/one/tranic/sewlia/preload/Preloads.java
 @@ -0,0 +1,5 @@
 +package one.tranic.sewlia.preload;
 +
-+public interface PreloadImpl {
-+    void doPreload();
++public abstract class Preloads {
++    public void doPreload() {}
 +}
