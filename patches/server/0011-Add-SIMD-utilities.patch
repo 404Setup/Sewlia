@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Tue, 5 Nov 2024 13:12:36 +0800
+Subject: [PATCH] Add SIMD utilities
+
+
+diff --git a/src/main/java/one/tranic/sewlia/preload/mod/SIMDCheck.java b/src/main/java/one/tranic/sewlia/preload/mod/SIMDCheck.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..88432939aee4c3c3fd456ffa1686738895b29a90
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/preload/mod/SIMDCheck.java
+@@ -0,0 +1,28 @@
++package one.tranic.sewlia.preload.mod;
++
++import gg.pufferfish.pufferfish.simd.SIMDDetection;
++import net.minecraft.server.MinecraftServer;
++import one.tranic.sewlia.preload.PreloadImpl;
++
++public class SIMDCheck implements PreloadImpl {
++    public void doPreload() {
++        // Attempt to detect vectorization
++        try {
++            SIMDDetection.isEnabled = SIMDDetection.canEnable(MinecraftServer.LOGGER);
++            SIMDDetection.versionLimited = SIMDDetection.getJavaVersion() < 17;
++        } catch (NoClassDefFoundError | Exception e) {
++            e.printStackTrace();
++        }
++
++        if (SIMDDetection.isEnabled) {
++            MinecraftServer.LOGGER.info("SIMD operations detected as functional. Will replace some operations with faster versions.");
++        } else if (SIMDDetection.versionLimited) {
++            MinecraftServer.LOGGER.warn("Will not enable SIMD! These optimizations are only safely supported on Java 17-21.");
++        } else {
++            MinecraftServer.LOGGER.warn("SIMD operations are available for your server, but are not configured!");
++            MinecraftServer.LOGGER.warn("To enable additional optimizations, add \"--add-modules=jdk.incubator.vector\" to your startup flags, BEFORE the \"-jar\".");
++            MinecraftServer.LOGGER.warn("If you have already added this flag, then SIMD operations are not supported on your JVM or CPU.");
++            MinecraftServer.LOGGER.warn("Debug: Java: {}, test run: {}", System.getProperty("java.version"), SIMDDetection.testRun);
++        }
++    }
++}

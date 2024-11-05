@@ -1,0 +1,111 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Tue, 5 Nov 2024 13:05:59 +0800
+Subject: [PATCH] Pufferfish: Add SIMD utilities
+
+The utilities added in this patch are not intended to be used by plugins
+and API spec stability is NOT guaranteed. If you use this in plugins,
+they WILL break eventually.
+
+diff --git a/build.gradle.kts b/build.gradle.kts
+index 2ed9d0dbf2d69084524332fa88bb8c619cfffd60..2b7ef4a0df539aacfb2c360a56cd5e040843c739 100644
+--- a/build.gradle.kts
++++ b/build.gradle.kts
+@@ -192,6 +192,7 @@ tasks.withType<Javadoc> {
+             into("build/docs/javadoc")
+         }
+     }
++    options.addStringOption("-add-modules", "jdk.incubator.vector")
+ }
+ 
+ tasks.test {
+@@ -207,6 +208,7 @@ tasks.compileTestJava {
+ // Paper end
+ 
+ tasks.compileJava {
++    options.compilerArgs.add("--add-modules=jdk.incubator.vector")
+     options.compilerArgs.add("-Xlint:-deprecation") // Sewlia
+     options.isWarnings = false // Sewlia
+ }
+diff --git a/src/main/java/gg/pufferfish/pufferfish/simd/SIMDChecker.java b/src/main/java/gg/pufferfish/pufferfish/simd/SIMDChecker.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..0fdcc1af40412413682e398b1b43873f81854d83
+--- /dev/null
++++ b/src/main/java/gg/pufferfish/pufferfish/simd/SIMDChecker.java
+@@ -0,0 +1,35 @@
++package gg.pufferfish.pufferfish.simd;
++
++import jdk.incubator.vector.FloatVector;
++import jdk.incubator.vector.IntVector;
++import jdk.incubator.vector.VectorSpecies;
++import org.slf4j.Logger;
++
++/**
++ * Basically, java is annoying and we have to push this out to its own class.
++ */
++public class SIMDChecker {
++
++    public static boolean canEnable(Logger logger) {
++        try {
++            if (SIMDDetection.getJavaVersion() < 17) return false;
++
++            SIMDDetection.testRun = true;
++            VectorSpecies<Integer> ISPEC = IntVector.SPECIES_PREFERRED;
++            VectorSpecies<Float> FSPEC = FloatVector.SPECIES_PREFERRED;
++
++            logger.info("Max SIMD vector size on this system is {} bits (int)", ISPEC.vectorBitSize());
++            logger.info("Max SIMD vector size on this system is {} bits (float)", FSPEC.vectorBitSize());
++
++            if (ISPEC.elementSize() < 2 || FSPEC.elementSize() < 2) {
++                logger.info("SIMD is not properly supported on this system!");
++                return false;
++            }
++
++            return true;
++        } catch (NoClassDefFoundError | Exception ignored) {
++        } // Basically, we don't do anything. This lets us detect if it's not functional and disable it.
++        return false;
++    }
++
++}
+\ No newline at end of file
+diff --git a/src/main/java/gg/pufferfish/pufferfish/simd/SIMDDetection.java b/src/main/java/gg/pufferfish/pufferfish/simd/SIMDDetection.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..1717af9f185f0c7c32b5da3e47d05635c93ef0a5
+--- /dev/null
++++ b/src/main/java/gg/pufferfish/pufferfish/simd/SIMDDetection.java
+@@ -0,0 +1,33 @@
++package gg.pufferfish.pufferfish.simd;
++
++
++import org.slf4j.Logger;
++
++public class SIMDDetection {
++
++    public static boolean isEnabled = false;
++	public static boolean versionLimited = false;
++	public static boolean testRun = false;
++
++	public static boolean canEnable(Logger logger) {
++        try {
++            return SIMDChecker.canEnable(logger);
++        } catch (NoClassDefFoundError | Exception ignored) {
++            return false;
++        }
++    }
++
++	public static int getJavaVersion() {
++        // https://stackoverflow.com/a/2591122
++        String version = System.getProperty("java.version");
++        if(version.startsWith("1.")) {
++            version = version.substring(2, 3);
++        } else {
++            int dot = version.indexOf(".");
++            if(dot != -1) { version = version.substring(0, dot); }
++        }
++        version = version.split("-")[0]; // Azul is stupid
++        return Integer.parseInt(version);
++    }
++
++}
+\ No newline at end of file
