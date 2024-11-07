@@ -651,6 +651,20 @@ index 0000000000000000000000000000000000000000..7a8aaa9962832a5b7a429dbcb84bb15f
 +        return value ? Thread.ofVirtual().factory() : Thread.ofPlatform().factory();
 +    }
 +}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/pufferfish/AsyncMobSpawning.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/pufferfish/AsyncMobSpawning.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..440a471c8cb1ed19c35283a9d564d6354e7f883f
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/pufferfish/AsyncMobSpawning.java
+@@ -0,0 +1,8 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.pufferfish;
++
++import one.tranic.sewlia.config.annotation.DisableReload;
++
++public class AsyncMobSpawning {
++    @DisableReload
++    public static boolean value = false;
++}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/fix/POIAccessOffRegion.java b/src/main/java/one/tranic/sewlia/config/mod/fix/POIAccessOffRegion.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..bda476a96f551ea1d303d85d425968e112f118ee
@@ -799,6 +813,26 @@ index 0000000000000000000000000000000000000000..e3e62aafe376e822295fdb6c9f62847f
 +    @Comment("The timeout of the cache. Unit: Minutes.")
 +    public static int value = 1440;
 +}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/AsyncMobSpawning.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/AsyncMobSpawning.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..a589304754c1d7b3e376a3837687e8d238063ed0
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/optimization/AsyncMobSpawning.java
+@@ -0,0 +1,14 @@
++package one.tranic.sewlia.config.mod.optimization;
++
++import one.tranic.sewlia.config.annotation.Comments;
++import one.tranic.sewlia.config.annotation.DisableReload;
++
++public class AsyncMobSpawning {
++    @Comments({"Whether or not asynchronous mob spawning should be enabled.",
++            "On servers with many entities, this can improve performance by up to 15%. You must have",
++            "paper's per-player-mob-spawns setting set to true for this to work.",
++            "One quick note - this does not actually spawn mobs async (that would be very unsafe).",
++            "This just offloads some expensive calculations that are required for mob spawning."})
++    @DisableReload
++    public static boolean value = false;
++}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/RunExtraTasksDuringWaiting.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/RunExtraTasksDuringWaiting.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..7549383deabee9b461becdd308d9c8708bf4c91d
@@ -826,4 +860,50 @@ index 0000000000000000000000000000000000000000..67a331f19fb7d24e52582fcaed83cf36
 +            "be left enabled on most servers, but is provided as a",
 +            "configuration option if the vanilla deviation is undesirable."})
 +    public static boolean value = false;
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/projectile_loads/Enable.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/projectile_loads/Enable.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..78aa064e7829e654117c5ef5078cfedb9ee8fe7c
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/optimization/projectile_loads/Enable.java
+@@ -0,0 +1,8 @@
++package one.tranic.sewlia.config.mod.optimization.projectile_loads;
++
++import one.tranic.sewlia.config.annotation.DisableReload;
++
++public class Enable {
++    @DisableReload
++    public static boolean value = false;
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/projectile_loads/Max.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/projectile_loads/Max.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..96b15ed1509c8d05f74eb7be025fdd7fe004c0bc
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/optimization/projectile_loads/Max.java
+@@ -0,0 +1,10 @@
++package one.tranic.sewlia.config.mod.optimization.projectile_loads;
++
++import one.tranic.sewlia.config.annotation.Comment;
++import one.tranic.sewlia.config.annotation.DisableReload;
++
++public class Max {
++    @DisableReload
++    @Comment("Controls how many chunks a projectile can load in its lifetime before it gets automatically removed.")
++    public static int value = 10;
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/projectile_loads/MaxTick.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/projectile_loads/MaxTick.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..dc831edaea729e1909263fbc142cad33eb576f2c
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/optimization/projectile_loads/MaxTick.java
+@@ -0,0 +1,10 @@
++package one.tranic.sewlia.config.mod.optimization.projectile_loads;
++
++import one.tranic.sewlia.config.annotation.Comment;
++import one.tranic.sewlia.config.annotation.DisableReload;
++
++public class MaxTick {
++    @Comment("Controls how many chunks are allowed to be sync loaded by projectiles in a tick.")
++    @DisableReload
++    public static int value = 10;
 +}

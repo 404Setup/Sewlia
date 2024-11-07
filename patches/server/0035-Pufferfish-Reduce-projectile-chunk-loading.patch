@@ -1,0 +1,52 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Paul Sauve <paul@technove.co>
+Date: Sun, 13 Dec 2020 17:52:35 -0600
+Subject: [PATCH] Pufferfish: Reduce projectile chunk loading
+
+
+diff --git a/src/main/java/net/minecraft/world/entity/projectile/Projectile.java b/src/main/java/net/minecraft/world/entity/projectile/Projectile.java
+index 75f94ef09f611ae1a317212198589c76230edcda..1f82a2c558d1e355be731c8cc5f4e878f9453ec3 100644
+--- a/src/main/java/net/minecraft/world/entity/projectile/Projectile.java
++++ b/src/main/java/net/minecraft/world/entity/projectile/Projectile.java
+@@ -52,6 +52,41 @@ public abstract class Projectile extends Entity implements TraceableEntity {
+         super(type, world);
+     }
+ 
++    // Pufferfish start
++    private static final java.lang.ThreadLocal<Long> loadedThisTick = java.lang.ThreadLocal.withInitial(() -> 0L);
++    private static final java.lang.ThreadLocal<Long> loadedTick = java.lang.ThreadLocal.withInitial(() -> 0L);
++
++    private int loadedLifetime = 0;
++    @Override
++    public void setPos(double x, double y, double z) {
++        if (one.tranic.sewlia.config.mod.optimization.projectile_loads.Enable.value && io.papermc.paper.threadedregions.TickRegionScheduler.getCurrentRegion() != null && ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(this)) {
++            long currentTick = io.papermc.paper.threadedregions.TickRegionScheduler.getCurrentRegion().getData().getCurrentTick();
++
++            if (loadedTick.get() != currentTick) {
++                loadedTick.set(currentTick);
++                loadedThisTick.set(0L);
++            }
++
++            int previousX = Mth.floor(this.getX()) >> 4, previousZ = Mth.floor(this.getZ()) >> 4;
++            int newX = Mth.floor(x) >> 4, newZ = Mth.floor(z) >> 4;
++            if (previousX != newX || previousZ != newZ) {
++                boolean isLoaded = ((net.minecraft.server.level.ServerChunkCache) this.level().getChunkSource()).getChunkAtIfLoadedImmediately(newX, newZ) != null;
++                if (!isLoaded) {
++                    if (Projectile.loadedThisTick.get() > one.tranic.sewlia.config.mod.optimization.projectile_loads.MaxTick.value) {
++                        if (++this.loadedLifetime > one.tranic.sewlia.config.mod.optimization.projectile_loads.Max.value) {
++                            this.discard();
++                        }
++                        return;
++                    }
++                    Projectile.loadedThisTick.set(Projectile.loadedThisTick.get() + 1);
++                }
++            }
++            return;
++        }
++        super.setPosRaw(x, y, z);
++    }
++    // Pufferfish end
++
+     public void setOwner(@Nullable Entity entity) {
+         if (entity != null) {
+             this.ownerUUID = entity.getUUID();
