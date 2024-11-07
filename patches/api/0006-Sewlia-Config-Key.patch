@@ -766,6 +766,39 @@ index 0000000000000000000000000000000000000000..54d5ac1138baa45f35e6b110112dcae0
 +public class WarnOnDetected {
 +    public static boolean value = true;
 +}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/misc/cache_player_profile/Enable.java b/src/main/java/one/tranic/sewlia/config/mod/misc/cache_player_profile/Enable.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..1a6b6d39a0d656beb1d98d6d1f0db713be9a7437
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/misc/cache_player_profile/Enable.java
+@@ -0,0 +1,11 @@
++package one.tranic.sewlia.config.mod.misc.cache_player_profile;
++
++import one.tranic.sewlia.config.annotation.Comments;
++import one.tranic.sewlia.config.annotation.DisableReload;
++
++public class Enable {
++    @DisableReload
++    @Comments({"Cache the player profile result on they first join.",
++            "It's useful if Mojang's verification server is down."})
++    public static boolean value = false;
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/misc/cache_player_profile/ResultTimeout.java b/src/main/java/one/tranic/sewlia/config/mod/misc/cache_player_profile/ResultTimeout.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..e3e62aafe376e822295fdb6c9f62847f3aa9ccc9
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/misc/cache_player_profile/ResultTimeout.java
+@@ -0,0 +1,10 @@
++package one.tranic.sewlia.config.mod.misc.cache_player_profile;
++
++import one.tranic.sewlia.config.annotation.Comment;
++import one.tranic.sewlia.config.annotation.DisableReload;
++
++public class ResultTimeout {
++    @DisableReload
++    @Comment("The timeout of the cache. Unit: Minutes.")
++    public static int value = 1440;
++}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/RunExtraTasksDuringWaiting.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/RunExtraTasksDuringWaiting.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..7549383deabee9b461becdd308d9c8708bf4c91d

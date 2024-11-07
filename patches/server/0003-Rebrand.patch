@@ -5,10 +5,10 @@ Subject: [PATCH] Rebrand
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 38ee24c2135a5fb1426f0d2ba0c315450238b6ca..39c491aec4278b1f5027445d0e7ea1e4686769d6 100644
+index d2d0ac7006a3384761f92a498f0509f64a62f4cc..c296b67e9904ab578aa502c1f7beb66cbe91c887 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -95,14 +95,14 @@ tasks.jar {
+@@ -96,14 +96,14 @@ tasks.jar {
          val gitBranch = git("rev-parse", "--abbrev-ref", "HEAD").getText().trim() // Paper
          attributes(
              "Main-Class" to "org.bukkit.craftbukkit.Main",
