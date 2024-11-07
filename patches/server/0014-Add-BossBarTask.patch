@@ -6,7 +6,7 @@ Subject: [PATCH] Add BossBarTask
 This patch is inspired by Purpur.
 
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 7050c6e01f28b0daf3134cafd09831851fbf4d07..171930b1c67680fa86c6404b8df8229f0ea62fb1 100644
+index 38867f707488058bdd175c57d176051225a33a05..67932c003e8184b3b8b60912581637f2b35334af 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -1200,6 +1200,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
