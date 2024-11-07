@@ -810,3 +810,20 @@ index 0000000000000000000000000000000000000000..7549383deabee9b461becdd308d9c870
 +public class RunExtraTasksDuringWaiting {
 +    public static boolean value = false;
 +}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/Suffocation.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/Suffocation.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..67a331f19fb7d24e52582fcaed83cf36f17f1995
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/optimization/Suffocation.java
+@@ -0,0 +1,11 @@
++package one.tranic.sewlia.config.mod.optimization;
++
++import one.tranic.sewlia.config.annotation.Comments;
++
++public class Suffocation {
++    @Comments({"Optimizes the suffocation check by selectively skipping",
++            "the check in a way that still appears vanilla. This should",
++            "be left enabled on most servers, but is provided as a",
++            "configuration option if the vanilla deviation is undesirable."})
++    public static boolean value = false;
++}
