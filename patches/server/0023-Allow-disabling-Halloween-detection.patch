@@ -1,0 +1,18 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Fri, 8 Nov 2024 19:42:25 +0800
+Subject: [PATCH] Allow disabling Halloween detection
+
+
+diff --git a/src/main/java/net/minecraft/world/entity/ambient/Bat.java b/src/main/java/net/minecraft/world/entity/ambient/Bat.java
+index dc27ddf5131e7398a5390a5187261d4c7fb6ccaa..f19bcf0604c33edea5ae62cbe62acb2ca8e7875d 100644
+--- a/src/main/java/net/minecraft/world/entity/ambient/Bat.java
++++ b/src/main/java/net/minecraft/world/entity/ambient/Bat.java
+@@ -240,6 +240,7 @@ public class Bat extends AmbientCreature {
+     }
+ 
+     private static boolean isHalloween() {
++        if (!one.tranic.sewlia.config.mod.optimization.Halloween.value) return false;
+         LocalDate localdate = LocalDate.now();
+         int i = localdate.get(ChronoField.DAY_OF_MONTH);
+         int j = localdate.get(ChronoField.MONTH_OF_YEAR);

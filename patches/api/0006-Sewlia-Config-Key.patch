@@ -833,6 +833,17 @@ index 0000000000000000000000000000000000000000..a589304754c1d7b3e376a3837687e8d2
 +    @DisableReload
 +    public static boolean value = false;
 +}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/Halloween.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/Halloween.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..5e7a369d27e3319d5dff06214d21509bc68ca7e2
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/optimization/Halloween.java
+@@ -0,0 +1,5 @@
++package one.tranic.sewlia.config.mod.optimization;
++
++public class Halloween {
++    public static boolean value = false;
++}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/RunExtraTasksDuringWaiting.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/RunExtraTasksDuringWaiting.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..7549383deabee9b461becdd308d9c8708bf4c91d
