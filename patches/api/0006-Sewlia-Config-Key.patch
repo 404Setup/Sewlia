@@ -810,6 +810,21 @@ index 0000000000000000000000000000000000000000..5e7a369d27e3319d5dff06214d21509b
 +public class Halloween {
 +    public static boolean value = false;
 +}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/InactiveGoalSelectorThrottle.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/InactiveGoalSelectorThrottle.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..e657d54881feb75e05438fb7e1c93018f3287ef3
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/optimization/InactiveGoalSelectorThrottle.java
+@@ -0,0 +1,9 @@
++package one.tranic.sewlia.config.mod.optimization;
++
++import one.tranic.sewlia.config.annotation.Comments;
++
++public class InactiveGoalSelectorThrottle {
++    @Comments({"Throttles the AI goal selector in entity inactive ticks.",
++            "This can improve performance by a few percent, but has minor gameplay implications."})
++    public static boolean value = false;
++}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/RunExtraTasksDuringWaiting.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/RunExtraTasksDuringWaiting.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..7549383deabee9b461becdd308d9c8708bf4c91d
