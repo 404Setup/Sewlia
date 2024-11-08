@@ -1,0 +1,56 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Paul Sauve <paul@technove.co>
+Date: Fri, 8 Nov 2024 19:50:07 +0800
+Subject: [PATCH] Pufferfish: Only check for spooky season once an hour
+
+Airplane
+Copyright (C) 2020 Technove LLC
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+diff --git a/src/main/java/net/minecraft/world/entity/ambient/Bat.java b/src/main/java/net/minecraft/world/entity/ambient/Bat.java
+index f19bcf0604c33edea5ae62cbe62acb2ca8e7875d..ef1279d79c67d2dae0cfbdc18677255e0eb58b9d 100644
+--- a/src/main/java/net/minecraft/world/entity/ambient/Bat.java
++++ b/src/main/java/net/minecraft/world/entity/ambient/Bat.java
+@@ -239,13 +239,25 @@ public class Bat extends AmbientCreature {
+         }
+     }
+ 
++    // Pufferfish start - only check for spooky season once an hour
++    private static boolean isSpookySeason = false;
++    private static final int ONE_HOUR = 20 * 60 * 60;
++    private static int lastSpookyCheck = -ONE_HOUR;
+     private static boolean isHalloween() {
+         if (!one.tranic.sewlia.config.mod.optimization.Halloween.value) return false;
+-        LocalDate localdate = LocalDate.now();
+-        int i = localdate.get(ChronoField.DAY_OF_MONTH);
+-        int j = localdate.get(ChronoField.MONTH_OF_YEAR);
+-
+-        return j == 10 && i >= 20 || j == 11 && i <= 3;
++        final io.papermc.paper.threadedregions.ThreadedRegionizer.ThreadedRegion<io.papermc.paper.threadedregions.TickRegions.TickRegionData, io.papermc.paper.threadedregions.TickRegions.TickRegionSectionData> region =
++                io.papermc.paper.threadedregions.TickRegionScheduler.getCurrentRegion();
++        final long tickCount = region.getData().getCurrentTick();
++        if (tickCount - lastSpookyCheck > ONE_HOUR) {
++            LocalDate localdate = LocalDate.now();
++            int i = localdate.getDayOfMonth(); // Sewlia
++            int j = localdate.getMonthValue(); // Sewlia
++
++            isSpookySeason = j == 10 && i >= 20 || j == 11 && i <= 3;
++            lastSpookyCheck = (int) tickCount;
++        }
++        // Pufferfish end
++        return isSpookySeason;
+     }
+ 
+     private void setupAnimationStates() {
