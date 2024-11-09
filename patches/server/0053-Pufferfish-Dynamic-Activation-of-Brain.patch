@@ -39,7 +39,7 @@ index 99123594c8adda5cdac90d47114d2acfff2b7570..3cd429e824926c4052e12f33058faa03
          this.server.spark.enableEarlyIfRequested(); // Paper - spark
          // Paper start - fix converting txt to json file; convert old users earlier after PlayerList creation but before file load/save
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index ad54079e5f4430965f1585ec82b7d7c8badf327a..14c46be892bd45f8702903124cf6737430879989 100644
+index 558c0e9a55cc7ef601c40923477ffc0182c95952..58eb23e34fc3b7e24a8f5494e0b6e9d74bcefd98 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -805,6 +805,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.

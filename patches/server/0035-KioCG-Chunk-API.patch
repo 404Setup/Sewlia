@@ -73,7 +73,7 @@ index 67932c003e8184b3b8b60912581637f2b35334af..244c81bf9cf7ba5bd9ec1569cdcea39b
          int playerSaveInterval = io.papermc.paper.configuration.GlobalConfiguration.get().playerAutoSave.rate;
          if (playerSaveInterval < 0) {
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 7accad9d29a614eae14b2e8848895808d2e297cf..814d59ce8dd59df24acfcf95d5d4526b5c2f576f 100644
+index 03e065109c71a6fe44c8773fdbddddb80392f31b..33e18996e07d7107e4efe2e6f509b59f614fc5f0 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -1376,6 +1376,8 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
@@ -369,10 +369,10 @@ index 158869fceb91416eedcb7699bdd5083e55567ec3..0bd668e594c475f92fc8d945a7955597
          TPS, MSPT, PING
      }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
-index 45e262308aebafa377a2353661acdd122933b99e..10b2261169d3cd10d736273fe7703f509fe2dffc 100644
+index 0f0097dabc52d060096e3adfddbdc5171134919c..87228f75d53db7ac88efa38c2143bb2a90aafee1 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
-@@ -436,4 +436,12 @@ public class CraftChunk implements Chunk {
+@@ -441,4 +441,12 @@ public class CraftChunk implements Chunk {
      static {
          Arrays.fill(FULL_LIGHT, (byte) 0xFF);
      }

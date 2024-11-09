@@ -71,6 +71,39 @@ index 0000000000000000000000000000000000000000..aa673e7c22f4780bec656d1506b48d7b
 +    @Comment("Users add a central repository mirror")
 +    public static String value = "";
 +}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/secure_seed/Enable.java b/src/main/java/one/tranic/sewlia/config/mod/feature/secure_seed/Enable.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..22ce9f802a88da2c65b3e9f27a024cf37ad7c9bf
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/secure_seed/Enable.java
+@@ -0,0 +1,11 @@
++package one.tranic.sewlia.config.mod.feature.secure_seed;
++
++import one.tranic.sewlia.config.annotation.Comments;
++import one.tranic.sewlia.config.annotation.DisableReload;
++
++public class Enable {
++    @DisableReload
++    @Comments({"Rejected possible hacking attempts by upgrading the world seed generator to 1024-bit.",
++            "You must delete the existing map before you can toggle it on or off."})
++    public static boolean value = false;
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/secure_seed/SecureRandom.java b/src/main/java/one/tranic/sewlia/config/mod/feature/secure_seed/SecureRandom.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..e92b64a6680ae33dd34cd0dee9be3b81f58d8d74
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/secure_seed/SecureRandom.java
+@@ -0,0 +1,10 @@
++package one.tranic.sewlia.config.mod.feature.secure_seed;
++
++import one.tranic.sewlia.config.annotation.Comment;
++import one.tranic.sewlia.config.annotation.DisableReload;
++
++public class SecureRandom {
++    @Comment("Whether to enable the secure RNG generator in secure seed operations, at the expense of some performance.")
++    @DisableReload
++    public static boolean value = true;
++}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/bukkit/AsyncScheduler.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/bukkit/AsyncScheduler.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..fa69e4abc7780f721b2b156d8e3165cfdca03620
