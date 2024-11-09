@@ -855,63 +855,71 @@ index 0000000000000000000000000000000000000000..67a331f19fb7d24e52582fcaed83cf36
 +}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/dab/ActivationDistanceMod.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/dab/ActivationDistanceMod.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..a460ac725636bbf0f3b0276d16522c7ee27abd33
+index 0000000000000000000000000000000000000000..fb5732a2d9d5d1475c5df3af12855c822b1f0a68
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/config/mod/optimization/dab/ActivationDistanceMod.java
-@@ -0,0 +1,11 @@
+@@ -0,0 +1,13 @@
 +package one.tranic.sewlia.config.mod.optimization.dab;
 +
 +import one.tranic.sewlia.config.annotation.Comments;
++import one.tranic.sewlia.config.annotation.DisableReload;
 +
 +public class ActivationDistanceMod {
 +    @Comments({"This value defines how much distance modifies an entity's",
 +            "tick frequency. freq = (distanceToPlayer^2) / (2^value)",
 +            "If you want further away entities to tick less often, use 7.",
 +            "If you want further away entities to tick more often, try 9."})
++    @DisableReload
 +    public static int value = 8;
 +}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/dab/Enable.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/dab/Enable.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..0b8b1b4deb66f75842237327d88dc74ba5e0df19
+index 0000000000000000000000000000000000000000..c6287cbd474a620967b1ba67548ae0c8fde412f6
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/config/mod/optimization/dab/Enable.java
-@@ -0,0 +1,8 @@
+@@ -0,0 +1,10 @@
 +package one.tranic.sewlia.config.mod.optimization.dab;
 +
 +import one.tranic.sewlia.config.annotation.Comment;
++import one.tranic.sewlia.config.annotation.DisableReload;
 +
 +public class Enable {
 +    @Comment("Optimizes entity brains when they're far away from the player")
++    @DisableReload
 +    public static boolean value = false;
 +}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/dab/MaxActivationPrio.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/dab/MaxActivationPrio.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..3d389e7660f4bef69d63bfa3b5abd2f3d1f3720e
+index 0000000000000000000000000000000000000000..d4de8c6c1201d0c82d0b94dcae049ecc9825cdb6
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/config/mod/optimization/dab/MaxActivationPrio.java
-@@ -0,0 +1,9 @@
+@@ -0,0 +1,11 @@
 +package one.tranic.sewlia.config.mod.optimization.dab;
 +
 +import one.tranic.sewlia.config.annotation.Comments;
++import one.tranic.sewlia.config.annotation.DisableReload;
 +
 +public class MaxActivationPrio {
 +    @Comments({"This value defines how often in ticks, the furthest entity",
 +            "will get their pathfinders and behaviors ticked. 20 = 1s"})
++    @DisableReload
 +    public static int value = 20;
 +}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/dab/StartDistance.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/dab/StartDistance.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..bd0de447c83dc31ea2328b23944bf262d6c31113
+index 0000000000000000000000000000000000000000..caf2a726f30b6af9c0fe2ec2ee52da26f0b8d005
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/config/mod/optimization/dab/StartDistance.java
-@@ -0,0 +1,15 @@
+@@ -0,0 +1,17 @@
 +package one.tranic.sewlia.config.mod.optimization.dab;
 +
 +import one.tranic.sewlia.config.annotation.Comments;
++import one.tranic.sewlia.config.annotation.DisableReload;
 +
 +public class StartDistance {
 +    @Comments({"This value determines how far away an entity has to be",
 +            "from the player to start being effected by DEAR."})
++    @DisableReload
 +    public static int value = 12;
 +
 +    public static int finalValue = value * value;

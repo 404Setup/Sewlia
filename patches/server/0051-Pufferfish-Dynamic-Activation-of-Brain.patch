@@ -302,22 +302,30 @@ index 91728a992a29bc22e46a260750d5dd88e629bfd1..7229dd5d2886da882172bef7b87afe35
              this.assignProfessionWhenSpawned = false;
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/dab/BlacklistedEntities.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/dab/BlacklistedEntities.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..61633640a565cb45d619653e8c8a67f0f74fabdb
+index 0000000000000000000000000000000000000000..3880094d0345606b95dd77b75fc65c5256ccbcd9
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/config/mod/optimization/dab/BlacklistedEntities.java
-@@ -0,0 +1,24 @@
+@@ -0,0 +1,32 @@
 +package one.tranic.sewlia.config.mod.optimization.dab;
 +
++import net.minecraft.core.registries.BuiltInRegistries;
 +import net.minecraft.server.MinecraftServer;
 +import net.minecraft.world.entity.EntityType;
++import one.tranic.sewlia.config.annotation.DisableReload;
 +
 +import java.util.List;
 +import java.util.Optional;
 +
 +public class BlacklistedEntities {
++    @DisableReload
 +    public static List<String> value = List.of();
 +
 +    public static void Do() {
++        if (Enable.value) {
++            for (EntityType<?> entityType : BuiltInRegistries.ENTITY_TYPE) {
++                entityType.dabEnabled = true; // reset all, before setting the ones to true
++            }
++        }
 +        if (value.isEmpty()) {
 +            value = null;
 +            return;
