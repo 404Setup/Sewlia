@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Sat, 9 Nov 2024 12:34:47 +0800
+Subject: [PATCH] Lithium: cached_hashcode
+
+Source in: https://github.com/CaffeineMC/lithium-fabric
+
+diff --git a/src/main/java/net/minecraft/world/level/block/Block.java b/src/main/java/net/minecraft/world/level/block/Block.java
+index e0e01d6b2b387bd1abbb97beda93e3abad2c48a7..4db0129b60aa1c777ee21745f1dfb32dc4275cf7 100644
+--- a/src/main/java/net/minecraft/world/level/block/Block.java
++++ b/src/main/java/net/minecraft/world/level/block/Block.java
+@@ -600,11 +600,19 @@ public class Block extends BlockBehaviour implements ItemLike {
+         private final BlockState first;
+         private final BlockState second;
+         private final Direction direction;
++        private final int hash; // Lithium: cached_hashcode
+ 
+         public BlockStatePairKey(BlockState self, BlockState other, Direction facing) {
+             this.first = self;
+             this.second = other;
+             this.direction = facing;
++
++            // Lithium start - cached_hashcode
++            int i = this.first.hashCode();
++            i = 31 * i + this.second.hashCode();
++            i = 31 * i + this.direction.hashCode();
++            this.hash = i;
++            // Lithium end
+         }
+ 
+         public boolean equals(Object object) {
+@@ -620,11 +628,7 @@ public class Block extends BlockBehaviour implements ItemLike {
+         }
+ 
+         public int hashCode() {
+-            int i = this.first.hashCode();
+-
+-            i = 31 * i + this.second.hashCode();
+-            i = 31 * i + this.direction.hashCode();
+-            return i;
++            return this.hash; // Lithium: cached_hashcode
+         }
+     }
+ }
