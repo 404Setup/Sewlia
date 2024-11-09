@@ -824,6 +824,17 @@ index 0000000000000000000000000000000000000000..e3e62aafe376e822295fdb6c9f62847f
 +    @Comment("The timeout of the cache. Unit: Minutes.")
 +    public static int value = 1440;
 +}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/AcquirePoiForStuckEntity.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/AcquirePoiForStuckEntity.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..beb40825e9f54adb0c87735179701459dc347a99
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/optimization/AcquirePoiForStuckEntity.java
+@@ -0,0 +1,5 @@
++package one.tranic.sewlia.config.mod.optimization;
++
++public class AcquirePoiForStuckEntity {
++    public static int value = 60;
++}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/Halloween.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/Halloween.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..5e7a369d27e3319d5dff06214d21509bc68ca7e2
