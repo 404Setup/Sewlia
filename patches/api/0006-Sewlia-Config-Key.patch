@@ -922,6 +922,17 @@ index 0000000000000000000000000000000000000000..67a331f19fb7d24e52582fcaed83cf36
 +            "configuration option if the vanilla deviation is undesirable."})
 +    public static boolean value = false;
 +}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/UseAlternativeNoiseGenerator.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/UseAlternativeNoiseGenerator.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..0a614f43c306a5796c130ea11e25b29ca02d8feb
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/optimization/UseAlternativeNoiseGenerator.java
+@@ -0,0 +1,5 @@
++package one.tranic.sewlia.config.mod.optimization;
++
++public class UseAlternativeNoiseGenerator {
++    public static boolean value = false;
++}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/dab/ActivationDistanceMod.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/dab/ActivationDistanceMod.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..fb5732a2d9d5d1475c5df3af12855c822b1f0a68

@@ -94,14 +94,14 @@ index 13d3c877b006a4975e7370713e3919c661e7890f..f3e7dcd0a5625c7b4e8a3512ee05637a
              for (int i = 0; i < storage.getSize(); i++) {
                  T object = palette.valueFor(storage.get(i));
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator.java b/src/main/java/net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator.java
-index 90a05c6c59c197dfd81938dbbf438a4408449ff4..9c020c8d6551ee3c4f2081ce0e4a109ce532a0d1 100644
+index 90a05c6c59c197dfd81938dbbf438a4408449ff4..cbd9fdafaf3755e89887f8ffb8d1c6ef8ab480c9 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator.java
 @@ -52,6 +52,7 @@ import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
  import org.apache.commons.lang3.mutable.MutableObject;
  
  public final class NoiseBasedChunkGenerator extends ChunkGenerator {
-+    public static boolean PLAZMA_USE_NOISIUM = false; // Plazma - Optimize noise chunk generation
++    public static boolean PLAZMA_USE_NOISIUM = one.tranic.sewlia.config.mod.optimization.UseAlternativeNoiseGenerator.value; // Plazma - Optimize noise chunk generation
      private static final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor(); // Canvas
  
      public static final MapCodec<NoiseBasedChunkGenerator> CODEC = RecordCodecBuilder.mapCodec((instance) -> {
@@ -156,3 +156,77 @@ index 90a05c6c59c197dfd81938dbbf438a4408449ff4..9c020c8d6551ee3c4f2081ce0e4a109c
                                      heightmap.update(k4, j3, j5, iblockdata);
                                      heightmap1.update(k4, j3, j5, iblockdata);
                                      if (aquifer.shouldScheduleFluidUpdate() && !iblockdata.getFluidState().isEmpty()) {
+diff --git a/src/main/java/net/minecraft/world/level/levelgen/NoiseSettings.java b/src/main/java/net/minecraft/world/level/levelgen/NoiseSettings.java
+index 52fcf1b92854e5c67c51a83d31b4a136413b54e0..7a9262c7104b5d3a6515d704a2ed417f09c10535 100644
+--- a/src/main/java/net/minecraft/world/level/levelgen/NoiseSettings.java
++++ b/src/main/java/net/minecraft/world/level/levelgen/NoiseSettings.java
+@@ -8,7 +8,7 @@ import net.minecraft.core.QuartPos;
+ import net.minecraft.world.level.LevelHeightAccessor;
+ import net.minecraft.world.level.dimension.DimensionType;
+ 
+-public record NoiseSettings(int minY, int height, int noiseSizeHorizontal, int noiseSizeVertical) {
++public record NoiseSettings(int minY, int height, int noiseSizeHorizontal, int noiseSizeVertical, int horizontalCellBlockCount, int verticalCellBlockCount) { // Plazma - Optimize noise
+     public static final Codec<NoiseSettings> CODEC = RecordCodecBuilder.<NoiseSettings>create(
+             instance -> instance.group(
+                         Codec.intRange(DimensionType.MIN_Y, DimensionType.MAX_Y).fieldOf("min_y").forGetter(NoiseSettings::minY),
+@@ -16,8 +16,8 @@ public record NoiseSettings(int minY, int height, int noiseSizeHorizontal, int n
+                         Codec.intRange(1, 4).fieldOf("size_horizontal").forGetter(NoiseSettings::noiseSizeHorizontal),
+                         Codec.intRange(1, 4).fieldOf("size_vertical").forGetter(NoiseSettings::noiseSizeVertical)
+                     )
+-                    .apply(instance, NoiseSettings::new)
+-        )
++                    .apply(instance, NoiseSettings::create) // Plazma - Optimize noise
++            )
+         .comapFlatMap(NoiseSettings::guardY, Function.identity());
+     protected static final NoiseSettings OVERWORLD_NOISE_SETTINGS = create(-64, 384, 1, 2);
+     protected static final NoiseSettings NETHER_NOISE_SETTINGS = create(0, 128, 1, 2);
+@@ -36,7 +36,7 @@ public record NoiseSettings(int minY, int height, int noiseSizeHorizontal, int n
+     }
+ 
+     public static NoiseSettings create(int minimumY, int height, int horizontalSize, int verticalSize) {
+-        NoiseSettings noiseSettings = new NoiseSettings(minimumY, height, horizontalSize, verticalSize);
++        NoiseSettings noiseSettings = new NoiseSettings(minimumY, height, horizontalSize, verticalSize, QuartPos.toBlock(horizontalSize), QuartPos.toBlock(verticalSize)); // Plazma - Optimize noise
+         guardY(noiseSettings).error().ifPresent(error -> {
+             throw new IllegalStateException(error.message());
+         });
+@@ -44,16 +44,16 @@ public record NoiseSettings(int minY, int height, int noiseSizeHorizontal, int n
+     }
+ 
+     public int getCellHeight() {
+-        return QuartPos.toBlock(this.noiseSizeVertical());
++        return this.noiseSizeHorizontal; // Plazma - Optimize noise
+     }
+ 
+     public int getCellWidth() {
+-        return QuartPos.toBlock(this.noiseSizeHorizontal());
++        return this.noiseSizeVertical; // Plazma - Optimize noise
+     }
+ 
+     public NoiseSettings clampToHeightAccessor(LevelHeightAccessor world) {
+         int i = Math.max(this.minY, world.getMinBuildHeight());
+         int j = Math.min(this.minY + this.height, world.getMaxBuildHeight()) - i;
+-        return new NoiseSettings(i, j, this.noiseSizeHorizontal, this.noiseSizeVertical);
++        return new NoiseSettings(i, j, this.noiseSizeHorizontal, this.noiseSizeVertical, QuartPos.toBlock(this.noiseSizeHorizontal), QuartPos.toBlock(this.noiseSizeVertical)); // Plazma - Optimize noise
+     }
+ }
+diff --git a/src/main/java/net/minecraft/world/level/levelgen/material/MaterialRuleList.java b/src/main/java/net/minecraft/world/level/levelgen/material/MaterialRuleList.java
+index afdbc74a3012fa717f59ecef613567338d285b7b..148dc8a7ccd8ed97b9e62e7bae86081adda7a7fc 100644
+--- a/src/main/java/net/minecraft/world/level/levelgen/material/MaterialRuleList.java
++++ b/src/main/java/net/minecraft/world/level/levelgen/material/MaterialRuleList.java
+@@ -10,11 +10,11 @@ public record MaterialRuleList(List<NoiseChunk.BlockStateFiller> materialRuleLis
+     @Nullable
+     @Override
+     public BlockState calculate(DensityFunction.FunctionContext pos) {
+-        for (NoiseChunk.BlockStateFiller blockStateFiller : this.materialRuleList) {
+-            BlockState blockState = blockStateFiller.calculate(pos);
+-            if (blockState != null) {
+-                return blockState;
+-            }
++        // Plazma start - Optimize noise
++        for (int i = 0; i < this.materialRuleList.size(); i++) {
++            BlockState state = this.materialRuleList.get(i).calculate(pos);
++            if (state == null) continue;
++            return state; // Plazma end - Optimize noise
+         }
+ 
+         return null;
