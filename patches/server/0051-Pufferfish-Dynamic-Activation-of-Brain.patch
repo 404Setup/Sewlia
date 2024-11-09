@@ -302,10 +302,10 @@ index 91728a992a29bc22e46a260750d5dd88e629bfd1..7229dd5d2886da882172bef7b87afe35
              this.assignProfessionWhenSpawned = false;
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/dab/BlacklistedEntities.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/dab/BlacklistedEntities.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..fb95b6d6e4dbcf1e00f758c2766538b43c860e08
+index 0000000000000000000000000000000000000000..61633640a565cb45d619653e8c8a67f0f74fabdb
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/config/mod/optimization/dab/BlacklistedEntities.java
-@@ -0,0 +1,22 @@
+@@ -0,0 +1,24 @@
 +package one.tranic.sewlia.config.mod.optimization.dab;
 +
 +import net.minecraft.server.MinecraftServer;
@@ -318,13 +318,15 @@ index 0000000000000000000000000000000000000000..fb95b6d6e4dbcf1e00f758c2766538b4
 +    public static List<String> value = List.of();
 +
 +    public static void Do() {
++        if (value.isEmpty()) {
++            value = null;
++            return;
++        }
 +        for (String s : value) {
 +            Optional<EntityType<?>> v = EntityType.byString(s);
-+            if (v.isPresent()) {
-+                v.get().dabEnabled = false;
-+            } else MinecraftServer.LOGGER.warn("Unknown entity \"{}\"", s);
++            if (v.isPresent()) v.get().dabEnabled = false; else MinecraftServer.LOGGER.warn("Unknown entity \"{}\"", s);
 +        }
-+        value.clear();
++        try {value.clear();} catch (Exception ignored) {}
 +        value = null; // After execution, it is no longer needed, so clear it and set it to null
 +    }
 +}
