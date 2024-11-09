@@ -6,10 +6,10 @@ Subject: [PATCH] Sewlia Permission
 
 diff --git a/src/main/java/one/tranic/sewlia/Permission.java b/src/main/java/one/tranic/sewlia/Permission.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..e71e86b41f622b905f996a96c96f1cfb3a078773
+index 0000000000000000000000000000000000000000..1a397d7c56891ccec79a69377610c6a4874c52c6
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/Permission.java
-@@ -0,0 +1,47 @@
+@@ -0,0 +1,59 @@
 +package one.tranic.sewlia;
 +
 +import org.bukkit.permissions.PermissionDefault;
@@ -40,6 +40,18 @@ index 0000000000000000000000000000000000000000..e71e86b41f622b905f996a96c96f1cfb
 +        setPermission(
 +                "command.tpsbar.another",
 +                "Show tpsbar to others",
++                PermissionDefault.OP,
++                parent
++        );
++        setPermission(
++                "command.rambar.self",
++                "Show rambar for yourself",
++                PermissionDefault.TRUE,
++                parent
++        );
++        setPermission(
++                "command.rambar.another",
++                "Show rambar to others",
 +                PermissionDefault.OP,
 +                parent
 +        );

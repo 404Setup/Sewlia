@@ -6,10 +6,10 @@ Subject: [PATCH] Luminol: Prevent teleportAsync calling during moving event
 
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index d6c9163afd99dadc02fa50770d77cce9dc74eda2..d9dddf2cfaaa4967a9327cee777f99764055c979 100644
+index 6f6218c8be69583648bb5bb511d71f92d8f40cd9..06eb436679a82e84ce427a3f83f4a6b6831bb081 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-@@ -335,6 +335,10 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -336,6 +336,10 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
      }
      // Paper end - rewrite chunk system
  
