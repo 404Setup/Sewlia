@@ -5,10 +5,10 @@ Subject: [PATCH] Leaves: Fix falling block's block location
 
 
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index e61cec9aec2d5d313ff1936ab685956527a28977..f6746305b8ae71fa430de4b693c28a359053a81c 100644
+index 2b997edaab11c2fab76684f0e9208e4b6955b43b..984aed9dbd0d4a8a23a41599983fadd3c6934e66 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -5508,6 +5508,14 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -5520,6 +5520,14 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
              int j = Mth.floor(y);
              int k = Mth.floor(z);
  

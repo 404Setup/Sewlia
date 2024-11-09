@@ -18,7 +18,7 @@ index 3cd429e824926c4052e12f33058faa036d14bafb..ca22c0235b81f38a9c2a4ad800e43855
          this.server.spark.enableEarlyIfRequested(); // Paper - spark
          // Paper start - fix converting txt to json file; convert old users earlier after PlayerList creation but before file load/save
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index b6476f74ad9566d5e59e4977764a87d379b83856..63bf5cbbb45f13179819fee21a2c2142d5c34609 100644
+index 19c824b21a8f6ce445cb93308030eb9e47789247..8c453516ed6b7225a0733ac3254247e0a4ee5a7a 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -860,6 +860,12 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess

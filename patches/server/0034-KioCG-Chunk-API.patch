@@ -111,12 +111,12 @@ index 7accad9d29a614eae14b2e8848895808d2e297cf..814d59ce8dd59df24acfcf95d5d4526b
          } else {
              passenger.stopRiding();
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index d6c9163afd99dadc02fa50770d77cce9dc74eda2..15a1712a8664c9bb23716c48235e96bd5ec9d18b 100644
+index d9dddf2cfaaa4967a9327cee777f99764055c979..392c422976d7c8f2967e4695902981b27aebadeb 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-@@ -335,6 +335,26 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
-     }
-     // Paper end - rewrite chunk system
+@@ -339,6 +339,26 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+     public boolean handlingMoveEvent = false;
+     // Luminol end
  
 +    // KioCG start - ChunkHot
 +    private volatile long nearbyChunkHot = 0;
@@ -141,7 +141,7 @@ index d6c9163afd99dadc02fa50770d77cce9dc74eda2..15a1712a8664c9bb23716c48235e96bd
      public ServerPlayer(MinecraftServer server, ServerLevel world, GameProfile profile, ClientInformation clientOptions) {
          super(world, world.getSharedSpawnPos(), world.getSharedSpawnAngle(), profile);
          this.chatVisibility = ChatVisiblity.FULL;
-@@ -969,6 +989,12 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -973,6 +993,12 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
          this.trackEnteredOrExitedLavaOnVehicle();
          this.updatePlayerAttributes();
          this.advancements.flushDirty(this);
@@ -171,10 +171,10 @@ index 1859477e96709368683fe5707327e92f56fbfc8e..4c4814094552fa4382b1cbe649f24f47
 +    // KioCG end
  }
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index f6746305b8ae71fa430de4b693c28a359053a81c..9f6e4406941bd575dd42b0930bce2f6317f68f90 100644
+index 984aed9dbd0d4a8a23a41599983fadd3c6934e66..e8ceeb282b1c828f83fdf683c295b2eb46010e69 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -5810,4 +5810,6 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -5822,4 +5822,6 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
          return ((net.minecraft.server.level.ServerChunkCache) level.getChunkSource()).isPositionTicking(this);
      }
      // Paper end - Expose entity id counter

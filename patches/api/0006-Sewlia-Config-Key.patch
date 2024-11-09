@@ -766,6 +766,31 @@ index 0000000000000000000000000000000000000000..54d5ac1138baa45f35e6b110112dcae0
 +public class WarnOnDetected {
 +    public static boolean value = true;
 +}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/fix/teleport_async/Enable.java b/src/main/java/one/tranic/sewlia/config/mod/fix/teleport_async/Enable.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..caefde8bd937bb7cad561821e8c1fa29bbb2c9d5
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/fix/teleport_async/Enable.java
+@@ -0,0 +1,8 @@
++package one.tranic.sewlia.config.mod.fix.teleport_async;
++
++import one.tranic.sewlia.config.annotation.Comment;
++
++public class Enable {
++    @Comment("A fix which fixed some bugs of teleportAsync that caused by plugins(such as Residence)")
++    public static boolean value = false;
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/fix/teleport_async/ThrowOnDetected.java b/src/main/java/one/tranic/sewlia/config/mod/fix/teleport_async/ThrowOnDetected.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..c37c7515807b0a96ae0299511e1e2055725b6fca
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/fix/teleport_async/ThrowOnDetected.java
+@@ -0,0 +1,5 @@
++package one.tranic.sewlia.config.mod.fix.teleport_async;
++
++public class ThrowOnDetected {
++    public static boolean value = false;
++}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/misc/cache_player_profile/Enable.java b/src/main/java/one/tranic/sewlia/config/mod/misc/cache_player_profile/Enable.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..1a6b6d39a0d656beb1d98d6d1f0db713be9a7437
