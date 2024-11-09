@@ -21,7 +21,7 @@ index fb21572eecb512bdb5ecafcda44f404c2a0e6cde..a5abe913009e0e52e2b4ec3772243630
          }
  
          if (nbt.contains("Sewlia.TPSBar")) { this.tpsBar = nbt.getBoolean("Sewlia.TPSBar"); } // Sewlia
-+        if (nbt.contains("Sewlia.RamBar")) { this.tpsBar = nbt.getBoolean("Sewlia.RamBar"); } // Sewlia
++        if (nbt.contains("Sewlia.RamBar")) { this.ramBar = nbt.getBoolean("Sewlia.RamBar"); } // Sewlia
  
      }
  
@@ -29,7 +29,7 @@ index fb21572eecb512bdb5ecafcda44f404c2a0e6cde..a5abe913009e0e52e2b4ec3772243630
          }
  
          nbt.putBoolean("Sewlia.TPSBar", this.tpsBar); // Sewlia
-+        nbt.putBoolean("Sewlia.RamBar", this.tpsBar); // Sewlia
++        nbt.putBoolean("Sewlia.RamBar", this.ramBar); // Sewlia
      }
  
      // CraftBukkit start - World fallback code, either respawn location or global spawn
