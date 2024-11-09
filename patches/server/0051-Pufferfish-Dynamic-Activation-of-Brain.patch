@@ -26,6 +26,18 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
+index 99123594c8adda5cdac90d47114d2acfff2b7570..3cd429e824926c4052e12f33058faa036d14bafb 100644
+--- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
++++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
+@@ -180,6 +180,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+         this.paperConfigurations.initializeGlobalConfiguration(this.registryAccess());
+         this.paperConfigurations.initializeWorldDefaultsConfiguration(this.registryAccess());
+         // Paper end - initialize global and world-defaults configuration
++        one.tranic.sewlia.config.mod.optimization.dab.BlacklistedEntities.Do(); // Sewlia - Delayed boot
+         one.tranic.sewlia.command.CommandUtil.register(); // Sewlia - commands
+         this.server.spark.enableEarlyIfRequested(); // Paper - spark
+         // Paper start - fix converting txt to json file; convert old users earlier after PlayerList creation but before file load/save
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
 index ad54079e5f4430965f1585ec82b7d7c8badf327a..14c46be892bd45f8702903124cf6737430879989 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
@@ -290,7 +302,7 @@ index 91728a992a29bc22e46a260750d5dd88e629bfd1..7229dd5d2886da882172bef7b87afe35
              this.assignProfessionWhenSpawned = false;
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/dab/BlacklistedEntities.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/dab/BlacklistedEntities.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..cced4fc5f53d0a45038ccaeecacfbda365308a19
+index 0000000000000000000000000000000000000000..fb95b6d6e4dbcf1e00f758c2766538b43c860e08
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/config/mod/optimization/dab/BlacklistedEntities.java
 @@ -0,0 +1,22 @@
@@ -305,7 +317,7 @@ index 0000000000000000000000000000000000000000..cced4fc5f53d0a45038ccaeecacfbda3
 +public class BlacklistedEntities {
 +    public static List<String> value = List.of();
 +
-+    public static void ReadDo() {
++    public static void Do() {
 +        for (String s : value) {
 +            Optional<EntityType<?>> v = EntityType.byString(s);
 +            if (v.isPresent()) {
