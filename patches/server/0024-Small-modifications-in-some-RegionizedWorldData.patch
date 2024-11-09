@@ -1,0 +1,59 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Sat, 9 Nov 2024 16:25:04 +0800
+Subject: [PATCH] Small modifications in some RegionizedWorldData
+
+
+diff --git a/src/main/java/io/papermc/paper/threadedregions/RegionizedWorldData.java b/src/main/java/io/papermc/paper/threadedregions/RegionizedWorldData.java
+index 06cb6fe685f221d6f24ca07ad2837b9b747042b2..06bb823bcad9babb71a7e1eb2aca553a017f4fda 100644
+--- a/src/main/java/io/papermc/paper/threadedregions/RegionizedWorldData.java
++++ b/src/main/java/io/papermc/paper/threadedregions/RegionizedWorldData.java
+@@ -314,7 +314,7 @@ public final class RegionizedWorldData {
+     private RegionizedServer.WorldLevelData tickData;
+ 
+     // connections
+-    public final List<Connection> connections = new ArrayList<>();
++    public final List<Connection> connections = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(); // Sewlia
+ 
+     // misc. fields
+     private boolean isHandlingTick;
+@@ -328,7 +328,7 @@ public final class RegionizedWorldData {
+     }
+ 
+     // entities
+-    private final List<ServerPlayer> localPlayers = new ArrayList<>();
++    private final List<ServerPlayer> localPlayers = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(); // Sewlia
+     private final NearbyPlayers nearbyPlayers;
+     private final ReferenceList<Entity> allEntities = new ReferenceList<>(EMPTY_ENTITY_ARRAY);
+     private final ReferenceList<Entity> loadedEntities = new ReferenceList<>(EMPTY_ENTITY_ARRAY);
+@@ -343,8 +343,8 @@ public final class RegionizedWorldData {
+     private final LevelTicks<Fluid> fluidLevelTicks;
+ 
+     // tile entity ticking
+-    private final List<TickingBlockEntity> pendingBlockEntityTickers = new ArrayList<>();
+-    private final List<TickingBlockEntity> blockEntityTickers = new ArrayList<>();
++    private final List<TickingBlockEntity> pendingBlockEntityTickers = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(); // Sewlia
++    private final List<TickingBlockEntity> blockEntityTickers = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(); // Sewlia
+     private boolean tickingBlockEntities;
+ 
+     // time
+@@ -383,8 +383,8 @@ public final class RegionizedWorldData {
+     public boolean captureBlockStates = false;
+     public boolean captureTreeGeneration = false;
+     public boolean isBlockPlaceCancelled = false; // Paper - prevent calling cleanup logic when undoing a block place upon a cancelled BlockPlaceEvent
+-    public final Map<BlockPos, CraftBlockState> capturedBlockStates = new java.util.LinkedHashMap<>(); // Paper
+-    public final Map<BlockPos, BlockEntity> capturedTileEntities = new java.util.LinkedHashMap<>(); // Paper
++    public final Map<BlockPos, CraftBlockState> capturedBlockStates = new it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap<>(); // Paper // Sewlia
++    public final Map<BlockPos, BlockEntity> capturedTileEntities = new it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap<>(); // Paper // Sewlia
+     public List<ItemEntity> captureDrops;
+     // Paper start
+     public int wakeupInactiveRemainingAnimals;
+@@ -397,7 +397,7 @@ public final class RegionizedWorldData {
+     @VisibleForDebug
+     public NaturalSpawner.SpawnState lastSpawnState;
+     public boolean shouldSignal = true;
+-    public final Map<Explosion.CacheKey, Float> explosionDensityCache = new HashMap<>(64, 0.25f);
++    public final Map<Explosion.CacheKey, Float> explosionDensityCache = new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>(64, 0.25f); // Sewlia
+     public final PathTypeCache pathTypesByPosCache = new PathTypeCache();
+     public ServerChunkCache.ChunkAndHolder[] iterationCopy; // Paper - chunk tick iteration optimisations
+ 
