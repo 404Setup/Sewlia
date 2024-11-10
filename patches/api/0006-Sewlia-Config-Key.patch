@@ -1065,3 +1065,17 @@ index 0000000000000000000000000000000000000000..dc831edaea729e1909263fbc142cad33
 +    @DisableReload
 +    public static int value = 10;
 +}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/rail/FasterSignalSearch.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/rail/FasterSignalSearch.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..38f86c72e6604732254751674f0875401e878005
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/optimization/rail/FasterSignalSearch.java
+@@ -0,0 +1,8 @@
++package one.tranic.sewlia.config.mod.optimization.rail;
++
++import one.tranic.sewlia.config.annotation.Comment;
++
++public class FasterSignalSearch {
++    @Comment("Optimizing powered rails with faster implementations")
++    public static boolean value = false;
++}
