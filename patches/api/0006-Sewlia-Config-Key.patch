@@ -894,6 +894,17 @@ index 0000000000000000000000000000000000000000..e657d54881feb75e05438fb7e1c93018
 +            "This can improve performance by a few percent, but has minor gameplay implications."})
 +    public static boolean value = false;
 +}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/NoiseGeneration.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/NoiseGeneration.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..6478b751ced379af0fe5fa3f84d8e991ac809d47
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/optimization/NoiseGeneration.java
+@@ -0,0 +1,5 @@
++package one.tranic.sewlia.config.mod.optimization;
++
++public class NoiseGeneration {
++    public static boolean value = false;
++}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/RunExtraTasksDuringWaiting.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/RunExtraTasksDuringWaiting.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..7549383deabee9b461becdd308d9c8708bf4c91d
