@@ -40,7 +40,7 @@ jobs:
       - name: Clear Build
         run: pwsh scripts/clear_build.ps1
       - name: Upload to Mars API
-        run: pwsh scripts/create_build.ps1 ${{ env.mcversion }} ${{ secrets.MARS_TOKEN }} experimental
+        run: pwsh scripts/create_build.ps1 ${{ env.mcversion }} ${{ secrets.MARS_TOKEN }}
       - name: Upload Artifact
         uses: "actions/upload-artifact@v4"
         with:
