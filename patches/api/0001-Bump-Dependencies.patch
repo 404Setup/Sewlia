@@ -5,7 +5,7 @@ Subject: [PATCH] Bump Dependencies
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index e7c96be769fde8375b9a1b128cc7ce474144d16d..bad513122bcffe01d0d46898f7366fffeb8e4f26 100644
+index e7c96be769fde8375b9a1b128cc7ce474144d16d..4dd8c0d2de9e9ad14ce16221c3d351af444fd0c2 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -12,8 +12,8 @@ java {
@@ -45,16 +45,19 @@ index e7c96be769fde8375b9a1b128cc7ce474144d16d..bad513122bcffe01d0d46898f7366fff
      apiAndDocs(platform("net.kyori:adventure-bom:$adventureVersion"))
      apiAndDocs("net.kyori:adventure-api")
      apiAndDocs("net.kyori:adventure-text-minimessage")
-@@ -72,6 +72,8 @@ dependencies {
+@@ -72,6 +72,11 @@ dependencies {
      // Paper end
      api("org.jspecify:jspecify:1.0.0") // Paper - add jspecify
  
-+    api("net.intelie.tinymap:tinymap:0.7") // Sewlia
++    // Sewlia start
++    api("net.intelie.tinymap:tinymap:0.7")
++    api("org.libj:math:0.6.9-SNAPSHOT")
++    // Sewlia end
 +
      testImplementation("org.apache.commons:commons-lang3:3.12.0")
      testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
      testImplementation("org.hamcrest:hamcrest:2.2")
-@@ -148,13 +150,13 @@ tasks.withType<Javadoc> {
+@@ -148,13 +153,13 @@ tasks.withType<Javadoc> {
      options.use()
      options.isDocFilesSubDirs = true
      options.links(

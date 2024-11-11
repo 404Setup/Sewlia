@@ -5,10 +5,10 @@ Subject: [PATCH] Ignore compile time warnings
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index c296b67e9904ab578aa502c1f7beb66cbe91c887..04c2913331904e7ca64fba2a359c5d3fa6efb091 100644
+index e8fe5a342b88743087b8e372a9ce1a3d8823887f..4b78edb6f96b7420817c86fb947671680bd943de 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -200,6 +200,13 @@ fun TaskContainer.registerRunTask(
+@@ -201,6 +201,13 @@ fun TaskContainer.registerRunTask(
      block(this)
  }
  

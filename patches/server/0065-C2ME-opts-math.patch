@@ -6,13 +6,13 @@ Subject: [PATCH] C2ME: opts math
 Source in: https://github.com/RelativityMC/C2ME-fabric
 
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/synth/ImprovedNoise.java b/src/main/java/net/minecraft/world/level/levelgen/synth/ImprovedNoise.java
-index 9a97e5cd23d839183ac4d243d28df92af3119fe7..b13bc01959138d77efbbd7bc764e12846afe53b3 100644
+index 9a97e5cd23d839183ac4d243d28df92af3119fe7..587c4a0896ea707dadd8a19011689f71d1103797 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/synth/ImprovedNoise.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/synth/ImprovedNoise.java
 @@ -11,6 +11,27 @@ public final class ImprovedNoise {
      public final double yo;
      public final double zo;
-
+ 
 +    // C2ME start - opts math
 +    private static final double[] FLAT_SIMPLEX_GRAD = new double[]{
 +            1, 1, 0, 0,
@@ -60,17 +60,17 @@ index 9a97e5cd23d839183ac4d243d28df92af3119fe7..b13bc01959138d77efbbd7bc764e1284
 @@ -53,12 +81,12 @@ public final class ImprovedNoise {
                  m = h;
              }
-
+ 
 -            o = (double)Mth.floor(m / yScale + 1.0E-7F) * yScale;
 +            o = one.tranic.sewlia.config.mod.optimization.NoiseGeneration.value ? Math.floor(m / yScale + (double)1.0E-7F) * yScale : (double)Mth.floor(m / yScale + 1.0E-7F) * yScale; // C2ME - opts math
          } else {
              o = 0.0;
          }
-
+ 
 -        return this.sampleAndLerp(i, j, k, g, h - o, l, h);
 +        return one.tranic.sewlia.config.mod.optimization.NoiseGeneration.value ? this.sampleAndLerp((int) i, (int) j, (int) k, g, h - o, l, h) : this.sampleAndLerp(i, j, k, g, h - o, l, h); // C2ME - opts math
      }
-
+ 
      public double noiseWithDerivative(double x, double y, double z, double[] ds) {
 @@ -68,10 +96,19 @@ public final class ImprovedNoise {
          int i = Mth.floor(d);
@@ -94,11 +94,11 @@ index 9a97e5cd23d839183ac4d243d28df92af3119fe7..b13bc01959138d77efbbd7bc764e1284
 +        }
 +        // C2ME end
      }
-
+ 
      private static double gradDot(int hash, double x, double y, double z) {
 @@ -83,24 +120,90 @@ public final class ImprovedNoise {
      }
-
+ 
      private double sampleAndLerp(int sectionX, int sectionY, int sectionZ, double localX, double localY, double localZ, double fadeLocalY) {
 -        int i = this.p(sectionX);
 -        int j = this.p(sectionX + 1);
@@ -203,16 +203,16 @@ index 9a97e5cd23d839183ac4d243d28df92af3119fe7..b13bc01959138d77efbbd7bc764e1284
 +        }
 +        // C2ME end
      }
-
+ 
      private double sampleWithDerivative(int sectionX, int sectionY, int sectionZ, double localX, double localY, double localZ, double[] ds) {
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/synth/PerlinNoise.java b/src/main/java/net/minecraft/world/level/levelgen/synth/PerlinNoise.java
-index 35820670837376bcad8891241724d5b946fbd31f..f4480a6d508c82f6b47e2370999fa819525d9a29 100644
+index 35820670837376bcad8891241724d5b946fbd31f..5dcf53585a9c3a1b4f2aea43abc28e4eeeb96ec9 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/synth/PerlinNoise.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/synth/PerlinNoise.java
 @@ -27,6 +27,8 @@ public class PerlinNoise {
      private final double lowestFreqInputFactor;
      private final double maxValue;
-
+ 
 +    private final int octaveSamplersCount; private final double [] amplitudesArray; // C2ME - opts math
 +
      @Deprecated
@@ -225,11 +225,11 @@ index 35820670837376bcad8891241724d5b946fbd31f..f4480a6d508c82f6b47e2370999fa819
 +
 +        this.octaveSamplersCount = this.noiseLevels.length; this.amplitudesArray = this.amplitudes.toDoubleArray(); // C2ME - opts math
      }
-
+ 
      protected double maxValue() {
-@@ -138,7 +142,30 @@ public class PerlinNoise {
+@@ -138,11 +142,33 @@ public class PerlinNoise {
      }
-
+ 
      public double getValue(double x, double y, double z) {
 -        return this.getValue(x, y, z, 0.0, 0.0, false);
 +        // C2ME start - opts math
@@ -257,6 +257,10 @@ index 35820670837376bcad8891241724d5b946fbd31f..f4480a6d508c82f6b47e2370999fa819
 +        }
 +        // C2ME end
      }
-
-     @Deprecated
-\ No newline at end of file
+ 
+-    @Deprecated
+-    public double getValue(double x, double y, double z, double yScale, double yMax, boolean useOrigin) {
++    @Deprecated    public double getValue(double x, double y, double z, double yScale, double yMax, boolean useOrigin) {
+         double d = 0.0;
+         double e = this.lowestFreqInputFactor;
+         double f = this.lowestFreqValueFactor;
