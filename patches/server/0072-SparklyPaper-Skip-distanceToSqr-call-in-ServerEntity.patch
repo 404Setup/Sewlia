@@ -2,7 +2,7 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: MrPowerGamerBR <git@mrpowergamerbr.com>
 Date: Wed, 15 Nov 2023 23:39:36 -0300
 Subject: [PATCH] SparklyPaper: Skip "distanceToSqr" call in
- "ServerEntity#sendChanges" if  the delta movement hasn't changed
+ "ServerEntity#sendChanges" if the delta movement hasn't changed
 
 The "distanceToSqr" call is a bit expensive, so avoiding it is pretty nice, around ~15% calls are skipped with this check
 

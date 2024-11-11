@@ -7,7 +7,7 @@ Subject: [PATCH] SparklyPaper: Skip dirty stats copy when requesting player
 There's literally only one getDirty call. Because the map was only retrieved once, we don't actually need to create a copy of the map just to iterate it, we can just access it directly and clear it manually after use.
 
 diff --git a/src/main/java/net/minecraft/stats/ServerStatsCounter.java b/src/main/java/net/minecraft/stats/ServerStatsCounter.java
-index fb7342f7a5008a283c3400c6313c637de8210dfa..64ada354ec0aaf08f2344c177da7c63edb2ddb47 100644
+index 0b4c6f5194b337e1dbef5410f5d716373a496020..2647ed30d4779dba413f1b9178b10aeb9c550168 100644
 --- a/src/main/java/net/minecraft/stats/ServerStatsCounter.java
 +++ b/src/main/java/net/minecraft/stats/ServerStatsCounter.java
 @@ -90,12 +90,12 @@ public class ServerStatsCounter extends StatsCounter {
