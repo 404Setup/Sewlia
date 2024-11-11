@@ -9,7 +9,7 @@ Optimizes "image in map" maps, without requiring the map to be locked, which som
 This has the disadvantage that the vanilla map data will never be updated while the CraftMapRenderer is not present, but that's not a huuuge problem for us
 
 diff --git a/src/main/java/net/minecraft/world/item/MapItem.java b/src/main/java/net/minecraft/world/item/MapItem.java
-index e96f15814986109e5e947c7b3b210be6e56ba0ed..fd67442815b43b65fe64a831c8229390b979716e 100644
+index e96f15814986109e5e947c7b3b210be6e56ba0ed..a46b206b6150625596aaf1f0f1604e551feeb793 100644
 --- a/src/main/java/net/minecraft/world/item/MapItem.java
 +++ b/src/main/java/net/minecraft/world/item/MapItem.java
 @@ -281,9 +281,9 @@ public class MapItem extends ComplexItem {
