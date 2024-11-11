@@ -1,0 +1,251 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Mon, 11 Nov 2024 23:17:30 +0800
+Subject: [PATCH] Sewlia new version fetcher
+
+
+diff --git a/src/main/java/one/tranic/sewlia/utils/SewliaVersionFetcher.java b/src/main/java/one/tranic/sewlia/utils/SewliaVersionFetcher.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..cc46e24dd8c6fc7048413655f1de18f6b018faa1
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/utils/SewliaVersionFetcher.java
+@@ -0,0 +1,226 @@
++package one.tranic.sewlia.utils;
++
++import com.destroystokyo.paper.VersionHistoryManager;
++import com.destroystokyo.paper.util.VersionFetcher;
++import com.google.common.base.Charsets;
++import com.google.gson.Gson;
++import com.google.gson.JsonArray;
++import com.google.gson.JsonObject;
++import com.google.gson.JsonSyntaxException;
++import io.papermc.paper.ServerBuildInfo;
++import net.kyori.adventure.text.Component;
++import net.kyori.adventure.text.TextComponent;
++import net.kyori.adventure.text.event.ClickEvent;
++import net.kyori.adventure.text.format.NamedTextColor;
++import net.kyori.adventure.text.format.TextDecoration;
++import org.checkerframework.checker.nullness.qual.Nullable;
++import org.jetbrains.annotations.NotNull;
++import org.slf4j.Logger;
++import org.slf4j.LoggerFactory;
++
++import java.io.BufferedReader;
++import java.io.IOException;
++import java.io.InputStreamReader;
++import java.io.Reader;
++import java.net.HttpURLConnection;
++import java.net.MalformedURLException;
++import java.net.URI;
++import java.net.URL;
++import java.time.ZoneId;
++import java.time.ZonedDateTime;
++import java.time.format.DateTimeFormatter;
++import java.util.Optional;
++
++import static net.kyori.adventure.text.Component.text;
++import static net.kyori.adventure.text.format.TextColor.color;
++
++public class SewliaVersionFetcher implements VersionFetcher {
++    private static final Logger LOGGER = LoggerFactory.getLogger("SewliaVersionFetcher");
++    private static final ZoneId ZONE_ID = ZoneId.systemDefault();
++    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS'Z'");
++    private static final int DISTANCE_ERROR = -1;
++    private static final int DISTANCE_UNKNOWN = -2;
++    private static final BuildInfo DISTANCE_ERROR_INFO = new BuildInfo(DISTANCE_ERROR, null);
++    private static final BuildInfo DISTANCE_UNKNOWN_INFO = new BuildInfo(DISTANCE_UNKNOWN, null);
++    private static final Gson GSON = new Gson();
++    private static final URL API_ADDRESS;
++
++    static {
++        URL apiAddress;
++        try {
++            apiAddress = URI.create("https://mars.tranic.one/v2/projects/sewlia/versions/" + ServerBuildInfo.buildInfo().minecraftVersionId() + "/builds").toURL();
++        } catch (MalformedURLException e) {
++            apiAddress = null;
++            LOGGER.error("Failed to construct URL", e);
++        }
++        API_ADDRESS = apiAddress;
++    }
++
++    private static Component getUpdateStatusMessage(final String repo, final ServerBuildInfo build) {
++        BuildInfo distance = fetchDistanceFromSiteApi(build);
++
++        if (distance.distance() == DISTANCE_ERROR || distance.distance() == DISTANCE_UNKNOWN) {
++            Optional<String> gitBranch = build.gitBranch();
++            Optional<String> gitCommit = build.gitCommit();
++            if (gitBranch.isPresent() && gitCommit.isPresent()) {
++                distance = fetchDistanceFromGitHub(repo, gitBranch.get(), gitCommit.get());
++            }
++        }
++
++        return switch (distance.distance()) {
++            case DISTANCE_ERROR -> text("Error obtaining version information", NamedTextColor.YELLOW);
++            case 0 -> text("You are running the latest version", NamedTextColor.GREEN);
++            case DISTANCE_UNKNOWN -> text("Unknown version", NamedTextColor.YELLOW);
++            default -> buildUpdateMessage(distance);
++        };
++    }
++
++    private static BuildInfo fetchDistanceFromSiteApi(final ServerBuildInfo build) {
++        if (API_ADDRESS == null || build.gitCommit().isEmpty()) {
++            LOGGER.error("API Address or Commit ID is missing");
++            return DISTANCE_ERROR_INFO;
++        }
++
++        try (BufferedReader reader = getApiBufferedReader()) {
++            return reader != null ? checkBuildUpdates(reader, build.gitCommit().get()) : DISTANCE_UNKNOWN_INFO;
++        } catch (IOException | JsonSyntaxException e) {
++            LOGGER.error("Error parsing JSON from the API", e);
++            return DISTANCE_ERROR_INFO;
++        }
++    }
++
++    private static BufferedReader getApiBufferedReader() {
++        try {
++            HttpURLConnection connection = (HttpURLConnection) API_ADDRESS.openConnection();
++            connection.connect();
++            if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
++                return null;
++            }
++            return new BufferedReader(new InputStreamReader(connection.getInputStream(), Charsets.UTF_8));
++        } catch (IOException e) {
++            LOGGER.error("Error while establishing connection to API", e);
++            return null;
++        }
++    }
++
++    private static BuildInfo fetchDistanceFromGitHub(final String repo, final String branch, final String hash) {
++        String url = String.format("https://api.github.com/repos/%s/compare/%s...%s", repo, branch, hash);
++        try {
++            HttpURLConnection connection = (HttpURLConnection) URI.create(url).toURL().openConnection();
++            connection.connect();
++            if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
++                return DISTANCE_UNKNOWN_INFO;
++            }
++            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), Charsets.UTF_8))) {
++                JsonObject obj = GSON.fromJson(reader, JsonObject.class);
++                return parseGitHubResponse(obj);
++            }
++        } catch (IOException e) {
++            LOGGER.error("Error while fetching from GitHub", e);
++            return DISTANCE_ERROR_INFO;
++        }
++    }
++
++    private static BuildInfo parseGitHubResponse(JsonObject obj) {
++        String status = obj.get("status").getAsString();
++        return switch (status) {
++            case "identical" -> new BuildInfo(0, null);
++            case "behind" -> new BuildInfo(obj.get("behind_by").getAsInt(), null);
++            default -> DISTANCE_ERROR_INFO;
++        };
++    }
++
++    private static BuildInfo checkBuildUpdates(Reader json, String targetCommit) {
++        JsonObject jsonObject = GSON.fromJson(json, JsonObject.class);
++
++        JsonArray builds = jsonObject.has("builds") && jsonObject.get("builds").isJsonArray()
++                ? jsonObject.getAsJsonArray("builds")
++                : null;
++        if (builds == null || builds.isEmpty()) {
++            LOGGER.error("Build data is empty or missing.");
++            return DISTANCE_ERROR_INFO;
++        }
++
++        int latestBuildIndex = builds.size() - 1;
++        JsonObject latestBuild = builds.get(latestBuildIndex).getAsJsonObject();
++        String formattedTime = formatTime(latestBuild.get("time").getAsString());
++
++        int versionsBehind = DISTANCE_UNKNOWN;
++        for (int i = 0; i < builds.size(); i++) {
++            JsonObject build = builds.get(i).getAsJsonObject();
++
++            JsonArray changes = build.has("changes") && build.get("changes").isJsonArray() && !build.getAsJsonArray("changes").isEmpty()
++                    ? build.getAsJsonArray("changes")
++                    : null;
++            if (changes == null) {
++                LOGGER.warn("Changes array is empty or missing in build index: {}", i);
++                continue;
++            }
++
++            JsonObject change = changes.get(0).getAsJsonObject();
++            String commit = change.has("commit") && !change.get("commit").getAsString().isEmpty()
++                    ? change.get("commit").getAsString()
++                    : null;
++            if (commit == null) {
++                LOGGER.warn("Commit ID is missing or empty in build index: {}", i);
++                continue;
++            }
++
++            if (commit.equals(targetCommit)) {
++                versionsBehind = latestBuildIndex - i;
++                break;
++            }
++        }
++
++        return new BuildInfo(versionsBehind, formattedTime);
++    }
++
++
++    private static String formatTime(String time) {
++        try {
++            return FORMATTER.format(ZonedDateTime.parse(time, FORMATTER).withZoneSameInstant(ZONE_ID));
++        } catch (Exception e) {
++            return "Invalid time format";
++        }
++    }
++
++    private static Component buildUpdateMessage(BuildInfo distance) {
++        TextComponent.Builder message = text()
++                .append(text("You are " + distance.distance() + " version(s) behind", NamedTextColor.YELLOW))
++                .append(text("\nDownload the new version at: "))
++                .append(text("https://tranic.one/downloads/sewlia", NamedTextColor.GOLD)
++                        .hoverEvent(text("Click to open", NamedTextColor.WHITE))
++                        .clickEvent(ClickEvent.openUrl("https://tranic.one/downloads/sewlia")));
++
++        if (distance.latestBuildTime() != null) {
++            message.append(text("\nThe last update was published on: ", NamedTextColor.GRAY))
++                    .append(text(distance.latestBuildTime(), NamedTextColor.YELLOW));
++        }
++        return message.build();
++    }
++
++    @Override
++    public long getCacheTime() {
++        return 720000;
++    }
++
++    @Override
++    public @NotNull Component getVersionMessage(@NotNull String serverVersion) {
++        ServerBuildInfo build = ServerBuildInfo.buildInfo();
++        Component updateMessage = build.buildNumber().isEmpty() && build.gitCommit().isEmpty()
++                ? text("You are running a development version without access to version information", color(0xFF5300))
++                : getUpdateStatusMessage("LevelTranic/Sewlia", build);
++        Component history = getHistory();
++        return history != null ? Component.textOfChildren(updateMessage, text("\n"), history) : updateMessage;
++    }
++
++    private @Nullable Component getHistory() {
++        VersionHistoryManager.@Nullable VersionData data = VersionHistoryManager.INSTANCE.getVersionData();
++        return data != null && data.getOldVersion() != null
++                ? text("Previous version: " + data.getOldVersion(), NamedTextColor.GRAY, TextDecoration.ITALIC)
++                : null;
++    }
++
++    public record BuildInfo(int distance, String latestBuildTime) {
++    }
++}
+diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+index ba63befff9c46025a6237bf77edac3dd74b9399a..9de3f690e8a7e40e9bf234b899607659c4c42bb4 100644
+--- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
++++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+@@ -495,7 +495,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
+ 
+     @Override
+     public com.destroystokyo.paper.util.VersionFetcher getVersionFetcher() {
+-        return new com.destroystokyo.paper.PaperVersionFetcher();
++        return one.tranic.sewlia.config.mod.misc.UseNewFetch.value ? new one.tranic.sewlia.utils.SewliaVersionFetcher() : new com.destroystokyo.paper.PaperVersionFetcher();
+     }
+ 
+     @Override
