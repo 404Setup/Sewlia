@@ -6,10 +6,10 @@ Subject: [PATCH] Sewlia new version fetcher
 
 diff --git a/src/main/java/one/tranic/sewlia/utils/SewliaVersionFetcher.java b/src/main/java/one/tranic/sewlia/utils/SewliaVersionFetcher.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..cc46e24dd8c6fc7048413655f1de18f6b018faa1
+index 0000000000000000000000000000000000000000..7ee2b81e648ab7cc7fc08420f304775b42ec7975
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/utils/SewliaVersionFetcher.java
-@@ -0,0 +1,226 @@
+@@ -0,0 +1,227 @@
 +package one.tranic.sewlia.utils;
 +
 +import com.destroystokyo.paper.VersionHistoryManager;
@@ -25,6 +25,7 @@ index 0000000000000000000000000000000000000000..cc46e24dd8c6fc7048413655f1de18f6
 +import net.kyori.adventure.text.event.ClickEvent;
 +import net.kyori.adventure.text.format.NamedTextColor;
 +import net.kyori.adventure.text.format.TextDecoration;
++import one.tranic.sewlia.config.mod.misc.fetch.UseMars;
 +import org.checkerframework.checker.nullness.qual.Nullable;
 +import org.jetbrains.annotations.NotNull;
 +import org.slf4j.Logger;
@@ -69,9 +70,9 @@ index 0000000000000000000000000000000000000000..cc46e24dd8c6fc7048413655f1de18f6
 +    }
 +
 +    private static Component getUpdateStatusMessage(final String repo, final ServerBuildInfo build) {
-+        BuildInfo distance = fetchDistanceFromSiteApi(build);
++        BuildInfo distance = DISTANCE_ERROR_INFO;
 +
-+        if (distance.distance() == DISTANCE_ERROR || distance.distance() == DISTANCE_UNKNOWN) {
++        if (UseMars.value) distance = fetchDistanceFromSiteApi(build); else {
 +            Optional<String> gitBranch = build.gitBranch();
 +            Optional<String> gitCommit = build.gitCommit();
 +            if (gitBranch.isPresent() && gitCommit.isPresent()) {
@@ -237,7 +238,7 @@ index 0000000000000000000000000000000000000000..cc46e24dd8c6fc7048413655f1de18f6
 +    }
 +}
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index ba63befff9c46025a6237bf77edac3dd74b9399a..9de3f690e8a7e40e9bf234b899607659c4c42bb4 100644
+index ba63befff9c46025a6237bf77edac3dd74b9399a..af43c3b962ca35d85b133127fac4bd79fb3a524d 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 @@ -495,7 +495,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
@@ -245,7 +246,7 @@ index ba63befff9c46025a6237bf77edac3dd74b9399a..9de3f690e8a7e40e9bf234b899607659
      @Override
      public com.destroystokyo.paper.util.VersionFetcher getVersionFetcher() {
 -        return new com.destroystokyo.paper.PaperVersionFetcher();
-+        return one.tranic.sewlia.config.mod.misc.UseNewFetch.value ? new one.tranic.sewlia.utils.SewliaVersionFetcher() : new com.destroystokyo.paper.PaperVersionFetcher();
++        return one.tranic.sewlia.config.mod.misc.fetch.UseNewFetch.value ? new one.tranic.sewlia.utils.SewliaVersionFetcher() : new com.destroystokyo.paper.PaperVersionFetcher();
      }
  
      @Override

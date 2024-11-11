@@ -857,13 +857,24 @@ index 0000000000000000000000000000000000000000..e3e62aafe376e822295fdb6c9f62847f
 +    @Comment("The timeout of the cache. Unit: Minutes.")
 +    public static int value = 1440;
 +}
-diff --git a/src/main/java/one/tranic/sewlia/config/mod/misc/UseNewFetch.java b/src/main/java/one/tranic/sewlia/config/mod/misc/UseNewFetch.java
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/misc/fetch/UseMars.java b/src/main/java/one/tranic/sewlia/config/mod/misc/fetch/UseMars.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..d8b1fc5b80f45421a97ee7a32cc080dd9b53d1c3
+index 0000000000000000000000000000000000000000..c221e121b22887239f864442ebcd094c7384d0ed
 --- /dev/null
-+++ b/src/main/java/one/tranic/sewlia/config/mod/misc/UseNewFetch.java
++++ b/src/main/java/one/tranic/sewlia/config/mod/misc/fetch/UseMars.java
 @@ -0,0 +1,5 @@
-+package one.tranic.sewlia.config.mod.misc;
++package one.tranic.sewlia.config.mod.misc.fetch;
++
++public class UseMars {
++    public static boolean value = true;
++}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/misc/fetch/UseNewFetch.java b/src/main/java/one/tranic/sewlia/config/mod/misc/fetch/UseNewFetch.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..ebfd4fa27c691204f2cd4e2b886a9c1fca085578
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/misc/fetch/UseNewFetch.java
+@@ -0,0 +1,5 @@
++package one.tranic.sewlia.config.mod.misc.fetch;
 +
 +public class UseNewFetch {
 +    public static boolean value = true;
