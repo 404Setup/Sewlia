@@ -94,18 +94,43 @@ index 13d3c877b006a4975e7370713e3919c661e7890f..f3e7dcd0a5625c7b4e8a3512ee05637a
              for (int i = 0; i < storage.getSize(); i++) {
                  T object = palette.valueFor(storage.get(i));
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator.java b/src/main/java/net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator.java
-index 68be0d51aa64b5d917fb53dbbbdf8966d4f4abd8..167f9de5c669b2302c486eea8caf43a4ca6df91d 100644
+index 90a05c6c59c197dfd81938dbbf438a4408449ff4..cbd9fdafaf3755e89887f8ffb8d1c6ef8ab480c9 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator.java
-@@ -50,6 +50,7 @@ import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
+@@ -52,6 +52,7 @@ import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
  import org.apache.commons.lang3.mutable.MutableObject;
  
  public final class NoiseBasedChunkGenerator extends ChunkGenerator {
 +    public static boolean PLAZMA_USE_NOISIUM = one.tranic.sewlia.config.mod.optimization.UseAlternativeNoiseGenerator.value; // Plazma - Optimize noise chunk generation
+     private static final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor(); // Canvas
  
      public static final MapCodec<NoiseBasedChunkGenerator> CODEC = RecordCodecBuilder.mapCodec((instance) -> {
-         return instance.group(BiomeSource.CODEC.fieldOf("biome_source").forGetter((chunkgeneratorabstract) -> {
-@@ -377,7 +378,24 @@ public final class NoiseBasedChunkGenerator extends ChunkGenerator {
+@@ -292,6 +293,24 @@ public final class NoiseBasedChunkGenerator extends ChunkGenerator {
+         }
+ 
+         return CompletableFuture.supplyAsync(Util.wrapThreadWithTaskName("wgen_fill_noise", () -> {
++            // Plazma start - Optimize noise chunk generation
++            if (PLAZMA_USE_NOISIUM) {
++                int l = chunk.getSectionIndex(k * noisesettings.getCellHeight() - 1 + i);
++                int i1 = chunk.getSectionIndex(i);
++
++                var set = chunk.getSections();
++                for (int j1 = l; j1 >= i1; --j1) set[j1].acquire();
++
++                ChunkAccess ichunkaccess1;
++                try {
++                    ichunkaccess1 = this.doFill(blender, structureAccessor, noiseConfig, chunk, j, k);
++                } finally {
++                    for (int j1 = l; j1 >= i1; --j1) set[j1].release();
++                }
++
++                return ichunkaccess1;
++            }
++            // Plazma end - Optimize noise chunk generation
+             int l = chunk.getSectionIndex(k * noisesettings.getCellHeight() - 1 + i);
+             int i1 = chunk.getSectionIndex(i);
+             Set<LevelChunkSection> set = Sets.newHashSet();
+@@ -399,7 +418,24 @@ public final class NoiseBasedChunkGenerator extends ChunkGenerator {
  
                                  iblockdata = this.debugPreliminarySurfaceLevel(noisechunk, j4, j3, i5, iblockdata);
                                  if (iblockdata != NoiseBasedChunkGenerator.AIR && !SharedConstants.debugVoidTerrain(chunk.getPos())) {

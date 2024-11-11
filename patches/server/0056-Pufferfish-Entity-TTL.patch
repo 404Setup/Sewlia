@@ -5,10 +5,10 @@ Subject: [PATCH] Pufferfish: Entity TTL
 
 
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index 710bf9d042a4c8ba88c9e9257aa199ac2d5fd986..1c780ef295b9d4d90a044d19a23e0f60bedd2579 100644
+index 3cd429e824926c4052e12f33058faa036d14bafb..ca22c0235b81f38a9c2a4ad800e4385530879144 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -226,7 +226,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -180,7 +180,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          this.paperConfigurations.initializeGlobalConfiguration(this.registryAccess());
          this.paperConfigurations.initializeWorldDefaultsConfiguration(this.registryAccess());
          // Paper end - initialize global and world-defaults configuration

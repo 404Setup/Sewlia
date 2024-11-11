@@ -5,7 +5,7 @@ Subject: [PATCH] Pufferfish: TPSCatchup
 
 
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index f3ad30fbb9598685865289861be71c74220db434..9ee76e1a9e73f375f6c5e93f980078b4d0a33bde 100644
+index 244c81bf9cf7ba5bd9ec1569cdcea39b878965eb..242e12bab765dfcbbe0ae6d7878cabc39e5479e4 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -1390,6 +1390,12 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa

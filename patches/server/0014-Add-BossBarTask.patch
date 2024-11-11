@@ -6,7 +6,7 @@ Subject: [PATCH] Add BossBarTask
 This patch is inspired by Purpur.
 
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index f81f7954f512ac9c22370a78d26a2e1eb7a47f05..93708694d37dc8e99c62b9226f9be5b3cfcf0f92 100644
+index 38867f707488058bdd175c57d176051225a33a05..67932c003e8184b3b8b60912581637f2b35334af 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -1200,6 +1200,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -18,10 +18,10 @@ index f81f7954f512ac9c22370a78d26a2e1eb7a47f05..93708694d37dc8e99c62b9226f9be5b3
          this.hasLoggedStop = true; // Paper - Debugging
          if (isDebugging()) io.papermc.paper.util.TraceUtil.dumpTraceForThread("Server stopped"); // Paper - Debugging
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index ee393297fc69b22058feb60057494430a72f2475..ab3c1af40ea2de7dee7d4080e1738c762a6f46d1 100644
+index 381afd249404c5d1b4896a961fb821845ccfe17f..99123594c8adda5cdac90d47114d2acfff2b7570 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -360,6 +360,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -314,6 +314,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
                  DedicatedServer.LOGGER.info("JMX monitoring enabled");
              }
  
@@ -30,7 +30,7 @@ index ee393297fc69b22058feb60057494430a72f2475..ab3c1af40ea2de7dee7d4080e1738c76
          }
      }
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index d407b5d34c35b94ccfe81d3ffa2820f22327cb15..151f60bb99cc1aaf10f3c3ad306634ce98d020a3 100644
+index c7b4f288a9076975573e2a5e746a9e7a8a721ceb..0f333b01e89e631a60370cf3c1d12e521fc76ab7 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -578,6 +578,7 @@ public abstract class PlayerList {

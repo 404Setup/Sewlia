@@ -17,7 +17,7 @@ index 83b052dbf6d21775664b286518f3cef1d86e87d1..c6c5292e96ef610b6edbb9341fda97d4
      }
  
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 93708694d37dc8e99c62b9226f9be5b3cfcf0f92..f3ad30fbb9598685865289861be71c74220db434 100644
+index 67932c003e8184b3b8b60912581637f2b35334af..244c81bf9cf7ba5bd9ec1569cdcea39b878965eb 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -1716,6 +1716,30 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -111,7 +111,7 @@ index 03e065109c71a6fe44c8773fdbddddb80392f31b..33e18996e07d7107e4efe2e6f509b59f
          } else {
              passenger.stopRiding();
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index f801ef7ace15d72a02907933f330c19e378509ae..2d8a85355bc3b293a394ce425083d0e97abc7542 100644
+index 06eb436679a82e84ce427a3f83f4a6b6831bb081..a6bf604ddca212199479ad62514658cb51957d95 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -340,6 +340,26 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
