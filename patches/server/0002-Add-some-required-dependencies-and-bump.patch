@@ -5,7 +5,7 @@ Subject: [PATCH] Add some required dependencies and bump
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 754c40ca692bb68a6b47310ccca415635918c460..cd27d2304f14c361a3a1f97b3795a1263ea2eb74 100644
+index 754c40ca692bb68a6b47310ccca415635918c460..3a6220ea045de9fdeeb82378dfe3e868bb6a1f1b 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -24,13 +24,13 @@ dependencies {
@@ -25,7 +25,7 @@ index 754c40ca692bb68a6b47310ccca415635918c460..cd27d2304f14c361a3a1f97b3795a126
      implementation("org.ow2.asm:asm-commons:9.7.1")
      implementation("org.spongepowered:configurate-yaml:4.2.0-SNAPSHOT") // Paper - config files
      implementation("commons-lang:commons-lang:2.6")
-@@ -66,6 +66,18 @@ dependencies {
+@@ -66,6 +66,17 @@ dependencies {
      implementation("me.lucko:spark-api:0.1-20240720.200737-2")
      implementation("me.lucko:spark-paper:1.10.105-SNAPSHOT")
      // Paper end - spark
@@ -39,7 +39,6 @@ index 754c40ca692bb68a6b47310ccca415635918c460..cd27d2304f14c361a3a1f97b3795a126
 +    implementation("com.github.luben:zstd-jni:1.5.6-7")
 +    implementation("org.lz4:lz4-java:1.8.0")
 +    implementation("one.util:streamex:0.8.3")
-+    implementation("org.libj:math:0.6.9-SNAPSHOT")
 +    // Sewlia end
  }
  

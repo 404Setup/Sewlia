@@ -8,10 +8,10 @@ and API spec stability is NOT guaranteed. If you use this in plugins,
 they WILL break eventually.
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 457f7f629971a2d0a3b3c3b34f77656c97103c3f..06e5683c4b4ddaf19323a324d716cb95e08746ee 100644
+index 63986110737187f0c7912ad87792e66273162b37..720bb156d2a464f81f848005fbb3244f37ad3740 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -195,6 +195,7 @@ tasks.withType<Javadoc> {
+@@ -194,6 +194,7 @@ tasks.withType<Javadoc> {
              into("build/docs/javadoc")
          }
      }
@@ -19,7 +19,7 @@ index 457f7f629971a2d0a3b3c3b34f77656c97103c3f..06e5683c4b4ddaf19323a324d716cb95
  }
  
  tasks.test {
-@@ -210,6 +211,7 @@ tasks.compileTestJava {
+@@ -209,6 +210,7 @@ tasks.compileTestJava {
  // Paper end
  
  tasks.compileJava {
