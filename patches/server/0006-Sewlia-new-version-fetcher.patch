@@ -158,7 +158,7 @@ index 0000000000000000000000000000000000000000..7ee2b81e648ab7cc7fc08420f304775b
 +        JsonObject latestBuild = builds.get(latestBuildIndex).getAsJsonObject();
 +        String formattedTime = formatTime(latestBuild.get("time").getAsString());
 +
-+        int versionsBehind = DISTANCE_UNKNOWN;
++        int versionsBehind = 0;
 +        for (int i = 0; i < builds.size(); i++) {
 +            JsonObject build = builds.get(i).getAsJsonObject();
 +

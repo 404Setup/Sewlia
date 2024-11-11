@@ -53,7 +53,9 @@ run/
 # LevelBukkit
 build-data/
 Sewlia-API
+Sewlia-API/*
 Sewlia-Server
+Sewlia-Server/*
 paper-api-generator
 .kotlin/
 *.jar
