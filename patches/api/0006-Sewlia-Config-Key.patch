@@ -1030,6 +1030,20 @@ index 0000000000000000000000000000000000000000..142e86fdd907ecc315f8d9c5a1034c52
 +public class Enable {
 +    public static boolean value = false;
 +}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/map/SkipUpdateIfNoRenderer.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/map/SkipUpdateIfNoRenderer.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..065b545708c6edb09dc897740a89ff41d8c99eec
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/optimization/map/SkipUpdateIfNoRenderer.java
+@@ -0,0 +1,8 @@
++package one.tranic.sewlia.config.mod.optimization.map;
++
++import one.tranic.sewlia.config.annotation.Comment;
++
++public class SkipUpdateIfNoRenderer {
++    @Comment("Don't update maps if they don't have the CraftMapRenderer in the render list.")
++    public static boolean value = false;
++}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/optimization/projectile_loads/Enable.java b/src/main/java/one/tranic/sewlia/config/mod/optimization/projectile_loads/Enable.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..78aa064e7829e654117c5ef5078cfedb9ee8fe7c
