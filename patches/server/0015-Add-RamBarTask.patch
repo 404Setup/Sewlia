@@ -6,7 +6,7 @@ Subject: [PATCH] Add RamBarTask
 Reference Object: Purpur
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index fb21572eecb512bdb5ecafcda44f404c2a0e6cde..a5abe913009e0e52e2b4ec3772243630a86f0617 100644
+index fb21572eecb512bdb5ecafcda44f404c2a0e6cde..6dca3d0b01a060a96700e7e5ef8f1e526c70af4b 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -304,6 +304,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple

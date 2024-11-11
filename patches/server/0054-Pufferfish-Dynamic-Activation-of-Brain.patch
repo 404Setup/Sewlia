@@ -27,10 +27,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index 99123594c8adda5cdac90d47114d2acfff2b7570..3cd429e824926c4052e12f33058faa036d14bafb 100644
+index ab3c1af40ea2de7dee7d4080e1738c762a6f46d1..710bf9d042a4c8ba88c9e9257aa199ac2d5fd986 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -180,6 +180,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -226,6 +226,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          this.paperConfigurations.initializeGlobalConfiguration(this.registryAccess());
          this.paperConfigurations.initializeWorldDefaultsConfiguration(this.registryAccess());
          // Paper end - initialize global and world-defaults configuration
