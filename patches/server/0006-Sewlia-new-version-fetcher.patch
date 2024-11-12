@@ -6,10 +6,10 @@ Subject: [PATCH] Sewlia new version fetcher
 
 diff --git a/src/main/java/one/tranic/sewlia/utils/SewliaVersionFetcher.java b/src/main/java/one/tranic/sewlia/utils/SewliaVersionFetcher.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..37242d144ffe68b059bce99b2f7ddbc2b1157a58
+index 0000000000000000000000000000000000000000..7b409181a334dd1667795c7b9f6d34e83f0510bd
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/utils/SewliaVersionFetcher.java
-@@ -0,0 +1,208 @@
+@@ -0,0 +1,215 @@
 +package one.tranic.sewlia.utils;
 +
 +import com.destroystokyo.paper.VersionHistoryManager;
@@ -154,20 +154,27 @@ index 0000000000000000000000000000000000000000..37242d144ffe68b059bce99b2f7ddbc2
 +        int latestBuildIndex = latestBuild.get("build").getAsInt();
 +        String formattedTime = formatTime(latestBuild.get("time").getAsString());
 +
-+        final String normalizedTargetCommit = targetCommit.toLowerCase().substring(0, 7);
++        String normalizedTargetCommit = targetCommit.toLowerCase().substring(0, 7);
 +
-+        int versionsBehind = builds.stream()
-+                .map(JsonElement::getAsJsonObject)
-+                .filter(build -> build.has("changes") && !build.getAsJsonArray("changes").isEmpty())
-+                .flatMap(build -> build.getAsJsonArray("changes").asList().stream().limit(1))
-+                .map(change -> change.getAsJsonObject().get("commit").getAsString().toLowerCase().substring(0, 7))
-+                .filter(commit -> commit.equals(normalizedTargetCommit))
-+                .map(commit -> latestBuildIndex - builds.indexOf(commit))
-+                .findFirst()
-+                .orElse(DISTANCE_UNKNOWN);
++        int versionsBehind = DISTANCE_UNKNOWN;
++        for (int i = 0; i < builds.size(); i++) {
++            JsonObject build = builds.get(i).getAsJsonObject();
++
++            if (build.has("changes") && !build.getAsJsonArray("changes").isEmpty()) {
++                JsonObject change = build.getAsJsonArray("changes").get(0).getAsJsonObject();
++                if (change.has("commit")) {
++                    String commit = change.get("commit").getAsString().toLowerCase().substring(0, 7);
++                    if (commit.equals(normalizedTargetCommit)) {
++                        versionsBehind = latestBuildIndex - build.get("build").getAsInt();
++                        break;
++                    }
++                }
++            }
++        }
 +
 +        return new BuildInfo(versionsBehind, formattedTime);
 +    }
++
 +
 +
 +    private static String formatTime(String time) {
