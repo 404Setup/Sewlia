@@ -6,7 +6,7 @@ Subject: [PATCH] Sewlia new version fetcher
 
 diff --git a/src/main/java/one/tranic/sewlia/utils/SewliaVersionFetcher.java b/src/main/java/one/tranic/sewlia/utils/SewliaVersionFetcher.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..fc4f45f031b341da125872a702a97f9d864820e8
+index 0000000000000000000000000000000000000000..37242d144ffe68b059bce99b2f7ddbc2b1157a58
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/utils/SewliaVersionFetcher.java
 @@ -0,0 +1,208 @@
@@ -154,13 +154,13 @@ index 0000000000000000000000000000000000000000..fc4f45f031b341da125872a702a97f9d
 +        int latestBuildIndex = latestBuild.get("build").getAsInt();
 +        String formattedTime = formatTime(latestBuild.get("time").getAsString());
 +
-+        String normalizedTargetCommit = targetCommit.toLowerCase();
++        final String normalizedTargetCommit = targetCommit.toLowerCase().substring(0, 7);
 +
 +        int versionsBehind = builds.stream()
 +                .map(JsonElement::getAsJsonObject)
 +                .filter(build -> build.has("changes") && !build.getAsJsonArray("changes").isEmpty())
 +                .flatMap(build -> build.getAsJsonArray("changes").asList().stream().limit(1))
-+                .map(change -> change.getAsJsonObject().get("commit").getAsString().toLowerCase())
++                .map(change -> change.getAsJsonObject().get("commit").getAsString().toLowerCase().substring(0, 7))
 +                .filter(commit -> commit.equals(normalizedTargetCommit))
 +                .map(commit -> latestBuildIndex - builds.indexOf(commit))
 +                .findFirst()
