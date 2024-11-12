@@ -68,7 +68,7 @@ index e61cec9aec2d5d313ff1936ab685956527a28977..2b997edaab11c2fab76684f0e9208e4b
              return false;
          }
 diff --git a/src/main/java/net/minecraft/world/entity/vehicle/AbstractMinecart.java b/src/main/java/net/minecraft/world/entity/vehicle/AbstractMinecart.java
-index a38ce400550893f63640e3bb5bb801ab40f06266..68561425abc80131d097d54d9d75110f9c3656e5 100644
+index 02e7016a52ff2931210bde4b502adfe1e60ccea3..57f3f0f4ea25346f4438209e224b27644c6e0575 100644
 --- a/src/main/java/net/minecraft/world/entity/vehicle/AbstractMinecart.java
 +++ b/src/main/java/net/minecraft/world/entity/vehicle/AbstractMinecart.java
 @@ -375,7 +375,25 @@ public abstract class AbstractMinecart extends VehicleEntity {

@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Tue, 12 Nov 2024 18:39:53 +0800
+Subject: [PATCH] Paper: Improve Minecart#getMinecartMaterial
+
+Removes the hardcoded lookup in favour of calling the
+AbstractVehicle getItemDrop method.
+
+diff --git a/src/main/java/net/minecraft/world/entity/vehicle/AbstractMinecart.java b/src/main/java/net/minecraft/world/entity/vehicle/AbstractMinecart.java
+index a38ce400550893f63640e3bb5bb801ab40f06266..02e7016a52ff2931210bde4b502adfe1e60ccea3 100644
+--- a/src/main/java/net/minecraft/world/entity/vehicle/AbstractMinecart.java
++++ b/src/main/java/net/minecraft/world/entity/vehicle/AbstractMinecart.java
+@@ -1013,4 +1013,6 @@ public abstract class AbstractMinecart extends VehicleEntity {
+         this.derailedZ = derailed.getZ();
+     }
+     // CraftBukkit end
++
++    public net.minecraft.world.item.Item publicGetDropItem() { return getDropItem(); } // Paper - api to get boat and minecart material - expose public drop item
+ }
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftMinecart.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftMinecart.java
+index 5652ec4aea839fae3f8ea31d7cd5c80ecf129fb5..80167cfed416592fe9e2e5429cb540eccbe95a22 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftMinecart.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftMinecart.java
+@@ -73,16 +73,7 @@ public abstract class CraftMinecart extends CraftVehicle implements Minecart {
+     // Paper start
+     @Override
+     public Material getMinecartMaterial() {
+-         net.minecraft.world.item.Item minecartItem = switch (getHandle().getMinecartType()) {
+-            case CHEST -> Items.CHEST_MINECART;
+-            case FURNACE ->  Items.FURNACE_MINECART;
+-            case TNT ->  Items.TNT_MINECART;
+-            case HOPPER ->  Items.HOPPER_MINECART;
+-            case COMMAND_BLOCK ->  Items.COMMAND_BLOCK_MINECART;
+-            case RIDEABLE, SPAWNER ->  Items.MINECART;
+-        };
+-
+-        return CraftMagicNumbers.getMaterial(minecartItem);
++        return CraftMagicNumbers.getMaterial(this.getHandle().publicGetDropItem());
+     }
+     // Paper end
+ 
