@@ -6,19 +6,16 @@ Subject: [PATCH] Sewlia new version fetcher
 
 diff --git a/src/main/java/one/tranic/sewlia/utils/SewliaVersionFetcher.java b/src/main/java/one/tranic/sewlia/utils/SewliaVersionFetcher.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..7ee2b81e648ab7cc7fc08420f304775b42ec7975
+index 0000000000000000000000000000000000000000..fc4f45f031b341da125872a702a97f9d864820e8
 --- /dev/null
 +++ b/src/main/java/one/tranic/sewlia/utils/SewliaVersionFetcher.java
-@@ -0,0 +1,227 @@
+@@ -0,0 +1,208 @@
 +package one.tranic.sewlia.utils;
 +
 +import com.destroystokyo.paper.VersionHistoryManager;
 +import com.destroystokyo.paper.util.VersionFetcher;
 +import com.google.common.base.Charsets;
-+import com.google.gson.Gson;
-+import com.google.gson.JsonArray;
-+import com.google.gson.JsonObject;
-+import com.google.gson.JsonSyntaxException;
++import com.google.gson.*;
 +import io.papermc.paper.ServerBuildInfo;
 +import net.kyori.adventure.text.Component;
 +import net.kyori.adventure.text.TextComponent;
@@ -42,6 +39,7 @@ index 0000000000000000000000000000000000000000..7ee2b81e648ab7cc7fc08420f304775b
 +import java.time.ZoneId;
 +import java.time.ZonedDateTime;
 +import java.time.format.DateTimeFormatter;
++import java.util.List;
 +import java.util.Optional;
 +
 +import static net.kyori.adventure.text.Component.text;
@@ -146,44 +144,27 @@ index 0000000000000000000000000000000000000000..7ee2b81e648ab7cc7fc08420f304775b
 +    private static BuildInfo checkBuildUpdates(Reader json, String targetCommit) {
 +        JsonObject jsonObject = GSON.fromJson(json, JsonObject.class);
 +
-+        JsonArray builds = jsonObject.has("builds") && jsonObject.get("builds").isJsonArray()
-+                ? jsonObject.getAsJsonArray("builds")
-+                : null;
++        List<JsonElement> builds = jsonObject.has("builds") ? jsonObject.getAsJsonArray("builds").asList() : null;
 +        if (builds == null || builds.isEmpty()) {
 +            LOGGER.error("Build data is empty or missing.");
 +            return DISTANCE_ERROR_INFO;
 +        }
 +
-+        int latestBuildIndex = builds.size() - 1;
-+        JsonObject latestBuild = builds.get(latestBuildIndex).getAsJsonObject();
++        JsonObject latestBuild = builds.getLast().getAsJsonObject();
++        int latestBuildIndex = latestBuild.get("build").getAsInt();
 +        String formattedTime = formatTime(latestBuild.get("time").getAsString());
 +
-+        int versionsBehind = 0;
-+        for (int i = 0; i < builds.size(); i++) {
-+            JsonObject build = builds.get(i).getAsJsonObject();
++        String normalizedTargetCommit = targetCommit.toLowerCase();
 +
-+            JsonArray changes = build.has("changes") && build.get("changes").isJsonArray() && !build.getAsJsonArray("changes").isEmpty()
-+                    ? build.getAsJsonArray("changes")
-+                    : null;
-+            if (changes == null) {
-+                LOGGER.warn("Changes array is empty or missing in build index: {}", i);
-+                continue;
-+            }
-+
-+            JsonObject change = changes.get(0).getAsJsonObject();
-+            String commit = change.has("commit") && !change.get("commit").getAsString().isEmpty()
-+                    ? change.get("commit").getAsString()
-+                    : null;
-+            if (commit == null) {
-+                LOGGER.warn("Commit ID is missing or empty in build index: {}", i);
-+                continue;
-+            }
-+
-+            if (commit.equals(targetCommit)) {
-+                versionsBehind = latestBuildIndex - i;
-+                break;
-+            }
-+        }
++        int versionsBehind = builds.stream()
++                .map(JsonElement::getAsJsonObject)
++                .filter(build -> build.has("changes") && !build.getAsJsonArray("changes").isEmpty())
++                .flatMap(build -> build.getAsJsonArray("changes").asList().stream().limit(1))
++                .map(change -> change.getAsJsonObject().get("commit").getAsString().toLowerCase())
++                .filter(commit -> commit.equals(normalizedTargetCommit))
++                .map(commit -> latestBuildIndex - builds.indexOf(commit))
++                .findFirst()
++                .orElse(DISTANCE_UNKNOWN);
 +
 +        return new BuildInfo(versionsBehind, formattedTime);
 +    }
