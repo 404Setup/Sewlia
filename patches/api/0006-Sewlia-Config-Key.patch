@@ -684,6 +684,20 @@ index 0000000000000000000000000000000000000000..7a8aaa9962832a5b7a429dbcb84bb15f
 +        return value ? Thread.ofVirtual().factory() : Thread.ofPlatform().factory();
 +    }
 +}
+diff --git a/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/paper/Worker.java b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/paper/Worker.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..fa3807f7fc804d8d0daa8e5d4ba0d158941f16ba
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/virtual_thread/paper/Worker.java
+@@ -0,0 +1,8 @@
++package one.tranic.sewlia.config.mod.feature.virtual_thread.paper;
++
++import one.tranic.sewlia.config.annotation.DisableReload;
++
++public class Worker {
++    @DisableReload
++    public static boolean value = false;
++}
 diff --git a/src/main/java/one/tranic/sewlia/config/mod/fix/POIAccessOffRegion.java b/src/main/java/one/tranic/sewlia/config/mod/fix/POIAccessOffRegion.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..bda476a96f551ea1d303d85d425968e112f118ee

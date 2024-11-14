@@ -65,8 +65,44 @@ index 5931afeccc17733103641c9d84390617fc9f62c0..828ec91591eb102d3ab9c0163f8b332f
              .setNameFormat("Paper Async Task Handler Thread - %1$d")
              .setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(MinecraftServer.LOGGER))
              .build()
+diff --git a/src/main/java/io/papermc/paper/util/ServerWorkerThreadFactory.java b/src/main/java/io/papermc/paper/util/ServerWorkerThreadFactory.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..faf5e6f90b0a764c5c02e99648cde6986a35a227
+--- /dev/null
++++ b/src/main/java/io/papermc/paper/util/ServerWorkerThreadFactory.java
+@@ -0,0 +1,30 @@
++package io.papermc.paper.util;
++
++import net.minecraft.Util;
++import one.tranic.sewlia.config.mod.feature.virtual_thread.paper.Worker;
++import org.jetbrains.annotations.NotNull;
++
++import java.util.concurrent.ThreadFactory;
++import java.util.concurrent.atomic.AtomicInteger;
++
++public class ServerWorkerThreadFactory implements ThreadFactory {
++    private static final AtomicInteger threadId = new AtomicInteger(1);
++    private final String poolName;
++    private final int prioritityModifier;
++
++    public ServerWorkerThreadFactory(String poolName, int prioritityModifier) {
++        this.poolName = poolName;
++        this.prioritityModifier = prioritityModifier;
++    }
++
++    @Override
++    public Thread newThread(@NotNull Runnable r) {
++        final Thread ret = Worker.value ? Thread.ofVirtual().unstarted(r) : new Thread(r);
++        ret.setName("Worker-" + poolName + "-" + threadId.getAndIncrement());
++        ret.setPriority(Thread.NORM_PRIORITY+prioritityModifier); // Deprioritize over main
++        ret.setDaemon(true);
++        ret.setUncaughtExceptionHandler(Util::onThreadException);
++
++        return ret;
++    }
++}
 diff --git a/src/main/java/net/minecraft/Util.java b/src/main/java/net/minecraft/Util.java
-index 0e38a641d8e537750166b56c57aca4a90d418af1..2f1fbbf546d294a17cbb94d0cdb4d86ccc11fd9e 100644
+index 0e38a641d8e537750166b56c57aca4a90d418af1..97a6c48524037e1cf0f63f980097461345bcc131 100644
 --- a/src/main/java/net/minecraft/Util.java
 +++ b/src/main/java/net/minecraft/Util.java
 @@ -90,8 +90,8 @@ public class Util {
@@ -89,6 +125,15 @@ index 0e38a641d8e537750166b56c57aca4a90d418af1..2f1fbbf546d294a17cbb94d0cdb4d86c
              ret.setName("Profile Lookup Executor #" + this.count.getAndIncrement());
              ret.setUncaughtExceptionHandler((Thread thread, Throwable throwable) -> {
                  LOGGER.error("Uncaught exception in thread " + thread.getName(), throwable);
+@@ -179,7 +179,7 @@ public class Util {
+         if (i <= 0) {
+             executorService = MoreExecutors.newDirectExecutorService();
+         } else {
+-            executorService = new java.util.concurrent.ThreadPoolExecutor(i, i,0L, TimeUnit.MILLISECONDS, new java.util.concurrent.LinkedBlockingQueue<>(), target -> new io.papermc.paper.util.ServerWorkerThread(target, s, priorityModifier));
++            executorService = new java.util.concurrent.ThreadPoolExecutor(i, i,0L, TimeUnit.MILLISECONDS, new java.util.concurrent.LinkedBlockingQueue<>(), new io.papermc.paper.util.ServerWorkerThreadFactory(s, priorityModifier) /*target -> new io.papermc.paper.util.ServerWorkerThread(target, s, priorityModifier)*/);
+         }
+         /*
+                     @Override
 @@ -253,9 +253,13 @@ public class Util {
      }
  
