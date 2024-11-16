@@ -825,7 +825,7 @@ index 97817400b70b2579f3a8750f7f33197a5db7ba94..2806e0d72ec4f5512d9ef8e415be9c6d
                          final int packetTimerId = profiler.getOrCreateTimerAndStart(() -> "Packet Handler: ".concat(io.papermc.paper.util.ObfHelper.INSTANCE.deobfClassName(packet.getClass().getName()))); try { // Folia - profiler
                          packet.handle(listener);
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 511992c31d70e806bba68737048ca760bef1def0..f81f7954f512ac9c22370a78d26a2e1eb7a47f05 100644
+index 4ed79a51c89d54a7b2ab65a99b5b09cc807f4d4e..8ec4f543f9aecbc52936674fa47d0cd58ffac6d5 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -3,7 +3,7 @@ package net.minecraft.server;
@@ -1054,10 +1054,10 @@ index 74524dcd4539a31e9d0037cd607ffbfce02f414c..e1d4b84804a18c75bb24e438283773f4
  import com.google.common.collect.ImmutableList.Builder;
  import com.google.common.collect.Iterables;
 diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-index 135fa024d81b962761f0edc6896a2a507b6981f9..f088cae48c1bb8390a3106eda5846388e4b12b76 100644
+index f7311d6efc2119b9dbe062a439850a890c9bf6b8..945fe8f49b9ab36ef0b443a54b996edaa3feb01c 100644
 --- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 +++ b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-@@ -355,9 +355,9 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -360,9 +360,9 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
  
      public void save(boolean flush) {
          // Paper - rewrite chunk system
@@ -1069,7 +1069,7 @@ index 135fa024d81b962761f0edc6896a2a507b6981f9..f088cae48c1bb8390a3106eda5846388
      }
  
      @Override
-@@ -394,7 +394,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -399,7 +399,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
      public void tick(BooleanSupplier shouldKeepTicking, boolean tickChunks) {
          final ca.spottedleaf.leafprofiler.RegionizedProfiler.Handle profiler = io.papermc.paper.threadedregions.TickRegionScheduler.getProfiler(); // Folia - profiler
          this.level.getProfiler().push("purge");
@@ -1078,7 +1078,7 @@ index 135fa024d81b962761f0edc6896a2a507b6981f9..f088cae48c1bb8390a3106eda5846388
          profiler.startTimer(ca.spottedleaf.leafprofiler.LProfilerRegistry.CHUNK_HOLDER_MANAGER_TICK); try { // Folia - profiler
          if (this.level.tickRateManager().runsNormally() || !tickChunks || this.level.spigotConfig.unloadFrozenChunks) { // Spigot
              this.distanceManager.purgeStaleTickets();
-@@ -402,24 +402,24 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -407,24 +407,24 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
  
          this.runDistanceManagerUpdates();
          } finally { profiler.stopTimer(ca.spottedleaf.leafprofiler.LProfilerRegistry.CHUNK_HOLDER_MANAGER_TICK); } // Folia - profiler
@@ -1108,7 +1108,7 @@ index 135fa024d81b962761f0edc6896a2a507b6981f9..f088cae48c1bb8390a3106eda5846388
          this.level.getProfiler().pop();
          this.clearCache();
      }
-@@ -458,14 +458,14 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -463,14 +463,14 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
              }
              } finally { profiler.stopTimer(ca.spottedleaf.leafprofiler.LProfilerRegistry.CHUNK_TICK_COLLECT_CHUNKS); } // Folia - profiler
              // Paper end - chunk tick iteration optimisations
@@ -1126,7 +1126,7 @@ index 135fa024d81b962761f0edc6896a2a507b6981f9..f088cae48c1bb8390a3106eda5846388
                  int k = this.distanceManager.getNaturalSpawnChunkCount();
                  // Paper start - Optional per player mob spawns
                  int naturalSpawnChunkCount = k;
-@@ -492,7 +492,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -497,7 +497,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
                  }
                  } finally { profiler.stopTimer(ca.spottedleaf.leafprofiler.LProfilerRegistry.MOB_SPAWN_ENTITY_COUNT); } // Folia - profiler
                  // Paper end - Optional per player mob spawns
@@ -1135,7 +1135,7 @@ index 135fa024d81b962761f0edc6896a2a507b6981f9..f088cae48c1bb8390a3106eda5846388
  
                  regionizedWorldData.lastSpawnState = spawnercreature_d; // Folia - region threading
                  gameprofilerfiller.popPush("spawnAndTick");
-@@ -541,21 +541,21 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -546,21 +546,21 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
                  profiler.addCounter(ca.spottedleaf.leafprofiler.LProfilerRegistry.SPAWN_CHUNK_COUNT, spawnChunkCount); // Folia - profiler
                  profiler.addCounter(ca.spottedleaf.leafprofiler.LProfilerRegistry.RANDOM_CHUNK_TICK_COUNT, randomChunkCount); // Folia - profiler
                  } finally { profiler.stopTimer(ca.spottedleaf.leafprofiler.LProfilerRegistry.SPAWN_AND_RANDOM_TICK); } // Folia - profiler
@@ -1161,7 +1161,7 @@ index 135fa024d81b962761f0edc6896a2a507b6981f9..f088cae48c1bb8390a3106eda5846388
              profiler.startTimer(ca.spottedleaf.leafprofiler.LProfilerRegistry.BROADCAST_BLOCK_CHANGES); try { // Folia - profiler
              {
                  final it.unimi.dsi.fastutil.objects.ObjectArrayList<net.minecraft.server.level.ServerChunkCache.ChunkAndHolder> chunks = (it.unimi.dsi.fastutil.objects.ObjectArrayList<net.minecraft.server.level.ServerChunkCache.ChunkAndHolder>)list;
-@@ -571,7 +571,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -576,7 +576,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
                  }
              }
              } finally { profiler.stopTimer(ca.spottedleaf.leafprofiler.LProfilerRegistry.BROADCAST_BLOCK_CHANGES); } // Folia - profiler
