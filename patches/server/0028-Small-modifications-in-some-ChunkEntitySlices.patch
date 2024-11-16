@@ -1,0 +1,46 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Sat, 16 Nov 2024 18:26:35 +0800
+Subject: [PATCH] Small modifications in some ChunkEntitySlices
+
+
+diff --git a/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/level/entity/ChunkEntitySlices.java b/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/level/entity/ChunkEntitySlices.java
+index 5c7f2471a0b15ac2e714527296ad2aa7291999eb..ebe77b280a83a3f7e33819252bada7c2975054e0 100644
+--- a/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/level/entity/ChunkEntitySlices.java
++++ b/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/level/entity/ChunkEntitySlices.java
+@@ -100,7 +100,7 @@ public final class ChunkEntitySlices {
+         }
+ 
+         final ListTag entitiesTag = new ListTag();
+-        final java.util.Map<net.minecraft.world.entity.EntityType<?>, Integer> savedEntityCounts = new java.util.HashMap<>(); // Paper - Entity load/save limit per chunk
++        final java.util.Map<net.minecraft.world.entity.EntityType<?>, Integer> savedEntityCounts = new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>(); // Paper - Entity load/save limit per chunk
+         for (final Entity entity : entities) {
+             // Paper start - Entity load/save limit per chunk
+             final EntityType<?> entityType = entity.getType();
+@@ -131,7 +131,7 @@ public final class ChunkEntitySlices {
+         }
+ 
+         final Entity[] rawData = this.entities.getRawData();
+-        final List<Entity> collectedEntities = new ArrayList<>(len);
++        final List<Entity> collectedEntities = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(len);
+         for (int i = 0; i < len; ++i) {
+             final Entity entity = rawData[i];
+             if (entity.shouldBeSaved()) {
+@@ -174,7 +174,7 @@ public final class ChunkEntitySlices {
+ 
+     // Paper start
+     public org.bukkit.entity.Entity[] getChunkEntities() {
+-        List<org.bukkit.entity.Entity> ret = new java.util.ArrayList<>();
++        List<org.bukkit.entity.Entity> ret = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+         final Entity[] entities = this.entities.getRawData();
+         for (int i = 0, size = Math.min(entities.length, this.entities.size()); i < size; ++i) {
+             final Entity entity = entities[i];
+@@ -206,7 +206,7 @@ public final class ChunkEntitySlices {
+         }
+ 
+         final Entity[] rawData = this.entities.getRawData();
+-        final List<Entity> collectedEntities = new ArrayList<>(len);
++        final List<Entity> collectedEntities = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(len);
+         for (int i = 0; i < len; ++i) {
+             collectedEntities.add(rawData[i]);
+         }

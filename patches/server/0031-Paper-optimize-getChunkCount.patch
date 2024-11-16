@@ -7,7 +7,7 @@ It was returning ticking chunk count instead of the intended full chunk count.
 We can also directly use the size of the fullChunks collection instead of iterating all chunks.
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-index e8e9af9128e8cbdba3664f5afa3c5f56403fe70e..dc6e1258c6fdaaa3cae8d4f26f1640b8567a65d7 100644
+index 41243283d4b9fd74bf427fa588d1997c4b455cdb..00c8e22a88532c3dfda1740e79a23a1b6bb57812 100644
 --- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 +++ b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 @@ -67,6 +67,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
