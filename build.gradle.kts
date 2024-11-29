@@ -31,15 +31,6 @@ allprojects {
 }
 
 subprojects {
-    apply(plugin = "java")
-    apply(plugin = "maven-publish")
-
-    java {
-        toolchain {
-            languageVersion = JavaLanguageVersion.of(21)
-        }
-    }
-
     tasks.withType<JavaCompile> {
         options.encoding = Charsets.UTF_8.name()
         options.release = 21
