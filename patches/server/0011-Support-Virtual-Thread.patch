@@ -54,10 +54,10 @@ index 374abffb9f1ce1a308822aed13038e77fe9ca08b..77be3946a5561c77cf5e2f38868fc800
              ret.setName("Folia Async Scheduler Thread Timer");
              ret.setPriority(Thread.NORM_PRIORITY + 1);
 diff --git a/src/main/java/io/papermc/paper/util/MCUtil.java b/src/main/java/io/papermc/paper/util/MCUtil.java
-index 5931afeccc17733103641c9d84390617fc9f62c0..828ec91591eb102d3ab9c0163f8b332fc67e8419 100644
+index d81a543206f808b7a36204dd277391370186ea43..6e51fde9bf909993726705213bded7692513ceaf 100644
 --- a/src/main/java/io/papermc/paper/util/MCUtil.java
 +++ b/src/main/java/io/papermc/paper/util/MCUtil.java
-@@ -34,6 +34,7 @@ public final class MCUtil {
+@@ -42,6 +42,7 @@ public final class MCUtil {
          2, 2, 60L, TimeUnit.SECONDS,
          new LinkedBlockingQueue<>(),
          new ThreadFactoryBuilder()
@@ -102,21 +102,21 @@ index 0000000000000000000000000000000000000000..faf5e6f90b0a764c5c02e99648cde698
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/Util.java b/src/main/java/net/minecraft/Util.java
-index 0e38a641d8e537750166b56c57aca4a90d418af1..97a6c48524037e1cf0f63f980097461345bcc131 100644
+index ccfe9ef24dce9f34613692adb13738d3ad0e7aac..50ab046a56961a8eed3c18b0aa69c16466ff20dd 100644
 --- a/src/main/java/net/minecraft/Util.java
 +++ b/src/main/java/net/minecraft/Util.java
-@@ -90,8 +90,8 @@ public class Util {
+@@ -93,8 +93,8 @@ public class Util {
      private static final int DEFAULT_SAFE_FILE_OPERATION_RETRIES = 10;
      private static final String MAX_THREADS_SYSTEM_PROPERTY = "max.bg.threads";
-     private static final ExecutorService BACKGROUND_EXECUTOR = makeExecutor("Main", -1); // Paper - Perf: add priority
--    private static final ExecutorService IO_POOL = makeIoExecutor("IO-Worker-", false);
--    private static final ExecutorService DOWNLOAD_POOL = makeIoExecutor("Download-", true);
-+    private static final ExecutorService IO_POOL = makeIoExecutor("IO-Worker-", false, one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.io.Worker.value);
-+    private static final ExecutorService DOWNLOAD_POOL = makeIoExecutor("Download-", true, one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.network.Download.value);
+     private static final TracingExecutor BACKGROUND_EXECUTOR = makeExecutor("Main", -1); // Paper - Perf: add priority
+-    private static final TracingExecutor IO_POOL = makeIoExecutor("IO-Worker-", false);
+-    private static final TracingExecutor DOWNLOAD_POOL = makeIoExecutor("Download-", true);
++    private static final TracingExecutor IO_POOL = makeIoExecutor("IO-Worker-", false, one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.io.Worker.value);
++    private static final TracingExecutor DOWNLOAD_POOL = makeIoExecutor("Download-", true, one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.network.Download.value);
      // Paper start - don't submit BLOCKING PROFILE LOOKUPS to the world gen thread
      public static final ExecutorService PROFILE_EXECUTOR = Executors.newFixedThreadPool(2, new java.util.concurrent.ThreadFactory() {
  
-@@ -99,7 +99,7 @@ public class Util {
+@@ -102,7 +102,7 @@ public class Util {
  
          @Override
          public Thread newThread(Runnable run) {
@@ -125,35 +125,35 @@ index 0e38a641d8e537750166b56c57aca4a90d418af1..97a6c48524037e1cf0f63f9800974613
              ret.setName("Profile Lookup Executor #" + this.count.getAndIncrement());
              ret.setUncaughtExceptionHandler((Thread thread, Throwable throwable) -> {
                  LOGGER.error("Uncaught exception in thread " + thread.getName(), throwable);
-@@ -179,7 +179,7 @@ public class Util {
+@@ -183,7 +183,7 @@ public class Util {
          if (i <= 0) {
              executorService = MoreExecutors.newDirectExecutorService();
          } else {
 -            executorService = new java.util.concurrent.ThreadPoolExecutor(i, i,0L, TimeUnit.MILLISECONDS, new java.util.concurrent.LinkedBlockingQueue<>(), target -> new io.papermc.paper.util.ServerWorkerThread(target, s, priorityModifier));
 +            executorService = new java.util.concurrent.ThreadPoolExecutor(i, i,0L, TimeUnit.MILLISECONDS, new java.util.concurrent.LinkedBlockingQueue<>(), new io.papermc.paper.util.ServerWorkerThreadFactory(s, priorityModifier) /*target -> new io.papermc.paper.util.ServerWorkerThread(target, s, priorityModifier)*/);
          }
-         /*
-                     @Override
-@@ -253,9 +253,13 @@ public class Util {
+         /*      final String string2 = "Worker-" + name + "-" + atomicInteger.getAndIncrement();
+                 ForkJoinWorkerThread forkJoinWorkerThread = new ForkJoinWorkerThread(pool) {
+@@ -248,9 +248,13 @@ public class Util {
      }
  
-     private static ExecutorService makeIoExecutor(String namePrefix, boolean daemon) {
+     private static TracingExecutor makeIoExecutor(String namePrefix, boolean daemon) {
 +        return makeIoExecutor(namePrefix, daemon, false);
 +    }
 +
-+    private static ExecutorService makeIoExecutor(String namePrefix, boolean daemon, boolean virtual) {
++    private static TracingExecutor makeIoExecutor(String namePrefix, boolean daemon, boolean virtual) {
          AtomicInteger atomicInteger = new AtomicInteger(1);
-         return Executors.newCachedThreadPool(runnable -> {
+         return new TracingExecutor(Executors.newCachedThreadPool(runnable -> {
 -            Thread thread = new Thread(runnable);
 +            Thread thread = virtual ? Thread.ofVirtual().unstarted(runnable) : new Thread(runnable);
-             thread.setName(namePrefix + atomicInteger.getAndIncrement());
-             thread.setDaemon(daemon);
-             thread.setUncaughtExceptionHandler(Util::onThreadException);
+             String string2 = namePrefix + atomicInteger.getAndIncrement();
+             TracyClient.setThreadName(string2, namePrefix.hashCode());
+             thread.setName(string2);
 diff --git a/src/main/java/net/minecraft/commands/Commands.java b/src/main/java/net/minecraft/commands/Commands.java
-index 442a5b557e5867038fcddf597951584faeedda80..3cd1d0405beb2745dd6d103bb399235de79d1fb0 100644
+index 17bf50b1ec1373952b25c5d0bfb09d6374e433a7..571feeaa826b7f7a90ca65edafd5891d13e67a76 100644
 --- a/src/main/java/net/minecraft/commands/Commands.java
 +++ b/src/main/java/net/minecraft/commands/Commands.java
-@@ -480,6 +480,7 @@ public class Commands {
+@@ -485,6 +485,7 @@ public class Commands {
          0, 2, 60L, java.util.concurrent.TimeUnit.SECONDS,
          new java.util.concurrent.LinkedBlockingQueue<>(),
          new com.google.common.util.concurrent.ThreadFactoryBuilder()
@@ -162,7 +162,7 @@ index 442a5b557e5867038fcddf597951584faeedda80..3cd1d0405beb2745dd6d103bb399235d
              .setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(net.minecraft.server.MinecraftServer.LOGGER))
              .build(),
 diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
-index cf160825199374f2c99ac200b371da95c612043c..289d42a802ffd21ea152a5e7428ab7dbd2beae9c 100644
+index 4c3961a10691362657b894a757d201069842d8d7..464841d1d876acd47220fd98c8ec6e2ee01495c4 100644
 --- a/src/main/java/net/minecraft/network/Connection.java
 +++ b/src/main/java/net/minecraft/network/Connection.java
 @@ -82,13 +82,13 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
@@ -183,10 +183,10 @@ index cf160825199374f2c99ac200b371da95c612043c..289d42a802ffd21ea152a5e7428ab7db
      private static final ProtocolInfo<ServerHandshakePacketListener> INITIAL_PROTOCOL = HandshakeProtocols.SERVERBOUND;
      private final PacketFlow receiving;
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index f81f7954f512ac9c22370a78d26a2e1eb7a47f05..38867f707488058bdd175c57d176051225a33a05 100644
+index b4b15c1f004955199b2f00769bec12f36b6fbafc..f153e6f3fadb11a69c5cd190030c57817ebcc227 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -3051,7 +3051,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -3132,7 +3132,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      }
  
      public final java.util.concurrent.ExecutorService chatExecutor = java.util.concurrent.Executors.newCachedThreadPool(
@@ -196,7 +196,7 @@ index f81f7954f512ac9c22370a78d26a2e1eb7a47f05..38867f707488058bdd175c57d1760512
      public final ChatDecorator improvedChatDecorator = new io.papermc.paper.adventure.ImprovedChatDecorator(this); // Paper - adventure
      public ChatDecorator getChatDecorator() {
 diff --git a/src/main/java/net/minecraft/server/chase/ChaseClient.java b/src/main/java/net/minecraft/server/chase/ChaseClient.java
-index 2ea987a115cca2240035e0bc80b85521811fc938..4b0429cf53efde051c88be4eff32442539b1c7cf 100644
+index b38c3491911277decaaddc8004ceccf2eeb0e3a4..0fcb359cb728360c0c5bc8e1e1ced812ecd6c200 100644
 --- a/src/main/java/net/minecraft/server/chase/ChaseClient.java
 +++ b/src/main/java/net/minecraft/server/chase/ChaseClient.java
 @@ -51,7 +51,7 @@ public class ChaseClient {
@@ -209,7 +209,7 @@ index 2ea987a115cca2240035e0bc80b85521811fc938..4b0429cf53efde051c88be4eff324425
          this.thread.start();
      }
 diff --git a/src/main/java/net/minecraft/server/chase/ChaseServer.java b/src/main/java/net/minecraft/server/chase/ChaseServer.java
-index d6da342d3df9c05a596bda9930581ee4034e4e4a..022393a27c6ce52286f94f2b5e6249ffcb94e14f 100644
+index f3610334289854e949b4ace158554015d85aba54..c6bbf8b033c479c81ea99303e07da8c0dfc0feaf 100644
 --- a/src/main/java/net/minecraft/server/chase/ChaseServer.java
 +++ b/src/main/java/net/minecraft/server/chase/ChaseServer.java
 @@ -44,10 +44,10 @@ public class ChaseServer {
@@ -226,10 +226,10 @@ index d6da342d3df9c05a596bda9930581ee4034e4e4a..022393a27c6ce52286f94f2b5e6249ff
              thread2.start();
          }
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index ee393297fc69b22058feb60057494430a72f2475..381afd249404c5d1b4896a961fb821845ccfe17f 100644
+index a88addb2d75f5f27627ee1a557956d994922b521..0b8f38cad8a5416726bbc2125e6947ac8a582458 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -107,58 +107,12 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -104,58 +104,12 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
  
      @Override
      public boolean initServer() throws IOException {
@@ -293,7 +293,7 @@ index ee393297fc69b22058feb60057494430a72f2475..381afd249404c5d1b4896a961fb82184
  
          // CraftBukkit start - TODO: handle command-line logging arguments
          java.util.logging.Logger global = java.util.logging.Logger.getLogger("");
-@@ -347,7 +301,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -344,7 +298,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
              }
  
              if (false && this.getMaxTickLength() > 0L) {  // Spigot - disable
@@ -302,7 +302,7 @@ index ee393297fc69b22058feb60057494430a72f2475..381afd249404c5d1b4896a961fb82184
  
                  thread1.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandlerWithName(DedicatedServer.LOGGER));
                  thread1.setName("Server Watchdog");
-@@ -500,7 +454,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -480,7 +434,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
                      sender.sendMessage(net.kyori.adventure.text.Component.text("Failed to dump chunk information, see console", net.kyori.adventure.text.format.NamedTextColor.RED));
                  }
              };
@@ -341,19 +341,6 @@ index ae88c6e2635b1608383f8c74813d723f7c6ffaf8..54002e8f13642771e976328e0baee7e0
      });
      final MinecraftServer server;
      public volatile boolean running;
-diff --git a/src/main/java/net/minecraft/server/network/TextFilterClient.java b/src/main/java/net/minecraft/server/network/TextFilterClient.java
-index 63eab023e11440cb0cb1af6861e2deb0676ae709..032fee2ad68528c6d6e323d5d59a193c704525a9 100644
---- a/src/main/java/net/minecraft/server/network/TextFilterClient.java
-+++ b/src/main/java/net/minecraft/server/network/TextFilterClient.java
-@@ -38,7 +38,7 @@ public class TextFilterClient implements AutoCloseable {
-     private static final Logger LOGGER = LogUtils.getLogger();
-     private static final AtomicInteger WORKER_COUNT = new AtomicInteger(1);
-     private static final ThreadFactory THREAD_FACTORY = runnable -> {
--        Thread thread = new Thread(runnable);
-+        Thread thread = one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.network.ChatFilterClient.getThread(runnable);
-         thread.setName("Chat-Filter-Worker-" + WORKER_COUNT.getAndIncrement());
-         return thread;
-     };
 diff --git a/src/main/java/net/minecraft/server/rcon/thread/GenericThread.java b/src/main/java/net/minecraft/server/rcon/thread/GenericThread.java
 index 3691e97e83e4f4883adc85ec2d8aa789812bd474..6120d2d6f49c971c367d92921fe33788787391e0 100644
 --- a/src/main/java/net/minecraft/server/rcon/thread/GenericThread.java
@@ -368,10 +355,10 @@ index 3691e97e83e4f4883adc85ec2d8aa789812bd474..6120d2d6f49c971c367d92921fe33788
              this.thread.start();
              LOGGER.info("Thread {} started", this.name);
 diff --git a/src/main/java/net/minecraft/util/datafix/DataFixers.java b/src/main/java/net/minecraft/util/datafix/DataFixers.java
-index 4cc1a63770ee7430ac3f8c10ef8965693fb3fbcc..0197d52b0004ddbc9abb236d1d4497d3f64eb202 100644
+index 0b8a8a7505963465ecb4247ec7a2713ae9daf14c..2d9ef39942efe8bf0c65e02d6dae596db6555654 100644
 --- a/src/main/java/net/minecraft/util/datafix/DataFixers.java
 +++ b/src/main/java/net/minecraft/util/datafix/DataFixers.java
-@@ -138,7 +138,7 @@ public class DataFixers {
+@@ -142,7 +142,7 @@ public class DataFixers {
          if (requiredTypes.isEmpty()) {
              return CompletableFuture.completedFuture((Object) null);
          } else {
@@ -394,80 +381,18 @@ index 04460b81d6351f63103199a980e463070c233300..11ef161dd06b4f2cbd8e3b51abe7842c
              LOGGER.error("Caught exception in thread {} from {}", threadx, runnable);
              LOGGER.error("", throwable);
 diff --git a/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java b/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
-index cb39c629af1827078f35904a373d35a63fea17ff..da39f6d798f06f4ec9fb93b6aba5dece09eb0ca1 100644
+index 622d0cbe023774d92d212f242b60b96317720835..049cd144434217d4ef1a5de97e300c07bd0781db 100644
 --- a/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
 +++ b/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
-@@ -52,7 +52,7 @@ import org.slf4j.Logger;
- public class WorldUpgrader {
+@@ -51,7 +51,7 @@ import org.slf4j.Logger;
+ public class WorldUpgrader implements AutoCloseable {
  
      static final Logger LOGGER = LogUtils.getLogger();
 -    private static final ThreadFactory THREAD_FACTORY = (new ThreadFactoryBuilder()).setDaemon(true).build();
 +    private static final ThreadFactory THREAD_FACTORY = (new ThreadFactoryBuilder()).setThreadFactory(one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.io.WorldUpgrader.getThreadFactory()).setDaemon(true).build();
      private static final String NEW_DIRECTORY_PREFIX = "new_";
-     static final MutableComponent STATUS_UPGRADING_POI = Component.translatable("optimizeWorld.stage.upgrading.poi");
-     static final MutableComponent STATUS_FINISHED_POI = Component.translatable("optimizeWorld.stage.finished.poi");
-diff --git a/src/main/java/net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator.java b/src/main/java/net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator.java
-index 68be0d51aa64b5d917fb53dbbbdf8966d4f4abd8..90a05c6c59c197dfd81938dbbf438a4408449ff4 100644
---- a/src/main/java/net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator.java
-+++ b/src/main/java/net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator.java
-@@ -13,6 +13,8 @@ import java.util.Objects;
- import java.util.OptionalInt;
- import java.util.Set;
- import java.util.concurrent.CompletableFuture;
-+import java.util.concurrent.ExecutorService;
-+import java.util.concurrent.Executors;
- import java.util.function.Predicate;
- import java.util.function.Supplier;
- import javax.annotation.Nullable;
-@@ -50,6 +52,7 @@ import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
- import org.apache.commons.lang3.mutable.MutableObject;
- 
- public final class NoiseBasedChunkGenerator extends ChunkGenerator {
-+    private static final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor(); // Canvas
- 
-     public static final MapCodec<NoiseBasedChunkGenerator> CODEC = RecordCodecBuilder.mapCodec((instance) -> {
-         return instance.group(BiomeSource.CODEC.fieldOf("biome_source").forGetter((chunkgeneratorabstract) -> {
-@@ -269,7 +272,26 @@ public final class NoiseBasedChunkGenerator extends ChunkGenerator {
-         int j = Mth.floorDiv(i, noisesettings.getCellHeight());
-         int k = Mth.floorDiv(noisesettings.height(), noisesettings.getCellHeight());
- 
--        return k <= 0 ? CompletableFuture.completedFuture(chunk) : CompletableFuture.supplyAsync(Util.wrapThreadWithTaskName("wgen_fill_noise", () -> {
-+        if (k <= 0) return CompletableFuture.completedFuture(chunk);
-+
-+        if (one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.io.Noise.value) {
-+            // Canvas start
-+            int startIndex = chunk.getSectionIndex(k * noisesettings.getCellHeight() - 1 + i);
-+            int minYIndex = chunk.getSectionIndex(i);
-+
-+            LevelChunkSection[] sections = chunk.getSections();
-+            for (int v = startIndex; v >= minYIndex; --v) sections[v].acquire();
-+
-+            return CompletableFuture.supplyAsync(Util.wrapThreadWithTaskName(
-+                    "wgen_fill_noise",
-+                    () -> this.doFill(blender, structureAccessor, noiseConfig, chunk, j, k)
-+            ), Util.backgroundExecutor()).whenCompleteAsync((result, ignored) -> {
-+                for (int v = startIndex; v >= minYIndex; --v) sections[v].release();
-+            }, executorService);
-+            // Canvas end
-+        }
-+
-+        return CompletableFuture.supplyAsync(Util.wrapThreadWithTaskName("wgen_fill_noise", () -> {
-             int l = chunk.getSectionIndex(k * noisesettings.getCellHeight() - 1 + i);
-             int i1 = chunk.getSectionIndex(i);
-             Set<LevelChunkSection> set = Sets.newHashSet();
-diff --git a/src/main/java/net/minecraft/world/level/storage/DimensionDataStorage.java b/src/main/java/net/minecraft/world/level/storage/DimensionDataStorage.java
-index 2c086f1d4cbfc29a759a77e5c5f9f39d177e81ba..96d7a0ec86a5437b123c7c2daf4f2334a9c3502a 100644
---- a/src/main/java/net/minecraft/world/level/storage/DimensionDataStorage.java
-+++ b/src/main/java/net/minecraft/world/level/storage/DimensionDataStorage.java
-@@ -35,7 +35,7 @@ public class DimensionDataStorage implements java.io.Closeable { // Paper - Writ
-         this.fixerUpper = dataFixer;
-         this.dataFolder = directory;
-         this.registries = registryLookup;
--        this.ioExecutor = java.util.concurrent.Executors.newSingleThreadExecutor(new com.google.common.util.concurrent.ThreadFactoryBuilder().setNameFormat("DimensionDataIO - " + dataFolder.getParent() + " - %d").setDaemon(true).build()); // Paper - Write SavedData IO async
-+        this.ioExecutor = java.util.concurrent.Executors.newSingleThreadExecutor(new com.google.common.util.concurrent.ThreadFactoryBuilder().setThreadFactory(one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.io.DimensionData.getThreadFactory()).setNameFormat("DimensionDataIO - " + dataFolder.getParent() + " - %d").setDaemon(true).build()); // Paper - Write SavedData IO async
-     }
- 
-     private File getDataFile(String id) {
+     static final Component STATUS_UPGRADING_POI = Component.translatable("optimizeWorld.stage.upgrading.poi");
+     static final Component STATUS_FINISHED_POI = Component.translatable("optimizeWorld.stage.finished.poi");
 diff --git a/src/main/java/org/bukkit/craftbukkit/bootstrap/Main.java b/src/main/java/org/bukkit/craftbukkit/bootstrap/Main.java
 index 8a4f95049c63afb28bef6719c77b7a7092e75aae..3a7ba39c0bf59443392eacae547c7a58ed14f653 100644
 --- a/src/main/java/org/bukkit/craftbukkit/bootstrap/Main.java
@@ -482,7 +407,7 @@ index 8a4f95049c63afb28bef6719c77b7a7092e75aae..3a7ba39c0bf59443392eacae547c7a58
                      Class<?> mainClass = Class.forName(mainClassName, true, classLoader);
                      MethodHandle mainHandle = MethodHandles.lookup().findStatic(mainClass, "main", MethodType.methodType(void.class, String[].class)).asFixedArity();
 diff --git a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftAsyncScheduler.java b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftAsyncScheduler.java
-index 3c1992e212a6d6f1db4d5b807b38d71913619fc0..6da1eced229dbb0811535772fd2da37c10524888 100644
+index 0ca279fb71d39c81b1f608e0ee9ba3e498d55fa3..7e8078b3a2f3e145fbff0711c2db81618bb6bebe 100644
 --- a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftAsyncScheduler.java
 +++ b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftAsyncScheduler.java
 @@ -40,9 +40,9 @@ public class CraftAsyncScheduler extends CraftScheduler {

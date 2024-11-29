@@ -5,10 +5,10 @@ Subject: [PATCH] Allow disabling Halloween detection
 
 
 diff --git a/src/main/java/net/minecraft/world/entity/ambient/Bat.java b/src/main/java/net/minecraft/world/entity/ambient/Bat.java
-index dc27ddf5131e7398a5390a5187261d4c7fb6ccaa..f19bcf0604c33edea5ae62cbe62acb2ca8e7875d 100644
+index 60c2868f255d372226e0c1389caaa5477bbef41e..873e1318b33b6cb44c6b268d9345020051602e63 100644
 --- a/src/main/java/net/minecraft/world/entity/ambient/Bat.java
 +++ b/src/main/java/net/minecraft/world/entity/ambient/Bat.java
-@@ -240,6 +240,7 @@ public class Bat extends AmbientCreature {
+@@ -243,6 +243,7 @@ public class Bat extends AmbientCreature {
      }
  
      private static boolean isHalloween() {

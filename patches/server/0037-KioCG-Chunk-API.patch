@@ -1,0 +1,498 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Sat, 2 Nov 2024 17:06:30 +0800
+Subject: [PATCH] KioCG: Chunk API
+
+
+diff --git a/src/main/java/ca/spottedleaf/moonrise/common/util/ChunkSystem.java b/src/main/java/ca/spottedleaf/moonrise/common/util/ChunkSystem.java
+index e1aba122e1c3d8b28ca16137fb15bcee07cdf0e7..af4bb03fda9ee9a8081e2a6345ebe86d18cdaacc 100644
+--- a/src/main/java/ca/spottedleaf/moonrise/common/util/ChunkSystem.java
++++ b/src/main/java/ca/spottedleaf/moonrise/common/util/ChunkSystem.java
+@@ -127,6 +127,7 @@ public final class ChunkSystem {
+     }
+ 
+     public static void onChunkNotTicking(final LevelChunk chunk, final ChunkHolder holder) {
++        chunk.getChunkHot().clear(); // KioCG
+         chunk.getLevel().getCurrentWorldData().removeTickingChunk(chunk.moonrise$getChunkAndHolder()); // Folia - region threading
+         ((ChunkTickServerLevel)(ServerLevel)chunk.getLevel()).moonrise$removeChunkForPlayerTicking(chunk); // Moonrise - chunk tick iteration
+     }
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index 21edd7c579c676d2176afc45da7ac580c94a826e..8c7e33d47fec05da0d0a743448f88548aab7c4f7 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -1799,6 +1799,32 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+             } finally { foliaProfiler.stopTimer(ca.spottedleaf.leafprofiler.LProfilerRegistry.ENTITY_SCHEDULER_TICK); } // Folia - profiler
+         }
+         // Folia end - region threading
++
++        // KioCG start - ChunkHot
++        final ca.spottedleaf.moonrise.common.list.IteratorSafeOrderedReferenceSet<net.minecraft.world.level.chunk.LevelChunk> chunks = new ca.spottedleaf.moonrise.common.list.IteratorSafeOrderedReferenceSet<>();
++        if (region != null){
++            for (net.minecraft.server.level.ServerChunkCache.ChunkAndHolder chunkAndHolder : region.world.getCurrentWorldData().getTickingChunks()){
++                final net.minecraft.world.level.chunk.LevelChunk chunk = chunkAndHolder.chunk();
++
++                if (!ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(region.world, chunk.locX, chunk.locZ)){
++                    continue;
++                }
++
++                chunks.add(chunk);
++            }
++        }
++        if (region != null && io.papermc.paper.threadedregions.RegionizedServer.getCurrentTick() % 20 == 0){
++            final Iterator<net.minecraft.world.level.chunk.LevelChunk> chunkIterator = chunks.unsafeIterator();
++            while (chunkIterator.hasNext()){
++                final net.minecraft.world.level.chunk.LevelChunk targetChunk = chunkIterator.next();
++
++                targetChunk.getChunkHot().nextTick();
++                targetChunk.getChunkHot().start();
++            }
++        }
++        //KioCG end
++
++        // Folia - region threading
+         if (region == null) this.tickRateManager.tick(); // Folia - region threading
+         this.tickChildren(shouldKeepTicking, region); // Folia - region threading
+         if (region == null && i - this.lastServerStatus >= MinecraftServer.STATUS_EXPIRE_TIME_NANOS) { // Folia - region threading
+@@ -1807,6 +1833,20 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+         }
+ 
+         // Folia - region threading
++        // KioCG start - ChunkHot
++        if (region != null && io.papermc.paper.threadedregions.RegionizedServer.getCurrentTick() % 20 == 0){
++            final Iterator<net.minecraft.world.level.chunk.LevelChunk> chunkIterator = chunks.unsafeIterator();
++            while (chunkIterator.hasNext()){
++                final net.minecraft.world.level.chunk.LevelChunk targetChunk = chunkIterator.next();
++
++                if (!targetChunk.getChunkHot().isStarted()){
++                    continue;
++                }
++
++                targetChunk.getChunkHot().stop();
++            }
++        }
++        //KioCG end
+         // Paper start - Incremental chunk and player saving
+         final ProfilerFiller profiler = Profiler.get();
+         int playerSaveInterval = io.papermc.paper.configuration.GlobalConfiguration.get().playerAutoSave.rate;
+diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
+index a1f32c7cd93fb758b0dbacf0ebc123118c8da4e0..2ea5c236cf8f333cb2ae4979d45342d3ff673d2a 100644
+--- a/src/main/java/net/minecraft/server/level/ServerLevel.java
++++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
+@@ -1367,6 +1367,9 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+         });
+         gameprofilerfiller.incrementCounter("tickNonPassenger");
+         final boolean isActive = org.spigotmc.ActivationRange.checkIfActive(entity); // Paper - EAR 2
++
++        LevelChunk levelChunk = entity.shouldTickHot() ? this.getChunkIfLoaded(entity.moonrise$getSectionX(),entity.moonrise$getSectionZ()) : null; // KioCG
++        if (levelChunk != null) levelChunk.getChunkHot().startTicking(); try { // KioCG
+         // Folia start - profiler
+         final int timerId = isActive ? entity.getType().tickTimerId : entity.getType().inactiveTickTimerId;
+         final ca.spottedleaf.leafprofiler.RegionizedProfiler.Handle profiler = io.papermc.paper.threadedregions.TickRegionScheduler.getProfiler();
+@@ -1388,6 +1391,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+         } else { entity.inactiveTick(); } // Paper - EAR 2
+         gameprofilerfiller.pop();
+         } finally { profiler.stopTimer(timerId); } // Folia - timer
++        } finally { if (levelChunk != null) levelChunk.getChunkHot().stopTickingAndCount(); } // KioCG
+         Iterator iterator = entity.getPassengers().iterator();
+ 
+         while (iterator.hasNext()) {
+@@ -1410,6 +1414,9 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+                 final int timerId = isActive ? passenger.getType().tickTimerId : passenger.getType().inactiveTickTimerId;
+                 final ca.spottedleaf.leafprofiler.RegionizedProfiler.Handle profiler = io.papermc.paper.threadedregions.TickRegionScheduler.getProfiler();
+                 profiler.startTimer(timerId);
++                LevelChunk levelChunk = !(passenger instanceof Player) ? this.getChunkIfLoaded(passenger.blockPosition()) : null; // KioCG
++                if (levelChunk != null) levelChunk.getChunkHot().startTicking(); try { // KioCG
++                // Folia end - timer
+                 try {
+                 // Folia end - profiler
+                 passenger.setOldPosAndRot();
+@@ -1450,6 +1457,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+                 }
+ 
+                 } finally { profiler.stopTimer(timerId); } // Folia - profiler
++                } finally { if (levelChunk != null) levelChunk.getChunkHot().stopTickingAndCount(); } // KioCG
+             }
+         } else {
+             passenger.stopRiding();
+diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+index 8e96cc943b5a71782dae7685f4081d7d20c02a54..39ec1c3c791154d2065d95418aa34c1a057300e1 100644
+--- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
++++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+@@ -362,6 +362,26 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+     }
+     // Paper end - rewrite chunk system
+ 
++    // KioCG start - ChunkHot
++    private volatile long nearbyChunkHot = 0;
++
++    public long getNearbyChunkHot() { return this.nearbyChunkHot; }
++
++    private long refreshNearbyChunkHot() {
++        long total = 0L;
++        int searchRadius = ((ServerLevel) this.level()).moonrise$getViewDistanceHolder().getViewDistances().tickViewDistance();
++        for (int i = this.moonrise$getSectionX() - searchRadius; i <= this.moonrise$getSectionX() + searchRadius; ++i) {
++            for (int j = this.moonrise$getSectionZ() - searchRadius; j <= this.moonrise$getSectionZ() + searchRadius; ++j) {
++                net.minecraft.world.level.chunk.LevelChunk targetChunk = this.level().getChunkIfLoaded(i, j);
++                if (targetChunk != null) {
++                    total += targetChunk.getChunkHot().getAverage();
++                }
++            }
++        }
++        return total;
++    }
++    // KioCG end
++
+     public ServerPlayer(MinecraftServer server, ServerLevel world, GameProfile profile, ClientInformation clientOptions) {
+         super(world, world.getSharedSpawnPos(), world.getSharedSpawnAngle(), profile);
+         this.chatVisibility = ChatVisiblity.FULL;
+@@ -1211,6 +1231,12 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+         this.trackEnteredOrExitedLavaOnVehicle();
+         this.updatePlayerAttributes();
+         this.advancements.flushDirty(this);
++
++        // KioCG start - ChunkHot
++        if (this.tickCount % 20 == 0){
++            this.nearbyChunkHot = this.refreshNearbyChunkHot();
++        }
++        // KioCG end
+     }
+ 
+     private void updatePlayerAttributes() {
+diff --git a/src/main/java/net/minecraft/world/entity/AreaEffectCloud.java b/src/main/java/net/minecraft/world/entity/AreaEffectCloud.java
+index 7eba7c0e7b8d2795abbe96b3d86a9c1a3b6b74a6..9187de83c6639a34b5725ec5c0cb8d6c30b913eb 100644
+--- a/src/main/java/net/minecraft/world/entity/AreaEffectCloud.java
++++ b/src/main/java/net/minecraft/world/entity/AreaEffectCloud.java
+@@ -465,4 +465,11 @@ public class AreaEffectCloud extends Entity implements TraceableEntity {
+     public final boolean hurtServer(ServerLevel world, DamageSource source, float amount) {
+         return false;
+     }
++
++    // KioCG start
++    @Override
++    public boolean shouldTickHot() {
++        return false;
++    }
++    // KioCG end
+ }
+diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
+index c3864c7310bf310b58015cfc1604fe34627f83f1..918da5aee3d71b18a94d243291894ea21d70e8ae 100644
+--- a/src/main/java/net/minecraft/world/entity/Entity.java
++++ b/src/main/java/net/minecraft/world/entity/Entity.java
+@@ -6170,4 +6170,6 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+         return ((net.minecraft.server.level.ServerLevel) this.level).isPositionEntityTicking(this.blockPosition());
+     }
+     // Paper end - Expose entity id counter
++
++    public boolean shouldTickHot() { return this.tickCount > 20 * 10 && this.isAlive(); } // KioCG
+ }
+diff --git a/src/main/java/net/minecraft/world/entity/LightningBolt.java b/src/main/java/net/minecraft/world/entity/LightningBolt.java
+index 12127b14babf646711d3a118416453c4f1ac1460..5929cd58066b1a8f305b411af8ac4abc688a5cc6 100644
+--- a/src/main/java/net/minecraft/world/entity/LightningBolt.java
++++ b/src/main/java/net/minecraft/world/entity/LightningBolt.java
+@@ -302,4 +302,11 @@ public class LightningBolt extends Entity {
+     public final boolean hurtServer(ServerLevel world, DamageSource source, float amount) {
+         return false;
+     }
++
++    // KioCG start
++    @Override
++    public boolean shouldTickHot() {
++        return false;
++    }
++    // KioCG end
+ }
+diff --git a/src/main/java/net/minecraft/world/entity/Mob.java b/src/main/java/net/minecraft/world/entity/Mob.java
+index bd2d62f73e4f1fa1e655012d04e104acca5db198..49e3eb67d87838e7398b2377fc53792e850fc0fc 100644
+--- a/src/main/java/net/minecraft/world/entity/Mob.java
++++ b/src/main/java/net/minecraft/world/entity/Mob.java
+@@ -1839,4 +1839,11 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
+     public float[] getArmorDropChances() {
+         return this.armorDropChances;
+     }
++
++    // KioCG start
++    @Override
++    public boolean shouldTickHot() {
++        return super.shouldTickHot() && (!this.removeWhenFarAway(0.0) || this.isPersistenceRequired() || this.requiresCustomPersistence());
++    }
++    // KioCG end
+ }
+diff --git a/src/main/java/net/minecraft/world/entity/animal/horse/TraderLlama.java b/src/main/java/net/minecraft/world/entity/animal/horse/TraderLlama.java
+index 7b43fcf86984cc200f34c189e7a547996416f379..b4918895a3530836410b56124d9b2ca9091111ba 100644
+--- a/src/main/java/net/minecraft/world/entity/animal/horse/TraderLlama.java
++++ b/src/main/java/net/minecraft/world/entity/animal/horse/TraderLlama.java
+@@ -173,4 +173,11 @@ public class TraderLlama extends Llama {
+             super.start();
+         }
+     }
++
++    // KioCG start
++    @Override
++    public boolean shouldTickHot() {
++        return super.shouldTickHot() && !this.canDespawn();
++    }
++    // KioCG end
+ }
+diff --git a/src/main/java/net/minecraft/world/entity/npc/WanderingTrader.java b/src/main/java/net/minecraft/world/entity/npc/WanderingTrader.java
+index 1e77cce428d9e53142aaa2cf780b7f862d536eca..82ef89b2758c0ef75c9eabff28d0bd338b22d2ee 100644
+--- a/src/main/java/net/minecraft/world/entity/npc/WanderingTrader.java
++++ b/src/main/java/net/minecraft/world/entity/npc/WanderingTrader.java
+@@ -327,4 +327,11 @@ public class WanderingTrader extends net.minecraft.world.entity.npc.AbstractVill
+             return !pos.closerToCenterThan(this.trader.position(), proximityDistance);
+         }
+     }
++
++    // KioCG start
++    @Override
++    public boolean shouldTickHot() {
++        return false;
++    }
++    // KioCG end
+ }
+diff --git a/src/main/java/net/minecraft/world/entity/player/Player.java b/src/main/java/net/minecraft/world/entity/player/Player.java
+index e00bcd424d500aa4b76d0fd88eb4b9558d3aece5..3fb48814be0bd991e001b8111e0578a53402757f 100644
+--- a/src/main/java/net/minecraft/world/entity/player/Player.java
++++ b/src/main/java/net/minecraft/world/entity/player/Player.java
+@@ -2440,4 +2440,11 @@ public abstract class Player extends LivingEntity {
+             return this.message;
+         }
+     }
++
++    // KioCG start
++    @Override
++    public boolean shouldTickHot() {
++        return false;
++    }
++    // KioCG end
+ }
+diff --git a/src/main/java/net/minecraft/world/entity/projectile/Projectile.java b/src/main/java/net/minecraft/world/entity/projectile/Projectile.java
+index 522fa33311b433f8c0eff4cb10dd80128f3c96d7..fe894d64d8f79821f681c017ad2ea948c3047688 100644
+--- a/src/main/java/net/minecraft/world/entity/projectile/Projectile.java
++++ b/src/main/java/net/minecraft/world/entity/projectile/Projectile.java
+@@ -544,4 +544,11 @@ public abstract class Projectile extends Entity implements TraceableEntity {
+ 
+         T create(ServerLevel world, LivingEntity shooter, ItemStack stack);
+     }
++
++    // KioCG start
++    @Override
++    public boolean shouldTickHot() {
++        return false;
++    }
++    // KioCG end
+ }
+diff --git a/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java b/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
+index 4bccb94cf953ebd4dfd4f1620ad1784ef235356f..61e090f1aecbd166302dc2515a757f7a1d7eefed 100644
+--- a/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
++++ b/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
+@@ -94,6 +94,7 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
+     private final LevelChunkTicks<Block> blockTicks;
+     private final LevelChunkTicks<Fluid> fluidTicks;
+     private LevelChunk.UnsavedListener unsavedListener;
++    private final patch.com.kiocg.ChunkHot chunkHot = new patch.com.kiocg.ChunkHot(); public patch.com.kiocg.ChunkHot getChunkHot() { return this.chunkHot; } // KioCG
+ 
+     public LevelChunk(Level world, ChunkPos pos) {
+         this(world, pos, UpgradeData.EMPTY, new LevelChunkTicks<>(), new LevelChunkTicks<>(), 0L, (LevelChunkSection[]) null, (LevelChunk.PostLoadProcessor) null, (BlendingData) null);
+@@ -1080,6 +1081,7 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
+                         ProfilerFiller gameprofilerfiller = Profiler.get();
+ 
+                         gameprofilerfiller.push(this::getType);
++                        LevelChunk.this.chunkHot.startTicking(); // KioCG
+                         profiler.startTimer(timerId); try { // Folia - profiler
+                         BlockState iblockdata = LevelChunk.this.getBlockState(blockposition);
+ 
+@@ -1107,7 +1109,7 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
+                         LevelChunk.this.removeBlockEntity(this.getPos());
+                         // Paper end - Prevent block entity and entity crashes
+                         // Spigot start
+-                    }
++                    } finally { LevelChunk.this.chunkHot.stopTickingAndCount(); } // KioCG
+                 }
+             }
+ 
+diff --git a/src/main/java/net/minecraft/world/level/redstone/NeighborUpdater.java b/src/main/java/net/minecraft/world/level/redstone/NeighborUpdater.java
+index e414da8a51bb9b49c28a74eca166046cbee44835..ac22bb47836e97904729bad91ff75ce7abfb30b6 100644
+--- a/src/main/java/net/minecraft/world/level/redstone/NeighborUpdater.java
++++ b/src/main/java/net/minecraft/world/level/redstone/NeighborUpdater.java
+@@ -73,7 +73,10 @@ public interface NeighborUpdater {
+                 }
+             }
+             // CraftBukkit end
++            net.minecraft.world.level.chunk.LevelChunk levelChunk = world.getChunkIfLoaded(pos); // KioCG
++            if (levelChunk != null) levelChunk.getChunkHot().startTicking(); try { // KioCG
+             state.handleNeighborChanged(world, pos, sourceBlock, orientation, notify);
++            } finally { if (levelChunk != null) levelChunk.getChunkHot().stopTickingAndCount(); } // KioCG
+             // Spigot Start
+         } catch (StackOverflowError ex) {
+             world.lastPhysicsProblem = new BlockPos(pos);
+diff --git a/src/main/java/one/tranic/sewlia/task/TPSBarTask.java b/src/main/java/one/tranic/sewlia/task/TPSBarTask.java
+index 158869fceb91416eedcb7699bdd5083e55567ec3..0bd668e594c475f92fc8d945a795559787b3239e 100644
+--- a/src/main/java/one/tranic/sewlia/task/TPSBarTask.java
++++ b/src/main/java/one/tranic/sewlia/task/TPSBarTask.java
+@@ -39,7 +39,7 @@ public class TPSBarTask extends BossBarTask {
+ 
+     @Override
+     void updateBossBar(BossBar bossbar, Player player) {
+-        String commandTPSBarTitle = "<gray>TPS<yellow>:</yellow> <tps> MSPT<yellow>:</yellow> <mspt> Ping<yellow>:</yellow> <ping>ms";
++        String commandTPSBarTitle = "<gray>TPS<yellow>:</yellow> <tps> MSPT<yellow>:</yellow> <mspt> Ping<yellow>:</yellow> <ping>ms ChunkHot<yellow>:</yellow> <chunkhot>";
+         final ServerPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
+         final ThreadedRegionizer.ThreadedRegion<TickRegions.TickRegionData, TickRegions.TickRegionSectionData> region = ((ServerLevel) nmsPlayer.level()).regioniser.getRegionAtUnsynchronised(nmsPlayer.moonrise$getSectionX(), nmsPlayer.moonrise$getSectionZ()); // With Luminol
+ 
+@@ -55,7 +55,8 @@ public class TPSBarTask extends BossBarTask {
+             bossbar.name(MiniMessage.miniMessage().deserialize(commandTPSBarTitle,
+                     Placeholder.component("tps", getTPSColor(tpsData.average())),
+                     Placeholder.component("mspt", getMSPTColor(mspt)),
+-                    Placeholder.component("ping", getPingColor(player.getPing()))
++                    Placeholder.component("ping", getPingColor(player.getPing())),
++                    Placeholder.component("chunkhot", getChunkHotComponent(player.getNearbyChunkHot()))
+             ));
+         }
+     }
+@@ -148,6 +149,18 @@ public class TPSBarTask extends BossBarTask {
+         return MiniMessage.miniMessage().deserialize(color, Placeholder.parsed("text", String.format("%s", ping)));
+     }
+ 
++    private static Component getChunkHotComponent(long chunkHot){
++        final String color = barColorFromChunkHot(chunkHot);
++        return MiniMessage.miniMessage().deserialize(color, Placeholder.parsed("text", String.valueOf(chunkHot)));
++    }
++
++    private static String barColorFromChunkHot(long chunkHot){
++        if (chunkHot == -1) return commandTPSBarTextColorLow;
++        if (chunkHot <= 300000L) return commandTPSBarTextColorGood;
++        if (chunkHot <= 500000L) return commandTPSBarTextColorMedium;
++        return commandTPSBarTextColorLow;
++    }
++
+     public enum FillMode {
+         TPS, MSPT, PING
+     }
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
+index 53426970e68d151bf755900d8cc63995a63b0bf0..1e1024c59eb3a800cef15ec777328cde08a95a14 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
+@@ -441,4 +441,12 @@ public class CraftChunk implements Chunk {
+     static {
+         Arrays.fill(FULL_LIGHT, (byte) 0xFF);
+     }
++
++    // KioCG start - ChunkHot
++    @Override
++    public long getChunkHotAvg() {
++        final net.minecraft.world.level.chunk.LevelChunk target = this.worldServer.getChunkIfLoaded(this.x,this.z);
++        return target == null ? -1 : target.getChunkHot().getAverage();
++    }
++    // KioCG end
+ }
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+index b2ae1de0b18a7b5c684b04e3f81fdf071e013c61..309c122721c98dadad74376eeccba079a546750f 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+@@ -3592,4 +3592,11 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+         this.getHandle().connection.send(new net.minecraft.network.protocol.game.ClientboundEntityEventPacket(((CraftEntity) target).getHandle(), effect.getData()));
+     }
+     // Paper end - entity effect API
++
++    // KioCG start - ChunkHot
++    @Override
++    public long getNearbyChunkHot() {
++        return this.getHandle().getNearbyChunkHot();
++    }
++    // KioCG end
+ }
+diff --git a/src/main/java/patch/com/kiocg/ChunkHot.java b/src/main/java/patch/com/kiocg/ChunkHot.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..9ee96b1dd4024b569592302470b54bb803fc3799
+--- /dev/null
++++ b/src/main/java/patch/com/kiocg/ChunkHot.java
+@@ -0,0 +1,90 @@
++package patch.com.kiocg;
++
++import java.util.Arrays;
++
++public class ChunkHot {
++    // Total number of hotness statistics intervals
++    private static final int TIMES_LENGTH = 10;
++    // Current statistics interval index
++    private int index = -1;
++
++    // Hotness statistics intervals
++    private final long[] times = new long[TIMES_LENGTH];
++    // Store temporary interval values
++    // Used to fix the issue where the hotness of the current interval being counted is not included in the total value
++    private long temp;
++    // Total hotness value for all intervals
++    private long total;
++
++    // For calculations of each specific statistic
++    private long nanos;
++    // Whether the current statistics are ongoing
++    private volatile boolean started = false;
++
++    /**
++     * Update the interval index
++     */
++    public void nextTick() {
++        this.index = ++this.index % TIMES_LENGTH;
++    }
++
++    /**
++     * Start counting a new interval
++     */
++    public void start() {
++        started = true;
++        temp = times[this.index];
++        times[this.index] = 0L;
++    }
++
++    public boolean isStarted(){
++        return this.started;
++    }
++
++    /**
++     * End the current interval's statistics
++     * Update the statistics value into the total hotness value
++     */
++    public void stop() {
++        started = false;
++        total -= temp;
++        total += times[this.index];
++    }
++
++    /**
++     * Start a specific statistic
++     */
++    public void startTicking() {
++        if (!started) return;
++        nanos = System.nanoTime();
++    }
++
++    /**
++     * End a specific statistic
++     * Include the statistic value in the current hotness interval
++     */
++    public void stopTickingAndCount() {
++        if (!started) return;
++        // Define the maximum value for a specific statistic as 1,000,000
++        // Sometimes the calculated value of a specific statistic can spike at a certain moment, possibly due to saving data to disk?
++        times[this.index] += Math.min(System.nanoTime() - nanos, 1000000L);
++    }
++
++    /**
++     * Clear statistics (when the chunk is unloaded)
++     */
++    public void clear() {
++        started = false;
++        Arrays.fill(times, 0L);
++        temp = 0L;
++        total = 0L;
++        nanos = 0L;
++    }
++
++    /**
++     * @return Get the average hotness value of the chunk
++     */
++    public long getAverage() {
++        return total / ((long) TIMES_LENGTH * 20L);
++    }
++}

@@ -1,0 +1,78 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Sat, 2 Nov 2024 23:46:58 +0800
+Subject: [PATCH] Luminol: Try optimizing the task dispatching
+
+
+diff --git a/src/main/java/ca/spottedleaf/concurrentutil/scheduler/SchedulerThreadPool.java b/src/main/java/ca/spottedleaf/concurrentutil/scheduler/SchedulerThreadPool.java
+index 85e6ef636d435a0ee4bf3e0760b0c87422c520a1..6b814b34d3997c419ca5fc61b8d6c37ede95eb9c 100644
+--- a/src/main/java/ca/spottedleaf/concurrentutil/scheduler/SchedulerThreadPool.java
++++ b/src/main/java/ca/spottedleaf/concurrentutil/scheduler/SchedulerThreadPool.java
+@@ -372,6 +372,12 @@ public class SchedulerThreadPool {
+                     "scheduled_state=" + this.scheduled.get() + ","
+                     + "}";
+         }
++
++        // Luminol start
++        protected boolean flushExtraTask() {
++            return false;
++        }
++        // Luminol end
+     }
+ 
+     private static final class TickThreadRunner implements Runnable {
+@@ -532,7 +538,7 @@ public class SchedulerThreadPool {
+                             if (diff <= 0L) {
+                                 break;
+                             }
+-                            LockSupport.parkNanos(startState, diff);
++                            if (!one.tranic.sewlia.config.mod.optimization.RunExtraTasksDuringWaiting.value || !startStateTask.flushExtraTask()) LockSupport.parkNanos(startState, 1_000); // Luminol - Optimize task dispatching
+                             if (this.scheduler.halted) {
+                                 return;
+                             }
+diff --git a/src/main/java/io/papermc/paper/threadedregions/ThreadedRegionizer.java b/src/main/java/io/papermc/paper/threadedregions/ThreadedRegionizer.java
+index ce388e0ef231d7d73f75f5778c58eb40f6402f0f..7f8473a6db78dc652e0ccfdb7cc038126f1e61ea 100644
+--- a/src/main/java/io/papermc/paper/threadedregions/ThreadedRegionizer.java
++++ b/src/main/java/io/papermc/paper/threadedregions/ThreadedRegionizer.java
+@@ -682,7 +682,7 @@ public final class ThreadedRegionizer<R extends ThreadedRegionizer.ThreadedRegio
+ 
+         public final long id;
+ 
+-        private int state;
++        public int state; // Luminol - Optimize task dispatching
+ 
+         private final Long2ReferenceOpenHashMap<ThreadedRegionSection<R, S>> sectionByKey = new Long2ReferenceOpenHashMap<>();
+         private final ReferenceOpenHashSet<ThreadedRegionSection<R, S>> deadSections = new ReferenceOpenHashSet<>();
+diff --git a/src/main/java/io/papermc/paper/threadedregions/TickRegionScheduler.java b/src/main/java/io/papermc/paper/threadedregions/TickRegionScheduler.java
+index 056fb1ca7b07d5e713dcbd951830b14fc9025f4c..794329dc320c1860a9578a1a8d6e7dbc0f167c8f 100644
+--- a/src/main/java/io/papermc/paper/threadedregions/TickRegionScheduler.java
++++ b/src/main/java/io/papermc/paper/threadedregions/TickRegionScheduler.java
+@@ -364,6 +364,28 @@ public final class TickRegionScheduler {
+             return !this.markNotTicking() || this.cancelled.get() ? null : Boolean.valueOf(ret);
+         }
+ 
++        @Override // Luminol start - Optimize task dispatching
++        public boolean flushExtraTask() {
++            if (this.cancelled.get()) return false;
++            if (!this.tryMarkTicking()) return false;
++            if (this.cancelled.get()) {
++                this.markNotTicking();
++                return false;
++            }
++
++            if (this.region != null) TickRegionScheduler.setTickingRegion(this.region.region);
++            try {
++                if (this.region == null) return false;
++                if (this.region.region.getData().getTaskQueueData().executeChunkTask()) return true;
++                if (this.region.region.getData().getTaskQueueData().executeTickTask()) return true;
++            } finally {
++                this.markNotTicking();
++                if (this.region != null) TickRegionScheduler.setTickingRegion(null);
++            }
++
++            return false;
++        } // Luminol end - Optimize task dispatching
++
+         @Override
+         public final boolean runTick() {
+             // Remember, we are supposed use setScheduledStart if we return true here, otherwise

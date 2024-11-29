@@ -5,10 +5,10 @@ Subject: [PATCH] Add TPSBarTask
 
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index e4a68f43c1a48fe8193623c646eb40bc5f664c76..fb21572eecb512bdb5ecafcda44f404c2a0e6cde 100644
+index 68a88928a3aae9d2ea6cd18088ede0a54c31d0d2..c4d77d99452f9844144f91511fdc105a30845d2c 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-@@ -303,6 +303,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -329,6 +329,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
      public com.destroystokyo.paper.event.entity.PlayerNaturallySpawnCreaturesEvent playerNaturallySpawnedEvent; // Paper - PlayerNaturallySpawnCreaturesEvent
      public @Nullable String clientBrandName = null; // Paper - Brand support
      public org.bukkit.event.player.PlayerQuitEvent.QuitReason quitReason = null; // Paper - Add API for quit reason; there are a lot of changes to do if we change all methods leading to the event
@@ -16,7 +16,7 @@ index e4a68f43c1a48fe8193623c646eb40bc5f664c76..fb21572eecb512bdb5ecafcda44f404c
  
      // Paper start - rewrite chunk system
      private ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
-@@ -745,6 +746,8 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -835,6 +836,8 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
              });
          }
  
@@ -25,15 +25,15 @@ index e4a68f43c1a48fe8193623c646eb40bc5f664c76..fb21572eecb512bdb5ecafcda44f404c
      }
  
      @Override
-@@ -821,6 +824,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -886,6 +889,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
              });
          }
  
 +        nbt.putBoolean("Sewlia.TPSBar", this.tpsBar); // Sewlia
+         this.saveEnderPearls(nbt);
      }
  
-     // CraftBukkit start - World fallback code, either respawn location or global spawn
-@@ -3426,4 +3430,12 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -3785,4 +3789,12 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
          return (CraftPlayer) super.getBukkitEntity();
      }
      // CraftBukkit end

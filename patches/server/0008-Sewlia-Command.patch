@@ -5,10 +5,10 @@ Subject: [PATCH] Sewlia Command
 
 
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index 5dcf2d844435b4a17e6b3136f9aea4e3af332366..ee393297fc69b22058feb60057494430a72f2475 100644
+index 78f33298e809a7f6d079d9f2c64e2caa47a1b25a..a88addb2d75f5f27627ee1a557956d994922b521 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -226,6 +226,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -223,6 +223,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          this.paperConfigurations.initializeGlobalConfiguration(this.registryAccess());
          this.paperConfigurations.initializeWorldDefaultsConfiguration(this.registryAccess());
          // Paper end - initialize global and world-defaults configuration

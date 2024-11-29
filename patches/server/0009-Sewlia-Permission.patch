@@ -70,10 +70,10 @@ index 0000000000000000000000000000000000000000..1a397d7c56891ccec79a69377610c6a4
 +    }
 +}
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index dee23b4b96b7f2c6af54a6affe385b183479f8cc..821f6412384e392beca84d7eac03cf395a45c94a 100644
+index a8975cee866cf2c617b6d4976df71e5c20cf0e3d..bcc4adf7f781b009000e42edc2e1b649f63f8e87 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -607,6 +607,7 @@ public final class CraftServer implements Server {
+@@ -615,6 +615,7 @@ public final class CraftServer implements Server {
              DefaultPermissions.registerCorePermissions();
              CraftDefaultPermissions.registerCorePermissions();
              if (!io.papermc.paper.configuration.GlobalConfiguration.get().misc.loadPermissionsYmlBeforePlugins) this.loadCustomPermissions(); // Paper
@@ -81,7 +81,7 @@ index dee23b4b96b7f2c6af54a6affe385b183479f8cc..821f6412384e392beca84d7eac03cf39
              this.helpMap.initializeCommands();
              this.syncCommands();
          }
-@@ -3166,6 +3167,7 @@ public final class CraftServer implements Server {
+@@ -3201,6 +3202,7 @@ public final class CraftServer implements Server {
          if (!io.papermc.paper.configuration.GlobalConfiguration.get().misc.loadPermissionsYmlBeforePlugins) loadCustomPermissions();
          DefaultPermissions.registerCorePermissions();
          CraftDefaultPermissions.registerCorePermissions();

@@ -6,10 +6,10 @@ Subject: [PATCH] Add RamBarTask
 Reference Object: Purpur
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index fb21572eecb512bdb5ecafcda44f404c2a0e6cde..6dca3d0b01a060a96700e7e5ef8f1e526c70af4b 100644
+index c4d77d99452f9844144f91511fdc105a30845d2c..40abf7f275d4d4e916527fa1d28b3a02c1231468 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-@@ -304,6 +304,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -330,6 +330,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
      public @Nullable String clientBrandName = null; // Paper - Brand support
      public org.bukkit.event.player.PlayerQuitEvent.QuitReason quitReason = null; // Paper - Add API for quit reason; there are a lot of changes to do if we change all methods leading to the event
      private boolean tpsBar = false; // Sewlia
@@ -17,7 +17,7 @@ index fb21572eecb512bdb5ecafcda44f404c2a0e6cde..6dca3d0b01a060a96700e7e5ef8f1e52
  
      // Paper start - rewrite chunk system
      private ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
-@@ -747,6 +748,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -837,6 +838,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
          }
  
          if (nbt.contains("Sewlia.TPSBar")) { this.tpsBar = nbt.getBoolean("Sewlia.TPSBar"); } // Sewlia
@@ -25,15 +25,15 @@ index fb21572eecb512bdb5ecafcda44f404c2a0e6cde..6dca3d0b01a060a96700e7e5ef8f1e52
  
      }
  
-@@ -825,6 +827,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -890,6 +892,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
          }
  
          nbt.putBoolean("Sewlia.TPSBar", this.tpsBar); // Sewlia
 +        nbt.putBoolean("Sewlia.RamBar", this.ramBar); // Sewlia
+         this.saveEnderPearls(nbt);
      }
  
-     // CraftBukkit start - World fallback code, either respawn location or global spawn
-@@ -3438,4 +3441,12 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -3797,4 +3800,12 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
      public void tpsBar(boolean tpsBar) {
          this.tpsBar = tpsBar;
      }

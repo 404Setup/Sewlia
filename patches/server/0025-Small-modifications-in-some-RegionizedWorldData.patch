@@ -5,10 +5,10 @@ Subject: [PATCH] Small modifications in some RegionizedWorldData
 
 
 diff --git a/src/main/java/io/papermc/paper/threadedregions/RegionizedWorldData.java b/src/main/java/io/papermc/paper/threadedregions/RegionizedWorldData.java
-index 06cb6fe685f221d6f24ca07ad2837b9b747042b2..06bb823bcad9babb71a7e1eb2aca553a017f4fda 100644
+index 6d94e3142d06bba5f22c9a13b95d76fe9e9fc279..eb0af7498c3df04eefd8fc096de29bf9e1d6f462 100644
 --- a/src/main/java/io/papermc/paper/threadedregions/RegionizedWorldData.java
 +++ b/src/main/java/io/papermc/paper/threadedregions/RegionizedWorldData.java
-@@ -314,7 +314,7 @@ public final class RegionizedWorldData {
+@@ -332,7 +332,7 @@ public final class RegionizedWorldData {
      private RegionizedServer.WorldLevelData tickData;
  
      // connections
@@ -17,7 +17,7 @@ index 06cb6fe685f221d6f24ca07ad2837b9b747042b2..06bb823bcad9babb71a7e1eb2aca553a
  
      // misc. fields
      private boolean isHandlingTick;
-@@ -328,7 +328,7 @@ public final class RegionizedWorldData {
+@@ -346,7 +346,7 @@ public final class RegionizedWorldData {
      }
  
      // entities
@@ -26,7 +26,7 @@ index 06cb6fe685f221d6f24ca07ad2837b9b747042b2..06bb823bcad9babb71a7e1eb2aca553a
      private final NearbyPlayers nearbyPlayers;
      private final ReferenceList<Entity> allEntities = new ReferenceList<>(EMPTY_ENTITY_ARRAY);
      private final ReferenceList<Entity> loadedEntities = new ReferenceList<>(EMPTY_ENTITY_ARRAY);
-@@ -343,8 +343,8 @@ public final class RegionizedWorldData {
+@@ -361,8 +361,8 @@ public final class RegionizedWorldData {
      private final LevelTicks<Fluid> fluidLevelTicks;
  
      // tile entity ticking
@@ -37,7 +37,7 @@ index 06cb6fe685f221d6f24ca07ad2837b9b747042b2..06bb823bcad9babb71a7e1eb2aca553a
      private boolean tickingBlockEntities;
  
      // time
-@@ -383,8 +383,8 @@ public final class RegionizedWorldData {
+@@ -401,8 +401,8 @@ public final class RegionizedWorldData {
      public boolean captureBlockStates = false;
      public boolean captureTreeGeneration = false;
      public boolean isBlockPlaceCancelled = false; // Paper - prevent calling cleanup logic when undoing a block place upon a cancelled BlockPlaceEvent
@@ -48,12 +48,12 @@ index 06cb6fe685f221d6f24ca07ad2837b9b747042b2..06bb823bcad9babb71a7e1eb2aca553a
      public List<ItemEntity> captureDrops;
      // Paper start
      public int wakeupInactiveRemainingAnimals;
-@@ -397,7 +397,7 @@ public final class RegionizedWorldData {
+@@ -415,7 +415,7 @@ public final class RegionizedWorldData {
      @VisibleForDebug
      public NaturalSpawner.SpawnState lastSpawnState;
      public boolean shouldSignal = true;
--    public final Map<Explosion.CacheKey, Float> explosionDensityCache = new HashMap<>(64, 0.25f);
-+    public final Map<Explosion.CacheKey, Float> explosionDensityCache = new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>(64, 0.25f); // Sewlia
+-    public final Map<ServerExplosion.CacheKey, Float> explosionDensityCache = new HashMap<>(64, 0.25f);
++    public final Map<ServerExplosion.CacheKey, Float> explosionDensityCache = new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>(64, 0.25f); // Sewlia
      public final PathTypeCache pathTypesByPosCache = new PathTypeCache();
-     public ServerChunkCache.ChunkAndHolder[] iterationCopy; // Paper - chunk tick iteration optimisations
- 
+     public final List<LevelChunk> temporaryChunkTickList = new java.util.ArrayList<>();
+     public final Set<ChunkHolder> chunkHoldersToBroadcast = new ReferenceLinkedOpenHashSet<>();

@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Sat, 2 Nov 2024 23:38:08 +0800
+Subject: [PATCH] Luminol: Try fixing folia spector teleportation
+
+
+diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+index 40abf7f275d4d4e916527fa1d28b3a02c1231468..8e96cc943b5a71782dae7685f4081d7d20c02a54 100644
+--- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
++++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+@@ -1174,9 +1174,24 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+         }
+ 
+         Entity entity = this.getCamera();
++        //Luminol start - Fix folia spector teleportation
++        if (!ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(entity) && one.tranic.sewlia.config.mod.fix.SpectorTeleportation.value){
++            this.setCamera(this);
++        }
++        //Luminol end
+ 
+         if (entity != this) {
+-            if (entity.isAlive()) {
++            // Luminol start - Fix folia spector teleportation
++            var flag = false;
++            var cameraPos = entity.blockPosition();
++            var cameraLevel = entity.level();
++            if (!ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(cameraLevel, cameraPos) && one.tranic.sewlia.config.mod.fix.SpectorTeleportation.value){
++                this.setCamera(this);
++                flag = true;
++            }
++            // Luminol end
++
++            if (entity.isAlive() && !flag) { // Luminol - Fix folia spector teleportation
+                 this.absMoveTo(entity.getX(), entity.getY(), entity.getZ(), entity.getYRot(), entity.getXRot());
+                 this.serverLevel().getChunkSource().move(this);
+                 if (this.wantsToStopRiding()) {

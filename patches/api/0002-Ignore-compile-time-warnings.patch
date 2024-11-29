@@ -5,10 +5,10 @@ Subject: [PATCH] Ignore compile time warnings
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index a4d7e48f11c30136d97bc90e4233ca5ee97ff7f8..63986110737187f0c7912ad87792e66273162b37 100644
+index 428c62a884999345126eca20ce8c5a5b27561199..c1f2a8ab25de9bbb85fb97218d178d65d8d6da22 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -203,9 +203,16 @@ tasks.test {
+@@ -225,9 +225,16 @@ tasks.test {
  // Paper start - compile tests with -parameters for better junit parameterized test names
  tasks.compileTestJava {
      options.compilerArgs.add("-parameters")

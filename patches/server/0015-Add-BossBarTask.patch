@@ -6,10 +6,10 @@ Subject: [PATCH] Add BossBarTask
 This patch is inspired by Purpur.
 
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 38867f707488058bdd175c57d176051225a33a05..67932c003e8184b3b8b60912581637f2b35334af 100644
+index f153e6f3fadb11a69c5cd190030c57817ebcc227..21edd7c579c676d2176afc45da7ac580c94a826e 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1200,6 +1200,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1235,6 +1235,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          this.safeShutdown(waitForShutdown, false);
      }
      public void safeShutdown(boolean waitForShutdown, boolean isRestarting) {
@@ -18,10 +18,10 @@ index 38867f707488058bdd175c57d176051225a33a05..67932c003e8184b3b8b60912581637f2
          this.hasLoggedStop = true; // Paper - Debugging
          if (isDebugging()) io.papermc.paper.util.TraceUtil.dumpTraceForThread("Server stopped"); // Paper - Debugging
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index 381afd249404c5d1b4896a961fb821845ccfe17f..99123594c8adda5cdac90d47114d2acfff2b7570 100644
+index 0b8f38cad8a5416726bbc2125e6947ac8a582458..0a0dde85ccd4bd58017110c7fe662f1bcc3563a1 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -314,6 +314,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -311,6 +311,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
                  DedicatedServer.LOGGER.info("JMX monitoring enabled");
              }
  
@@ -30,18 +30,18 @@ index 381afd249404c5d1b4896a961fb821845ccfe17f..99123594c8adda5cdac90d47114d2acf
          }
      }
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index d407b5d34c35b94ccfe81d3ffa2820f22327cb15..151f60bb99cc1aaf10f3c3ad306634ce98d020a3 100644
+index 12ae1c610f59f13416753e237fd0d7073bcd372b..bcbcbe40201d3779316a68de7166b7a1c32f9f3f 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
-@@ -578,6 +578,7 @@ public abstract class PlayerList {
+@@ -511,6 +511,7 @@ public abstract class PlayerList {
              scoreboard.addPlayerToTeam(player.getScoreboardName(), collideRuleTeam);
          }
          // Paper end - Configurable player collision
 +        one.tranic.sewlia.task.BossBarTask.addToAll(player); // Sewlia
          PlayerList.LOGGER.info("{}[{}] logged in with entity id {} at ([{}]{}, {}, {})", player.getName().getString(), s1, player.getId(), worldserver1.serverLevelData.getLevelName(), player.getX(), player.getY(), player.getZ());
-     }
- 
-@@ -689,6 +690,7 @@ public abstract class PlayerList {
+         // Paper start - Send empty chunk, so players aren't stuck in the world loading screen with our chunk system not sending chunks when dead
+         if (player.isDeadOrDying()) {
+@@ -632,6 +633,7 @@ public abstract class PlayerList {
      }
      public net.kyori.adventure.text.Component remove(ServerPlayer entityplayer, net.kyori.adventure.text.Component leaveMessage) {
          // Paper end - Fix kick event leave message not being sent

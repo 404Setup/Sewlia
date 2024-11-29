@@ -1,0 +1,43 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Thu, 7 Nov 2024 13:47:27 +0800
+Subject: [PATCH] Leaf: Cache player profileResult
+
+
+diff --git a/src/main/java/net/minecraft/server/network/ServerLoginPacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
+index 227d62a69a453d49c28568ecb41ecef85a35405b..d471d33d85c0c2917eaedb210f8021608193a607 100644
+--- a/src/main/java/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
++++ b/src/main/java/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
+@@ -92,6 +92,11 @@ public class ServerLoginPacketListenerImpl implements ServerLoginPacketListener,
+     private ServerPlayer player; // CraftBukkit
+     public boolean iKnowThisMayNotBeTheBestIdeaButPleaseDisableUsernameValidation = false; // Paper - username validation overriding
+     private int velocityLoginMessageId = -1; // Paper - Add Velocity IP Forwarding Support
++    // Leaf start - Cache player profileResult
++    private final @Nullable com.github.benmanes.caffeine.cache.Cache<String, ProfileResult> playerProfileResultCahce = one.tranic.sewlia.config.mod.misc.cache_player_profile.Enable.value ? com.github.benmanes.caffeine.cache.Caffeine.newBuilder()
++            .expireAfterWrite(one.tranic.sewlia.config.mod.misc.cache_player_profile.ResultTimeout.value, java.util.concurrent.TimeUnit.MINUTES)
++            .build() : null;
++    // Leaf end
+ 
+     public ServerLoginPacketListenerImpl(MinecraftServer server, Connection connection, boolean transferred) {
+         this.state = ServerLoginPacketListenerImpl.State.HELLO;
+@@ -309,7 +314,19 @@ public class ServerLoginPacketListenerImpl implements ServerLoginPacketListener,
+                 String s1 = (String) Objects.requireNonNull(ServerLoginPacketListenerImpl.this.requestedUsername, "Player name not initialized");
+ 
+                 try {
+-                    ProfileResult profileresult = ServerLoginPacketListenerImpl.this.server.getSessionService().hasJoinedServer(s1, s, this.getAddress());
++                    // Leaf start - Cache player profileResult
++                    ProfileResult profileresult;
++                    if (one.tranic.sewlia.config.mod.misc.cache_player_profile.Enable.value && playerProfileResultCahce != null) {
++                        profileresult = playerProfileResultCahce.getIfPresent(s1);
++
++                        if (profileresult == null) {
++                            profileresult = ServerLoginPacketListenerImpl.this.server.getSessionService().hasJoinedServer(s1, s, this.getAddress());
++                            playerProfileResultCahce.put(s1, profileresult);
++                        }
++                    } else {
++                        profileresult = ServerLoginPacketListenerImpl.this.server.getSessionService().hasJoinedServer(s1, s, this.getAddress());
++                    }
++                    // Leaf end
+ 
+                     if (profileresult != null) {
+                         GameProfile gameprofile = profileresult.profile();

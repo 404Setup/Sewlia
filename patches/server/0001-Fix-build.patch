@@ -5,15 +5,15 @@ Subject: [PATCH] Fix build
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index c2f2ba1df68e9823c56287f1bea23fb6d6a781a2..754c40ca692bb68a6b47310ccca415635918c460 100644
+index 142714c7d47eb5de937ad385c81968148a7e4828..5f5a02743cae8607d3a93f8943cf92b8bb32e4c1 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -13,7 +13,7 @@ configurations.named(log4jPlugins.compileClasspathConfigurationName) {
- val alsoShade: Configuration by configurations.creating
+@@ -25,7 +25,7 @@ abstract class MockitoAgentProvider : CommandLineArgumentProvider {
+ // Paper end - configure mockito agent that is needed in newer java versions
  
  dependencies {
 -    implementation(project(":folia-api")) // Folia
 +    implementation(project(":sewlia-api")) // Folia // Sewlia
      // Paper start
-     implementation("org.jline:jline-terminal-jansi:3.21.0")
-     implementation("net.minecrell:terminalconsoleappender:1.3.0")
+     implementation("org.jline:jline-terminal-ffm:3.27.1") // use ffm on java 22+
+     implementation("org.jline:jline-terminal-jni:3.27.1") // fall back to jni on java 21

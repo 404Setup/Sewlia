@@ -6,24 +6,15 @@ Subject: [PATCH] Store gamerules in fastutil hashmap
 You can find the original code on https://github.com/CaffeineMC/lithium-fabric
 
 diff --git a/src/main/java/net/minecraft/world/level/GameRules.java b/src/main/java/net/minecraft/world/level/GameRules.java
-index 89e327bc3a45879fe68887c7aadb077f31a770eb..1dd886715704f5a8133d022755e27b5b6b56f46b 100644
+index 7c363d59c6567cae8e6caf213be51804efa5a96d..a47640e6d863d8c07d3f9526fea91e53a88a47ab 100644
 --- a/src/main/java/net/minecraft/world/level/GameRules.java
 +++ b/src/main/java/net/minecraft/world/level/GameRules.java
-@@ -142,14 +142,14 @@ public class GameRules {
- 
-     public GameRules() {
-         // Paper start - Perf: Use array for gamerule storage
--        this((Map) GameRules.GAME_RULE_TYPES.entrySet().stream().collect(ImmutableMap.toImmutableMap(Entry::getKey, (entry) -> {
--            return ((GameRules.Type) entry.getValue()).createRule();
-+        this(GameRules.GAME_RULE_TYPES.entrySet().stream().collect(ImmutableMap.toImmutableMap(Entry::getKey, (entry) -> {
-+            return entry.getValue().createRule();
-         })));
-         // Paper end - Perf: Use array for gamerule storage
+@@ -168,7 +168,7 @@ public class GameRules {
      }
  
-     private GameRules(Map<GameRules.Key<?>, GameRules.Value<?>> rules) {
+     private GameRules(Map<GameRules.Key<?>, GameRules.Value<?>> rules, FeatureFlagSet enabledFeatures) {
 -        this.rules = rules;
 +        this.rules = new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>(rules); // Lithium - store gamerules in fastutil hashmap
+         this.enabledFeatures = enabledFeatures;
  
          // Paper start - Perf: Use array for gamerule storage
-         int arraySize = rules.keySet().stream().mapToInt(key -> key.gameRuleIndex).max().orElse(-1) + 1;
