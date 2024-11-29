@@ -48,10 +48,10 @@ index c3ec370b83b895be0f03662e3884fa4a2442a2a6..a80e86bb363fdac8caedfeabd0a34363
              return GsonHelper.parse(!s1.isEmpty() ? s1 : "{}");
          }, new JsonObject()), (String) this.get("level-type", (s1) -> {
 diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-index 220db29a8901fbbfbec2b95be994f0ea0144b98d..1e26d6eaffee787c3393e623badc44fe55351152 100644
+index a5fc3187438467d24a3143a01188824bb7120b2a..d6c3de5bc93f47ad51fe19242904437cb94b2205 100644
 --- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 +++ b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-@@ -669,7 +669,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -668,7 +668,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
      }
  
      public ChunkGenerator getGenerator() {

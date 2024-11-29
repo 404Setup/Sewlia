@@ -14,10 +14,10 @@ This seems stupid, but it does seem that it improves the performance a bit, and 
 We also create a "canSee" method tailored for "ChunkMap#updatePlayer()", a method without the equals check (the "updatePlayer()" already checks if the entity is the same entity) because the CraftPlayer's `equals()` check is a *bit* expensive compared to only checking the object's identity, and because the identity has already been check, we don't need to check it twice.
 
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index dd63a17cdbf758aec2110924ef38ee3c1bc18fd1..51c6a965e72bcb0d73b01ebb5aa3ee84a84ef38b 100644
+index ad6d635971d0f5d23c923b1dc83c0b18e8f4a94a..926e070e3b3f1a8ce8a9c668e39239a837b35b0e 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
-@@ -1262,7 +1262,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -1256,7 +1256,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
                  // Folia end - region threading
  
                  // CraftBukkit start - respect vanish API
