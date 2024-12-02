@@ -54,17 +54,17 @@ index 374abffb9f1ce1a308822aed13038e77fe9ca08b..77be3946a5561c77cf5e2f38868fc800
              ret.setName("Folia Async Scheduler Thread Timer");
              ret.setPriority(Thread.NORM_PRIORITY + 1);
 diff --git a/src/main/java/io/papermc/paper/util/MCUtil.java b/src/main/java/io/papermc/paper/util/MCUtil.java
-index d81a543206f808b7a36204dd277391370186ea43..6e51fde9bf909993726705213bded7692513ceaf 100644
+index 4dcec640f5870d713bd3b98389a45dbef8a4ea8a..4a9844d825934137b8b9c2f7e17cd51a555539f6 100644
 --- a/src/main/java/io/papermc/paper/util/MCUtil.java
 +++ b/src/main/java/io/papermc/paper/util/MCUtil.java
-@@ -42,6 +42,7 @@ public final class MCUtil {
-         2, 2, 60L, TimeUnit.SECONDS,
-         new LinkedBlockingQueue<>(),
-         new ThreadFactoryBuilder()
-+            .setThreadFactory(one.tranic.sewlia.config.mod.feature.virtual_thread.paper.AsyncTaskHandler.getThreadFactory())
-             .setNameFormat("Paper Async Task Handler Thread - %1$d")
-             .setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(MinecraftServer.LOGGER))
-             .build()
+@@ -38,6 +38,7 @@ public final class MCUtil {
+         }
+     };
+     public static final ExecutorService ASYNC_EXECUTOR = Executors.newFixedThreadPool(2, new ThreadFactoryBuilder()
++        .setThreadFactory(one.tranic.sewlia.config.mod.feature.virtual_thread.paper.AsyncTaskHandler.getThreadFactory())
+         .setNameFormat("Paper Async Task Handler Thread - %1$d")
+         .setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(MinecraftServer.LOGGER))
+         .build()
 diff --git a/src/main/java/io/papermc/paper/util/ServerWorkerThreadFactory.java b/src/main/java/io/papermc/paper/util/ServerWorkerThreadFactory.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..faf5e6f90b0a764c5c02e99648cde6986a35a227
@@ -102,41 +102,54 @@ index 0000000000000000000000000000000000000000..faf5e6f90b0a764c5c02e99648cde698
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/Util.java b/src/main/java/net/minecraft/Util.java
-index ccfe9ef24dce9f34613692adb13738d3ad0e7aac..50ab046a56961a8eed3c18b0aa69c16466ff20dd 100644
+index 1360aa8202542d3d0f32247f1123575fc2c38ff1..5b45f563f1ca87c22a5629ebabd7f02ae39fe619 100644
 --- a/src/main/java/net/minecraft/Util.java
 +++ b/src/main/java/net/minecraft/Util.java
-@@ -93,8 +93,8 @@ public class Util {
+@@ -33,9 +33,6 @@ import java.net.URISyntaxException;
+ import java.nio.file.Files;
+ import java.nio.file.Path;
+ import java.nio.file.spi.FileSystemProvider;
+-import java.security.AccessController;
+-import java.security.PrivilegedActionException;
+-import java.security.PrivilegedExceptionAction;
+ import java.time.Duration;
+ import java.time.Instant;
+ import java.time.ZonedDateTime;
+@@ -93,9 +90,9 @@ public class Util {
      private static final int DEFAULT_SAFE_FILE_OPERATION_RETRIES = 10;
      private static final String MAX_THREADS_SYSTEM_PROPERTY = "max.bg.threads";
      private static final TracingExecutor BACKGROUND_EXECUTOR = makeExecutor("Main", -1); // Paper - Perf: add priority
 -    private static final TracingExecutor IO_POOL = makeIoExecutor("IO-Worker-", false);
++    private static final TracingExecutor IO_POOL = makeIoExecutor("IO-Worker-", false, one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.io.Worker.value); // Sewlia - VT2.0
++    private static final TracingExecutor DOWNLOAD_POOL = makeIoExecutor("Download-", true, one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.network.Download.value); // Sewlia - VT2.0
+     public static final TracingExecutor DIMENSION_DATA_IO_POOL = makeExtraIoExecutor("Dimension-Data-IO-Worker-"); // Paper - Separate dimension data IO pool
 -    private static final TracingExecutor DOWNLOAD_POOL = makeIoExecutor("Download-", true);
-+    private static final TracingExecutor IO_POOL = makeIoExecutor("IO-Worker-", false, one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.io.Worker.value);
-+    private static final TracingExecutor DOWNLOAD_POOL = makeIoExecutor("Download-", true, one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.network.Download.value);
      // Paper start - don't submit BLOCKING PROFILE LOOKUPS to the world gen thread
      public static final ExecutorService PROFILE_EXECUTOR = Executors.newFixedThreadPool(2, new java.util.concurrent.ThreadFactory() {
  
-@@ -102,7 +102,7 @@ public class Util {
+@@ -103,7 +100,7 @@ public class Util {
  
          @Override
          public Thread newThread(Runnable run) {
 -            Thread ret = new Thread(run);
-+            Thread ret = one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.network.ProfileLookup.getThread(run);
++            Thread ret = one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.network.ProfileLookup.getThread(run); // Sewlia - VT2.0
              ret.setName("Profile Lookup Executor #" + this.count.getAndIncrement());
              ret.setUncaughtExceptionHandler((Thread thread, Throwable throwable) -> {
                  LOGGER.error("Uncaught exception in thread " + thread.getName(), throwable);
-@@ -183,7 +183,7 @@ public class Util {
+@@ -184,7 +181,7 @@ public class Util {
          if (i <= 0) {
              executorService = MoreExecutors.newDirectExecutorService();
          } else {
--            executorService = new java.util.concurrent.ThreadPoolExecutor(i, i,0L, TimeUnit.MILLISECONDS, new java.util.concurrent.LinkedBlockingQueue<>(), target -> new io.papermc.paper.util.ServerWorkerThread(target, s, priorityModifier));
-+            executorService = new java.util.concurrent.ThreadPoolExecutor(i, i,0L, TimeUnit.MILLISECONDS, new java.util.concurrent.LinkedBlockingQueue<>(), new io.papermc.paper.util.ServerWorkerThreadFactory(s, priorityModifier) /*target -> new io.papermc.paper.util.ServerWorkerThread(target, s, priorityModifier)*/);
+-            executorService = Executors.newFixedThreadPool(i, target -> new io.papermc.paper.util.ServerWorkerThread(target, s, priorityModifier));
++            executorService = Executors.newFixedThreadPool(i, new io.papermc.paper.util.ServerWorkerThreadFactory(s, priorityModifier)); // Sewlia - VT2.0
          }
          /*      final String string2 = "Worker-" + name + "-" + atomicInteger.getAndIncrement();
                  ForkJoinWorkerThread forkJoinWorkerThread = new ForkJoinWorkerThread(pool) {
-@@ -248,9 +248,13 @@ public class Util {
+@@ -248,10 +245,15 @@ public class Util {
+         IO_POOL.shutdownAndAwait(3L, TimeUnit.SECONDS);
      }
  
++    // Sewlia start - VT2.0
      private static TracingExecutor makeIoExecutor(String namePrefix, boolean daemon) {
 +        return makeIoExecutor(namePrefix, daemon, false);
 +    }
@@ -149,12 +162,28 @@ index ccfe9ef24dce9f34613692adb13738d3ad0e7aac..50ab046a56961a8eed3c18b0aa69c164
              String string2 = namePrefix + atomicInteger.getAndIncrement();
              TracyClient.setThreadName(string2, namePrefix.hashCode());
              thread.setName(string2);
+@@ -259,13 +261,13 @@ public class Util {
+             thread.setUncaughtExceptionHandler(Util::onThreadException);
+             return thread;
+         }));
+-    }
++    }  // Sewlia end - VT2.0
+ 
+     // Paper start - Separate dimension data IO pool
+     private static TracingExecutor makeExtraIoExecutor(String namePrefix) {
+         AtomicInteger atomicInteger = new AtomicInteger(1);
+         return new TracingExecutor(Executors.newFixedThreadPool(4, runnable -> {
+-            Thread thread = new Thread(runnable);
++            Thread thread = one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.io.DimensionData.value ? Thread.ofVirtual().unstarted(runnable) : new Thread(runnable); // Sewlia - VT2.0
+             String string2 = namePrefix + atomicInteger.getAndIncrement();
+             TracyClient.setThreadName(string2, namePrefix.hashCode());
+             thread.setName(string2);
 diff --git a/src/main/java/net/minecraft/commands/Commands.java b/src/main/java/net/minecraft/commands/Commands.java
-index 17bf50b1ec1373952b25c5d0bfb09d6374e433a7..571feeaa826b7f7a90ca65edafd5891d13e67a76 100644
+index c54b897b0e14ac974a903729918a45a9eeec236b..6a2d6a3f8026ef13743b761a78f64a97d4621380 100644
 --- a/src/main/java/net/minecraft/commands/Commands.java
 +++ b/src/main/java/net/minecraft/commands/Commands.java
-@@ -485,6 +485,7 @@ public class Commands {
-         0, 2, 60L, java.util.concurrent.TimeUnit.SECONDS,
+@@ -486,6 +486,7 @@ public class Commands {
+         2, 2, 0, java.util.concurrent.TimeUnit.MILLISECONDS,
          new java.util.concurrent.LinkedBlockingQueue<>(),
          new com.google.common.util.concurrent.ThreadFactoryBuilder()
 +            .setThreadFactory(one.tranic.sewlia.config.mod.feature.virtual_thread.paper.AsyncCommandBuilder.getThreadFactory())
@@ -183,10 +212,10 @@ index 4c3961a10691362657b894a757d201069842d8d7..464841d1d876acd47220fd98c8ec6e2e
      private static final ProtocolInfo<ServerHandshakePacketListener> INITIAL_PROTOCOL = HandshakeProtocols.SERVERBOUND;
      private final PacketFlow receiving;
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index b4b15c1f004955199b2f00769bec12f36b6fbafc..f153e6f3fadb11a69c5cd190030c57817ebcc227 100644
+index fe9811d6ad9d7cccb331997b86d00200403c3d95..e97108dbde4007c881215de8dfee617de6072b6c 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -3132,7 +3132,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -3133,7 +3133,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      }
  
      public final java.util.concurrent.ExecutorService chatExecutor = java.util.concurrent.Executors.newCachedThreadPool(

@@ -6,10 +6,10 @@ Subject: [PATCH] Add BossBarTask
 This patch is inspired by Purpur.
 
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index f153e6f3fadb11a69c5cd190030c57817ebcc227..21edd7c579c676d2176afc45da7ac580c94a826e 100644
+index e97108dbde4007c881215de8dfee617de6072b6c..8a696841f7df793954d92ede49a6e69ec10b6881 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1235,6 +1235,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1236,6 +1236,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          this.safeShutdown(waitForShutdown, false);
      }
      public void safeShutdown(boolean waitForShutdown, boolean isRestarting) {
@@ -30,7 +30,7 @@ index 0b8f38cad8a5416726bbc2125e6947ac8a582458..0a0dde85ccd4bd58017110c7fe662f1b
          }
      }
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index 12ae1c610f59f13416753e237fd0d7073bcd372b..bcbcbe40201d3779316a68de7166b7a1c32f9f3f 100644
+index 995ea080be9ee8e3b246723e115e312d2f0984bb..e16cf0ce68e6fb2a0cf0f6f0bc5e8adfcb6b8bd3 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -511,6 +511,7 @@ public abstract class PlayerList {
