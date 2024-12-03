@@ -5,7 +5,7 @@ Subject: [PATCH] Add TPSBarTask
 
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 68a88928a3aae9d2ea6cd18088ede0a54c31d0d2..c4d77d99452f9844144f91511fdc105a30845d2c 100644
+index fb3ea176726fa01c2ab7220432121db4ad5e54ae..dc215057e8f65757a1ac0bd2b9c8733eb3424321 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -329,6 +329,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
@@ -16,7 +16,7 @@ index 68a88928a3aae9d2ea6cd18088ede0a54c31d0d2..c4d77d99452f9844144f91511fdc105a
  
      // Paper start - rewrite chunk system
      private ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
-@@ -835,6 +836,8 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -832,6 +833,8 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
              });
          }
  
@@ -25,7 +25,7 @@ index 68a88928a3aae9d2ea6cd18088ede0a54c31d0d2..c4d77d99452f9844144f91511fdc105a
      }
  
      @Override
-@@ -886,6 +889,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -883,6 +886,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
              });
          }
  
@@ -33,7 +33,7 @@ index 68a88928a3aae9d2ea6cd18088ede0a54c31d0d2..c4d77d99452f9844144f91511fdc105a
          this.saveEnderPearls(nbt);
      }
  
-@@ -3785,4 +3789,12 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -3782,4 +3786,12 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
          return (CraftPlayer) super.getBukkitEntity();
      }
      // CraftBukkit end

@@ -6,7 +6,7 @@ Subject: [PATCH] Add RamBarTask
 Reference Object: Purpur
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index c4d77d99452f9844144f91511fdc105a30845d2c..40abf7f275d4d4e916527fa1d28b3a02c1231468 100644
+index dc215057e8f65757a1ac0bd2b9c8733eb3424321..ade313e0a24d4db662fe3bd05a042eb7682a623f 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -330,6 +330,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
@@ -17,7 +17,7 @@ index c4d77d99452f9844144f91511fdc105a30845d2c..40abf7f275d4d4e916527fa1d28b3a02
  
      // Paper start - rewrite chunk system
      private ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
-@@ -837,6 +838,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -834,6 +835,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
          }
  
          if (nbt.contains("Sewlia.TPSBar")) { this.tpsBar = nbt.getBoolean("Sewlia.TPSBar"); } // Sewlia
@@ -25,7 +25,7 @@ index c4d77d99452f9844144f91511fdc105a30845d2c..40abf7f275d4d4e916527fa1d28b3a02
  
      }
  
-@@ -890,6 +892,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -887,6 +889,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
          }
  
          nbt.putBoolean("Sewlia.TPSBar", this.tpsBar); // Sewlia
@@ -33,7 +33,7 @@ index c4d77d99452f9844144f91511fdc105a30845d2c..40abf7f275d4d4e916527fa1d28b3a02
          this.saveEnderPearls(nbt);
      }
  
-@@ -3797,4 +3800,12 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -3794,4 +3797,12 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
      public void tpsBar(boolean tpsBar) {
          this.tpsBar = tpsBar;
      }
