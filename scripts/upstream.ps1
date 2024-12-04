@@ -28,7 +28,7 @@ if (-not $oldHash) {
     exit 1
 }
 
-$newHash = (Invoke-RestMethod -Uri "https://api.github.com/repos/PaperMC/Folia/commits/dev/1.21.3").sha
+$newHash = (Invoke-RestMethod -Uri "https://api.github.com/repos/PaperMC/Folia/commits/dev/1.21.4").sha
 
 if (-not $newHash) {
     Write-Error "Failure to get key information in the API"
