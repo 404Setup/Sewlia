@@ -6,10 +6,10 @@ Subject: [PATCH] Add RamBarTask
 Reference Object: Purpur
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index dc215057e8f65757a1ac0bd2b9c8733eb3424321..ade313e0a24d4db662fe3bd05a042eb7682a623f 100644
+index aeef1d8685ef867d301afbf6fdb4e4b3783f96ec..51e8c85a78169920c8abd9f8eab6aa88794dba97 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-@@ -330,6 +330,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -328,6 +328,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
      public @Nullable String clientBrandName = null; // Paper - Brand support
      public org.bukkit.event.player.PlayerQuitEvent.QuitReason quitReason = null; // Paper - Add API for quit reason; there are a lot of changes to do if we change all methods leading to the event
      private boolean tpsBar = false; // Sewlia
@@ -17,7 +17,7 @@ index dc215057e8f65757a1ac0bd2b9c8733eb3424321..ade313e0a24d4db662fe3bd05a042eb7
  
      // Paper start - rewrite chunk system
      private ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
-@@ -834,6 +835,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -832,6 +833,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
          }
  
          if (nbt.contains("Sewlia.TPSBar")) { this.tpsBar = nbt.getBoolean("Sewlia.TPSBar"); } // Sewlia
@@ -25,7 +25,7 @@ index dc215057e8f65757a1ac0bd2b9c8733eb3424321..ade313e0a24d4db662fe3bd05a042eb7
  
      }
  
-@@ -887,6 +889,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -885,6 +887,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
          }
  
          nbt.putBoolean("Sewlia.TPSBar", this.tpsBar); // Sewlia
@@ -33,7 +33,7 @@ index dc215057e8f65757a1ac0bd2b9c8733eb3424321..ade313e0a24d4db662fe3bd05a042eb7
          this.saveEnderPearls(nbt);
      }
  
-@@ -3794,4 +3797,12 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -3774,4 +3777,12 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
      public void tpsBar(boolean tpsBar) {
          this.tpsBar = tpsBar;
      }

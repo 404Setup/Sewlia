@@ -5,7 +5,7 @@ Subject: [PATCH] Pufferfish: Better checking for useless move packets
 
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerEntity.java b/src/main/java/net/minecraft/server/level/ServerEntity.java
-index 90eb4927fa51ce3df86aa7b6c71f49150a03e337..3ea4920323606150548d6e9fc1ce67724f19dc60 100644
+index 103e2c414780be66324bcb9cd4ea539bbdfe12ad..c563326d3131bc726c7f43311c3eaa82131c6745 100644
 --- a/src/main/java/net/minecraft/server/level/ServerEntity.java
 +++ b/src/main/java/net/minecraft/server/level/ServerEntity.java
 @@ -207,6 +207,7 @@ public class ServerEntity {

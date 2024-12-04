@@ -5,10 +5,10 @@ Subject: [PATCH] Add some required dependencies and bump
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 5f5a02743cae8607d3a93f8943cf92b8bb32e4c1..f003b1d288e4c69f9fc35c807d9e24df617dc1f2 100644
+index b876089f702ad6fe4c733df7866b3e4098feb507..cc22a35782c3b5ff91301ee9f44a3f72182bd8f3 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -37,13 +37,13 @@ dependencies {
+@@ -38,8 +38,8 @@ dependencies {
            all its classes to check if they are plugins.
            Scanning takes about 1-2 seconds so adding this speeds up the server start.
       */
@@ -19,19 +19,12 @@ index 5f5a02743cae8607d3a93f8943cf92b8bb32e4c1..f003b1d288e4c69f9fc35c807d9e24df
      runtimeOnly(log4jPlugins.output)
      alsoShade(log4jPlugins.output)
      implementation("io.netty:netty-codec-haproxy:4.1.97.Final") // Paper - Add support for proxy protocol
-     // Paper end
--    implementation("org.apache.logging.log4j:log4j-iostreams:2.22.1") // Paper - remove exclusion
-+    implementation("org.apache.logging.log4j:log4j-iostreams:2.23.1") // Paper - remove exclusion
-     implementation("org.ow2.asm:asm-commons:9.7.1")
-     implementation("org.spongepowered:configurate-yaml:4.2.0-SNAPSHOT") // Paper - config files
-     implementation("commons-lang:commons-lang:2.6")
-@@ -80,6 +80,17 @@ dependencies {
+@@ -81,6 +81,16 @@ dependencies {
      implementation("me.lucko:spark-api:0.1-20240720.200737-2")
      implementation("me.lucko:spark-paper:1.10.119-SNAPSHOT")
      // Paper end - spark
 +
 +    // Sewlia start
-+    implementation("org.yaml:snakeyaml:2.3")
 +    implementation ("me.carleslc.Simple-YAML:Simple-Yaml:1.8.4") {
 +        exclude(group="org.yaml", module="snakeyaml")
 +    }
@@ -39,7 +32,7 @@ index 5f5a02743cae8607d3a93f8943cf92b8bb32e4c1..f003b1d288e4c69f9fc35c807d9e24df
 +    implementation("com.github.luben:zstd-jni:1.5.6-7")
 +    implementation("org.lz4:lz4-java:1.8.0")
 +    implementation("one.util:streamex:0.8.3")
-+    // Sewlia end
++// Sewlia end
  }
  
  paperweight {

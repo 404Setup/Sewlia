@@ -5,10 +5,10 @@ Subject: [PATCH] Sewlia Preload Utils
 
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index ec4c3c8045488fc8083c77cbf53bd89e7e22dd0c..7a4bfd4894a5782695569b2cd51ede88e1d6f603 100644
+index ab0317ad7a64182cf471c5f40cb0799c391da4ab..8a88b4ef2cff2463fe8b291e9a9ad659bcc0fdf4 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
-@@ -121,6 +121,7 @@ public class Main {
+@@ -123,6 +123,7 @@ public class Main {
              }
  
              one.tranic.sewlia.config.ConfigUtils.reloadConfiguration(false); // Sewlia

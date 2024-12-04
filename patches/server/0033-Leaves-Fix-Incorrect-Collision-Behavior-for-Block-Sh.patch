@@ -5,7 +5,7 @@ Subject: [PATCH] Leaves: Fix Incorrect Collision Behavior for Block Shape
 
 
 diff --git a/src/main/java/ca/spottedleaf/moonrise/patches/collisions/CollisionUtil.java b/src/main/java/ca/spottedleaf/moonrise/patches/collisions/CollisionUtil.java
-index bf6b5e251bd8e5702e21cac2052ba53d38bfdf0c..25cd12513b691e767035f97248be548075e58899 100644
+index 5b66bce045ae74a3f8cae74302fddc40703cb13e..8b6abd402f33380eb321e1b9f985ccce03e281c8 100644
 --- a/src/main/java/ca/spottedleaf/moonrise/patches/collisions/CollisionUtil.java
 +++ b/src/main/java/ca/spottedleaf/moonrise/patches/collisions/CollisionUtil.java
 @@ -101,6 +101,14 @@ public final class CollisionUtil {

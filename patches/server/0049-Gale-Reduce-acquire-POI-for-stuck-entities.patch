@@ -31,18 +31,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 diff --git a/src/main/java/net/minecraft/world/entity/ai/behavior/AcquirePoi.java b/src/main/java/net/minecraft/world/entity/ai/behavior/AcquirePoi.java
-index e1b6fe9ecda25f86431baf414f1bfd3a26a8b2bd..814ed6dd84aac423623f465509ccd8fe33f597d4 100644
+index 0d177e828c2b338ce93c58aaef04df326e1eb0b2..d2103dfac7382595997e26fa5428b1e068a46f49 100644
 --- a/src/main/java/net/minecraft/world/entity/ai/behavior/AcquirePoi.java
 +++ b/src/main/java/net/minecraft/world/entity/ai/behavior/AcquirePoi.java
-@@ -13,6 +13,7 @@ import net.minecraft.core.BlockPos;
- import net.minecraft.core.GlobalPos;
- import net.minecraft.core.Holder;
- import net.minecraft.network.protocol.game.DebugPackets;
-+import net.minecraft.server.level.ServerLevel;
- import net.minecraft.util.RandomSource;
- import net.minecraft.world.entity.Mob;
- import net.minecraft.world.entity.PathfinderMob;
-@@ -26,6 +27,13 @@ import org.apache.commons.lang3.mutable.MutableLong;
+@@ -28,6 +28,13 @@ import org.apache.commons.lang3.mutable.MutableLong;
  public class AcquirePoi {
      public static final int SCAN_RANGE = 48;
  
@@ -54,9 +46,9 @@ index e1b6fe9ecda25f86431baf414f1bfd3a26a8b2bd..814ed6dd84aac423623f465509ccd8fe
 +    // Gale end - Airplane - reduce acquire POI for stuck entities
 +
      public static BehaviorControl<PathfinderMob> create(
-         Predicate<Holder<PoiType>> poiPredicate, MemoryModuleType<GlobalPos> poiPosModule, boolean onlyRunIfChild, Optional<Byte> entityStatus
-     ) {
-@@ -52,12 +60,13 @@ public class AcquirePoi {
+         Predicate<Holder<PoiType>> poiPredicate,
+         MemoryModuleType<GlobalPos> poiPosModule,
+@@ -65,12 +72,13 @@ public class AcquirePoi {
                                      return false;
                                  } else if (mutableLong.getValue() == 0L) {
                                      mutableLong.setValue(world.getGameTime() + (long)world.random.nextInt(20));

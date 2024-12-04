@@ -17,10 +17,10 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 diff --git a/src/main/java/net/minecraft/world/entity/monster/EnderMan.java b/src/main/java/net/minecraft/world/entity/monster/EnderMan.java
-index 48dcd2bc12ce1d08cc5195bff5460dc0dd9902d3..e1210417c5b184b329f149cd300828f69e39bb6b 100644
+index 2a394381a4ad46359359ba402b65c62b331480b4..784e65609f88326b5598ed906ba051f43259daf8 100644
 --- a/src/main/java/net/minecraft/world/entity/monster/EnderMan.java
 +++ b/src/main/java/net/minecraft/world/entity/monster/EnderMan.java
-@@ -307,11 +307,15 @@ public class EnderMan extends Monster implements NeutralMob {
+@@ -306,11 +306,15 @@ public class EnderMan extends Monster implements NeutralMob {
      private boolean teleport(double x, double y, double z) {
          BlockPos.MutableBlockPos blockposition_mutableblockposition = new BlockPos.MutableBlockPos(x, y, z);
  

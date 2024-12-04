@@ -7,7 +7,7 @@ Original code by RelativityMC, licensed under MIT
 You can find the original code on https://github.com/RelativityMC/VMP-fabric (Yarn mappings)
 
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 802d0220b853bfbbdb015e4fc2912ee96ec8138b..ae987c616ea31fb43a59ee2a75375768418099ee 100644
+index b28e4ac4bb4ad643c81617856ad0f2d01034b368..ab40efa663e8fc91c951e5ace025ed54bfa5d5a3 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -282,6 +282,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -18,7 +18,7 @@ index 802d0220b853bfbbdb015e4fc2912ee96ec8138b..ae987c616ea31fb43a59ee2a75375768
      public boolean onGround;
      public boolean horizontalCollision;
      public boolean verticalCollision;
-@@ -1179,6 +1180,12 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -1185,6 +1186,12 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
      private volatile boolean preventMoving = false; // Sewlia - Luminol Fix large pos moving
  
      public void move(MoverType type, Vec3 movement) {
@@ -31,7 +31,7 @@ index 802d0220b853bfbbdb015e4fc2912ee96ec8138b..ae987c616ea31fb43a59ee2a75375768
          final Vec3 originalMovement = movement; // Paper - Expose pre-collision velocity
          // Paper start - detailed watchdog information
          ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread("Cannot move an entity off-main");
-@@ -5219,6 +5226,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -5253,6 +5260,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
      }
  
      public final void setBoundingBox(AABB boundingBox) {

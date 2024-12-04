@@ -67,7 +67,7 @@ index 4dcec640f5870d713bd3b98389a45dbef8a4ea8a..4a9844d825934137b8b9c2f7e17cd51a
          .build()
 diff --git a/src/main/java/io/papermc/paper/util/ServerWorkerThreadFactory.java b/src/main/java/io/papermc/paper/util/ServerWorkerThreadFactory.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..faf5e6f90b0a764c5c02e99648cde6986a35a227
+index 0000000000000000000000000000000000000000..0dab3b428b404f4f844a85c153a337305c4cec9b
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/util/ServerWorkerThreadFactory.java
 @@ -0,0 +1,30 @@
@@ -101,33 +101,24 @@ index 0000000000000000000000000000000000000000..faf5e6f90b0a764c5c02e99648cde698
 +        return ret;
 +    }
 +}
+\ No newline at end of file
 diff --git a/src/main/java/net/minecraft/Util.java b/src/main/java/net/minecraft/Util.java
-index 1360aa8202542d3d0f32247f1123575fc2c38ff1..5b45f563f1ca87c22a5629ebabd7f02ae39fe619 100644
+index 38ffa1c4c204f73746c4b87127de92b631548eb1..bf15e0b095c88d9b206881a0fe2a361b7d2c7f61 100644
 --- a/src/main/java/net/minecraft/Util.java
 +++ b/src/main/java/net/minecraft/Util.java
-@@ -33,9 +33,6 @@ import java.net.URISyntaxException;
- import java.nio.file.Files;
- import java.nio.file.Path;
- import java.nio.file.spi.FileSystemProvider;
--import java.security.AccessController;
--import java.security.PrivilegedActionException;
--import java.security.PrivilegedExceptionAction;
- import java.time.Duration;
- import java.time.Instant;
- import java.time.ZonedDateTime;
-@@ -93,9 +90,9 @@ public class Util {
+@@ -93,9 +93,9 @@ public class Util {
      private static final int DEFAULT_SAFE_FILE_OPERATION_RETRIES = 10;
      private static final String MAX_THREADS_SYSTEM_PROPERTY = "max.bg.threads";
      private static final TracingExecutor BACKGROUND_EXECUTOR = makeExecutor("Main", -1); // Paper - Perf: add priority
 -    private static final TracingExecutor IO_POOL = makeIoExecutor("IO-Worker-", false);
 +    private static final TracingExecutor IO_POOL = makeIoExecutor("IO-Worker-", false, one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.io.Worker.value); // Sewlia - VT2.0
-+    private static final TracingExecutor DOWNLOAD_POOL = makeIoExecutor("Download-", true, one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.network.Download.value); // Sewlia - VT2.0
      public static final TracingExecutor DIMENSION_DATA_IO_POOL = makeExtraIoExecutor("Dimension-Data-IO-Worker-"); // Paper - Separate dimension data IO pool
 -    private static final TracingExecutor DOWNLOAD_POOL = makeIoExecutor("Download-", true);
++    private static final TracingExecutor DOWNLOAD_POOL = makeIoExecutor("Download-", true, one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.network.Download.value); // Sewlia - VT2.0
      // Paper start - don't submit BLOCKING PROFILE LOOKUPS to the world gen thread
      public static final ExecutorService PROFILE_EXECUTOR = Executors.newFixedThreadPool(2, new java.util.concurrent.ThreadFactory() {
  
-@@ -103,7 +100,7 @@ public class Util {
+@@ -103,7 +103,7 @@ public class Util {
  
          @Override
          public Thread newThread(Runnable run) {
@@ -136,16 +127,16 @@ index 1360aa8202542d3d0f32247f1123575fc2c38ff1..5b45f563f1ca87c22a5629ebabd7f02a
              ret.setName("Profile Lookup Executor #" + this.count.getAndIncrement());
              ret.setUncaughtExceptionHandler((Thread thread, Throwable throwable) -> {
                  LOGGER.error("Uncaught exception in thread " + thread.getName(), throwable);
-@@ -184,7 +181,7 @@ public class Util {
+@@ -172,7 +172,7 @@ public class Util {
          if (i <= 0) {
              executorService = MoreExecutors.newDirectExecutorService();
          } else {
--            executorService = Executors.newFixedThreadPool(i, target -> new io.papermc.paper.util.ServerWorkerThread(target, s, priorityModifier));
-+            executorService = Executors.newFixedThreadPool(i, new io.papermc.paper.util.ServerWorkerThreadFactory(s, priorityModifier)); // Sewlia - VT2.0
+-            executorService = Executors.newFixedThreadPool(i, target -> new io.papermc.paper.util.ServerWorkerThread(target, name, priorityModifier));
++            executorService = Executors.newFixedThreadPool(i , new io.papermc.paper.util.ServerWorkerThreadFactory(name, priorityModifier)); // Sewlia - VT2.0
          }
          /*      final String string2 = "Worker-" + name + "-" + atomicInteger.getAndIncrement();
                  ForkJoinWorkerThread forkJoinWorkerThread = new ForkJoinWorkerThread(pool) {
-@@ -248,10 +245,15 @@ public class Util {
+@@ -253,10 +253,15 @@ public class Util {
          IO_POOL.shutdownAndAwait(3L, TimeUnit.SECONDS);
      }
  
@@ -162,12 +153,12 @@ index 1360aa8202542d3d0f32247f1123575fc2c38ff1..5b45f563f1ca87c22a5629ebabd7f02a
              String string2 = namePrefix + atomicInteger.getAndIncrement();
              TracyClient.setThreadName(string2, namePrefix.hashCode());
              thread.setName(string2);
-@@ -259,13 +261,13 @@ public class Util {
+@@ -264,13 +269,13 @@ public class Util {
              thread.setUncaughtExceptionHandler(Util::onThreadException);
              return thread;
          }));
 -    }
-+    }  // Sewlia end - VT2.0
++    } // Sewlia end - VT2.0
  
      // Paper start - Separate dimension data IO pool
      private static TracingExecutor makeExtraIoExecutor(String namePrefix) {
@@ -191,7 +182,7 @@ index c54b897b0e14ac974a903729918a45a9eeec236b..6a2d6a3f8026ef13743b761a78f64a97
              .setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(net.minecraft.server.MinecraftServer.LOGGER))
              .build(),
 diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
-index 4c3961a10691362657b894a757d201069842d8d7..464841d1d876acd47220fd98c8ec6e2ee01495c4 100644
+index 30e3d0d7b0ca8cfa30efb60eefa73d94c65c4690..fd0b8d53f37fd1ab250e636a163661dae9ee8414 100644
 --- a/src/main/java/net/minecraft/network/Connection.java
 +++ b/src/main/java/net/minecraft/network/Connection.java
 @@ -82,13 +82,13 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
@@ -212,15 +203,15 @@ index 4c3961a10691362657b894a757d201069842d8d7..464841d1d876acd47220fd98c8ec6e2e
      private static final ProtocolInfo<ServerHandshakePacketListener> INITIAL_PROTOCOL = HandshakeProtocols.SERVERBOUND;
      private final PacketFlow receiving;
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index fe9811d6ad9d7cccb331997b86d00200403c3d95..e97108dbde4007c881215de8dfee617de6072b6c 100644
+index ad8c2831381876e9e8b9b1b3821895436107b608..c8ea2f9b5385ab548e965aa8cbe29cb27857207c 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -3133,7 +3133,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -3134,7 +3134,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      }
  
      public final java.util.concurrent.ExecutorService chatExecutor = java.util.concurrent.Executors.newCachedThreadPool(
 -            new com.google.common.util.concurrent.ThreadFactoryBuilder().setDaemon(true).setNameFormat("Async Chat Thread - #%d").setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(net.minecraft.server.MinecraftServer.LOGGER)).build()); // Paper
-+            new com.google.common.util.concurrent.ThreadFactoryBuilder().setThreadFactory(one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.AsyncChat.getThreadFactory()).setDaemon(true).setNameFormat("Async Chat Thread - #%d").setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(net.minecraft.server.MinecraftServer.LOGGER)).build()); // Paper
++            new com.google.common.util.concurrent.ThreadFactoryBuilder().setDaemon(true).setThreadFactory(one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.AsyncChat.getThreadFactory()).setNameFormat("Async Chat Thread - #%d").setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(net.minecraft.server.MinecraftServer.LOGGER)).build()); // Paper
  
      public final ChatDecorator improvedChatDecorator = new io.papermc.paper.adventure.ImprovedChatDecorator(this); // Paper - adventure
      public ChatDecorator getChatDecorator() {
@@ -255,21 +246,22 @@ index f3610334289854e949b4ace158554015d85aba54..c6bbf8b033c479c81ea99303e07da8c0
              thread2.start();
          }
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index a88addb2d75f5f27627ee1a557956d994922b521..0b8f38cad8a5416726bbc2125e6947ac8a582458 100644
+index a88addb2d75f5f27627ee1a557956d994922b521..5e3043e314e82683f80e748032f9a3a4ec41ec94 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -104,58 +104,12 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -104,58 +104,15 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
  
      @Override
      public boolean initServer() throws IOException {
 -        Thread thread = new Thread("Server console handler") {
 -            public void run() {
--                // CraftBukkit start
--                if (!org.bukkit.craftbukkit.Main.useConsole) {
--                    return;
--                }
--                // Paper start - Use TerminalConsoleAppender
--                new com.destroystokyo.paper.console.PaperConsole(DedicatedServer.this).start();
++        Thread thread = one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.Console.getThread("Server console handler" ,() -> {
+                 // CraftBukkit start
+                 if (!org.bukkit.craftbukkit.Main.useConsole) {
+                     return;
+                 }
+                 // Paper start - Use TerminalConsoleAppender
+                 new com.destroystokyo.paper.console.PaperConsole(DedicatedServer.this).start();
 -                /*
 -                jline.console.ConsoleReader bufferedreader = DedicatedServer.this.reader;
 -
@@ -311,18 +303,14 @@ index a88addb2d75f5f27627ee1a557956d994922b521..0b8f38cad8a5416726bbc2125e6947ac
 -                }
 -
 -                */
--                // Paper end
-+        Thread thread = one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.Console.getThread("Server console handler" ,() -> {
-+            if (!org.bukkit.craftbukkit.Main.useConsole) {
-+                return;
-             }
+                 // Paper end
+-            }
 -        };
-+            new com.destroystokyo.paper.console.PaperConsole(DedicatedServer.this).start();
 +        });
  
          // CraftBukkit start - TODO: handle command-line logging arguments
          java.util.logging.Logger global = java.util.logging.Logger.getLogger("");
-@@ -344,7 +298,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -344,7 +301,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
              }
  
              if (false && this.getMaxTickLength() > 0L) {  // Spigot - disable
@@ -331,7 +319,7 @@ index a88addb2d75f5f27627ee1a557956d994922b521..0b8f38cad8a5416726bbc2125e6947ac
  
                  thread1.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandlerWithName(DedicatedServer.LOGGER));
                  thread1.setName("Server Watchdog");
-@@ -480,7 +434,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -480,7 +437,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
                      sender.sendMessage(net.kyori.adventure.text.Component.text("Failed to dump chunk information, see console", net.kyori.adventure.text.format.NamedTextColor.RED));
                  }
              };
@@ -354,7 +342,7 @@ index 759062d219ff490a3cb19e710c4d18e3e08288e0..a11779343186fad9f3298f3c3d87af3a
  
              while ((s = LogQueues.getNextLogEvent("ServerGuiConsole")) != null) {
 diff --git a/src/main/java/net/minecraft/server/network/ServerConnectionListener.java b/src/main/java/net/minecraft/server/network/ServerConnectionListener.java
-index ae88c6e2635b1608383f8c74813d723f7c6ffaf8..54002e8f13642771e976328e0baee7e04c9637de 100644
+index ae88c6e2635b1608383f8c74813d723f7c6ffaf8..fd090b21fcb759a851359ce564e0424b11800ef4 100644
 --- a/src/main/java/net/minecraft/server/network/ServerConnectionListener.java
 +++ b/src/main/java/net/minecraft/server/network/ServerConnectionListener.java
 @@ -52,10 +52,10 @@ public class ServerConnectionListener {
@@ -362,11 +350,11 @@ index ae88c6e2635b1608383f8c74813d723f7c6ffaf8..54002e8f13642771e976328e0baee7e0
      private static final Logger LOGGER = LogUtils.getLogger();
      public static final Supplier<NioEventLoopGroup> SERVER_EVENT_GROUP = Suppliers.memoize(() -> {
 -        return new NioEventLoopGroup(0, (new ThreadFactoryBuilder()).setNameFormat("Netty Server IO #%d").setDaemon(true).setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(LOGGER)).build()); // Paper
-+        return new NioEventLoopGroup(0, (new ThreadFactoryBuilder()).setThreadFactory(one.tranic.sewlia.config.mod.feature.virtual_thread.netty.Server.getThreadFactory()).setNameFormat("Netty Server IO #%d").setDaemon(true).setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(LOGGER)).build()); // Paper
++        return new NioEventLoopGroup(0, (new ThreadFactoryBuilder()).setNameFormat("Netty Server IO #%d").setThreadFactory(one.tranic.sewlia.config.mod.feature.virtual_thread.netty.Server.getThreadFactory()).setDaemon(true).setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(LOGGER)).build()); // Paper
      });
      public static final Supplier<EpollEventLoopGroup> SERVER_EPOLL_EVENT_GROUP = Suppliers.memoize(() -> {
 -        return new EpollEventLoopGroup(0, (new ThreadFactoryBuilder()).setNameFormat("Netty Epoll Server IO #%d").setDaemon(true).setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(LOGGER)).build()); // Paper
-+        return new EpollEventLoopGroup(0, (new ThreadFactoryBuilder()).setThreadFactory(one.tranic.sewlia.config.mod.feature.virtual_thread.netty.EpollServer.getThreadFactory()).setNameFormat("Netty Epoll Server IO #%d").setDaemon(true).setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(LOGGER)).build()); // Paper
++        return new EpollEventLoopGroup(0, (new ThreadFactoryBuilder()).setNameFormat("Netty Epoll Server IO #%d").setThreadFactory(one.tranic.sewlia.config.mod.feature.virtual_thread.netty.EpollServer.getThreadFactory()).setDaemon(true).setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(LOGGER)).build()); // Paper
      });
      final MinecraftServer server;
      public volatile boolean running;
@@ -384,7 +372,7 @@ index 3691e97e83e4f4883adc85ec2d8aa789812bd474..6120d2d6f49c971c367d92921fe33788
              this.thread.start();
              LOGGER.info("Thread {} started", this.name);
 diff --git a/src/main/java/net/minecraft/util/datafix/DataFixers.java b/src/main/java/net/minecraft/util/datafix/DataFixers.java
-index 0b8a8a7505963465ecb4247ec7a2713ae9daf14c..2d9ef39942efe8bf0c65e02d6dae596db6555654 100644
+index f5bdd1dc3b67e8d5a1aabbb3ea37331d0b72d98a..f33af07a35a400b2417f48beef6e02e0b3484414 100644
 --- a/src/main/java/net/minecraft/util/datafix/DataFixers.java
 +++ b/src/main/java/net/minecraft/util/datafix/DataFixers.java
 @@ -142,7 +142,7 @@ public class DataFixers {

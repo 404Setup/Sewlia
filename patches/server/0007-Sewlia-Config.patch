@@ -5,10 +5,10 @@ Subject: [PATCH] Sewlia Config
 
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 581bd217304e0f9e0b2113c335694805dfb4e2a1..ec4c3c8045488fc8083c77cbf53bd89e7e22dd0c 100644
+index 300a044bb0f0e377133f24469cea1a9669de6e58..ab0317ad7a64182cf471c5f40cb0799c391da4ab 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
-@@ -120,6 +120,8 @@ public class Main {
+@@ -122,6 +122,8 @@ public class Main {
                  JvmProfiler.INSTANCE.start(Environment.SERVER);
              }
  

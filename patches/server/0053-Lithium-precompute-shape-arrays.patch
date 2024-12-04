@@ -6,7 +6,7 @@ Subject: [PATCH] Lithium: precompute shape arrays
 You can find the original code on https://github.com/CaffeineMC/lithium-fabric
 
 diff --git a/src/main/java/net/minecraft/core/Direction.java b/src/main/java/net/minecraft/core/Direction.java
-index 6548302d4983bf48cc6bc2b7f4833dc76b59fa5e..ad5ac9e78b71a6d26bb5483d0a6de071f5366b59 100644
+index 928f38fd6beb00753c92ae9f4678f7507519a39b..76daa2f1af9091546ab20172b10da2393d200b5c 100644
 --- a/src/main/java/net/minecraft/core/Direction.java
 +++ b/src/main/java/net/minecraft/core/Direction.java
 @@ -48,7 +48,7 @@ public enum Direction implements StringRepresentable, ca.spottedleaf.moonrise.pa

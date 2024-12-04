@@ -5,10 +5,10 @@ Subject: [PATCH] PlazmaBukkit: Improve SwingTime ticking
 
 
 diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-index 2799aaafe3d5513f19733bcc560a13a7312f074b..8cd270dadbe3636b8e674a8508d8b36e4582220c 100644
+index 52ceb303077535c7c264c768b2e54d72a05a704d..f0dddf2382baa065b120a928089d647686b63b6d 100644
 --- a/src/main/java/net/minecraft/world/entity/LivingEntity.java
 +++ b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-@@ -2772,6 +2772,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
+@@ -2783,6 +2783,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
      }
  
      protected void updateSwingTime() {

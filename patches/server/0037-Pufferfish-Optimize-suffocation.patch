@@ -17,10 +17,10 @@ but is so much cheaper than the suffocation check that it's worth
 keeping it.
 
 diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-index b63393c131f736cd51666c675ac18918e038eca6..f38ac3b4c01633ce7b095996516bc9be98c489de 100644
+index 73af15d18180b4df3fa0614b323f2397f5543db5..8acaff27b1f24a72fd98c24839f91d51c2bf215a 100644
 --- a/src/main/java/net/minecraft/world/entity/LivingEntity.java
 +++ b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-@@ -482,7 +482,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
+@@ -480,7 +480,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
  
              if (world1 instanceof ServerLevel) {
                  worldserver1 = (ServerLevel) world1;
@@ -50,10 +50,10 @@ index b63393c131f736cd51666c675ac18918e038eca6..f38ac3b4c01633ce7b095996516bc9be
      public boolean hurtServer(ServerLevel world, DamageSource source, float amount) {
          if (this.isInvulnerableTo(world, source)) {
 diff --git a/src/main/java/net/minecraft/world/entity/boss/wither/WitherBoss.java b/src/main/java/net/minecraft/world/entity/boss/wither/WitherBoss.java
-index 244e38db508efa3eebebb6392c4ebb0805367baf..d62c0d3c2bd5df5ee908bdcfdffaae9ce780810f 100644
+index bd9e10f79eaf0d23908229b3ebc2227946a14843..2ce65ef77e4b28e1fd5ac7bd6a304cc115b8aca2 100644
 --- a/src/main/java/net/minecraft/world/entity/boss/wither/WitherBoss.java
 +++ b/src/main/java/net/minecraft/world/entity/boss/wither/WitherBoss.java
-@@ -152,6 +152,13 @@ public class WitherBoss extends Monster implements RangedAttackMob {
+@@ -151,6 +151,13 @@ public class WitherBoss extends Monster implements RangedAttackMob {
          this.bossEvent.setName(this.getDisplayName());
      }
  

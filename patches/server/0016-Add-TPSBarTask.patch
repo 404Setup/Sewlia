@@ -5,10 +5,10 @@ Subject: [PATCH] Add TPSBarTask
 
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index fb3ea176726fa01c2ab7220432121db4ad5e54ae..dc215057e8f65757a1ac0bd2b9c8733eb3424321 100644
+index b6f3078fa688ca61cfd45d856b95c160cfe7b2da..aeef1d8685ef867d301afbf6fdb4e4b3783f96ec 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-@@ -329,6 +329,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -327,6 +327,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
      public com.destroystokyo.paper.event.entity.PlayerNaturallySpawnCreaturesEvent playerNaturallySpawnedEvent; // Paper - PlayerNaturallySpawnCreaturesEvent
      public @Nullable String clientBrandName = null; // Paper - Brand support
      public org.bukkit.event.player.PlayerQuitEvent.QuitReason quitReason = null; // Paper - Add API for quit reason; there are a lot of changes to do if we change all methods leading to the event
@@ -16,7 +16,7 @@ index fb3ea176726fa01c2ab7220432121db4ad5e54ae..dc215057e8f65757a1ac0bd2b9c8733e
  
      // Paper start - rewrite chunk system
      private ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
-@@ -832,6 +833,8 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -830,6 +831,8 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
              });
          }
  
@@ -25,7 +25,7 @@ index fb3ea176726fa01c2ab7220432121db4ad5e54ae..dc215057e8f65757a1ac0bd2b9c8733e
      }
  
      @Override
-@@ -883,6 +886,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -881,6 +884,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
              });
          }
  
@@ -33,7 +33,7 @@ index fb3ea176726fa01c2ab7220432121db4ad5e54ae..dc215057e8f65757a1ac0bd2b9c8733e
          this.saveEnderPearls(nbt);
      }
  
-@@ -3782,4 +3786,12 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -3762,4 +3766,12 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
          return (CraftPlayer) super.getBukkitEntity();
      }
      // CraftBukkit end

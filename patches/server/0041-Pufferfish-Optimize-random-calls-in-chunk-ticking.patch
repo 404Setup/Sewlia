@@ -34,10 +34,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 2ea5c236cf8f333cb2ae4979d45342d3ff673d2a..4a6a569111b685c23447a51081e04aae390e7e53 100644
+index 86b5b98f0578e7275aa668dd64ebd8295e988c0f..c9441be52794ce446f880abe35b19968046fd0f2 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
-@@ -992,7 +992,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+@@ -993,7 +993,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
          ProfilerFiller gameprofilerfiller = Profiler.get();
  
          gameprofilerfiller.push("thunder");
@@ -47,10 +47,10 @@ index 2ea5c236cf8f333cb2ae4979d45342d3ff673d2a..4a6a569111b685c23447a51081e04aae
  
              if (this.isRainingAt(blockposition)) {
 diff --git a/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java b/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
-index 61e090f1aecbd166302dc2515a757f7a1d7eefed..a911a7a802f7be47b51270750db88a4fa3b60a83 100644
+index 18e91bef17d085ad35a51bd479340961f5224a1a..4af593192c85780858bda2831efdb137275349dc 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
-@@ -95,6 +95,17 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
+@@ -96,6 +96,17 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
      private final LevelChunkTicks<Fluid> fluidTicks;
      private LevelChunk.UnsavedListener unsavedListener;
      private final patch.com.kiocg.ChunkHot chunkHot = new patch.com.kiocg.ChunkHot(); public patch.com.kiocg.ChunkHot getChunkHot() { return this.chunkHot; } // KioCG
@@ -68,7 +68,7 @@ index 61e090f1aecbd166302dc2515a757f7a1d7eefed..a911a7a802f7be47b51270750db88a4f
  
      public LevelChunk(Level world, ChunkPos pos) {
          this(world, pos, UpgradeData.EMPTY, new LevelChunkTicks<>(), new LevelChunkTicks<>(), 0L, (LevelChunkSection[]) null, (LevelChunk.PostLoadProcessor) null, (BlendingData) null);
-@@ -129,6 +140,8 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
+@@ -130,6 +141,8 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
          this.debug = !empty && this.level.isDebug();
          this.defaultBlockState = empty ? VOID_AIR_BLOCKSTATE : AIR_BLOCKSTATE;
          // Paper end - get block chunk optimisation
