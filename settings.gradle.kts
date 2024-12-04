@@ -11,5 +11,6 @@ rootProject.name = "sewlia"
 for (name in listOf("Sewlia-API", "Sewlia-Server")) {
     val projName = name.lowercase(Locale.ENGLISH)
     include(projName)
+    file(name).mkdirs()
     findProject(":$projName")!!.projectDir = file(name)
 }
