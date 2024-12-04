@@ -5,7 +5,7 @@ Subject: [PATCH] Leaves: Fix Incorrect Collision Behavior for Block Shape
 
 
 diff --git a/src/main/java/ca/spottedleaf/moonrise/patches/collisions/CollisionUtil.java b/src/main/java/ca/spottedleaf/moonrise/patches/collisions/CollisionUtil.java
-index 5b66bce045ae74a3f8cae74302fddc40703cb13e..8b6abd402f33380eb321e1b9f985ccce03e281c8 100644
+index c7ce32b31fc4247e72baa5f2dedac7378fa708c3..d63b0959843bf33f598e0abd595f834f5b0d49a2 100644
 --- a/src/main/java/ca/spottedleaf/moonrise/patches/collisions/CollisionUtil.java
 +++ b/src/main/java/ca/spottedleaf/moonrise/patches/collisions/CollisionUtil.java
 @@ -101,6 +101,14 @@ public final class CollisionUtil {
@@ -23,7 +23,7 @@ index 5b66bce045ae74a3f8cae74302fddc40703cb13e..8b6abd402f33380eb321e1b9f985ccce
      // assume !isEmpty(target) && abs(source_move) >= COLLISION_EPSILON
      public static double collideX(final AABB target, final AABB source, final double source_move) {
          if ((source.minY - target.maxY) < -COLLISION_EPSILON && (source.maxY - target.minY) > COLLISION_EPSILON &&
-@@ -2042,7 +2050,10 @@ public final class CollisionUtil {
+@@ -2015,7 +2023,10 @@ public final class CollisionUtil {
                                      AABB singleAABB = ((CollisionVoxelShape)blockCollision).moonrise$getSingleAABBRepresentation();
                                      if (singleAABB != null) {
                                          singleAABB = singleAABB.move((double)blockX, (double)blockY, (double)blockZ);
