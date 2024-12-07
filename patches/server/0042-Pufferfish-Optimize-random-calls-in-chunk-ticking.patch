@@ -34,7 +34,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 86b5b98f0578e7275aa668dd64ebd8295e988c0f..c9441be52794ce446f880abe35b19968046fd0f2 100644
+index ba661e0d952871065a825c4adab1378d37953c09..8ab5bcad5f342cc40bb5b6cc35c3978178b8caba 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -993,7 +993,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe

@@ -75,7 +75,7 @@ index bc65ba0abf801043b0edeee6d529497100894a8f..313a184febf31e62a6fa5764e35f02e3
          final ProfilerFiller profiler = Profiler.get();
          int playerSaveInterval = io.papermc.paper.configuration.GlobalConfiguration.get().playerAutoSave.rate;
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 009d611433d8aec0164f7741a6ec8b286e26cba7..86b5b98f0578e7275aa668dd64ebd8295e988c0f 100644
+index 826b81f93a6f37bbe7f2101c10a2d98c73e9357a..ba661e0d952871065a825c4adab1378d37953c09 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -1368,6 +1368,9 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe

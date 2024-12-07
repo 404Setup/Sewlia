@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Sat, 7 Dec 2024 11:11:15 +0800
+Subject: [PATCH] Luminol: Add fix for off region adult following ai behavior
+
+Might fix: https://github.com/PaperMC/Folia/issues/245
+
+diff --git a/src/main/java/net/minecraft/world/entity/ai/behavior/BabyFollowAdult.java b/src/main/java/net/minecraft/world/entity/ai/behavior/BabyFollowAdult.java
+index 0ff878a8cfcd6a3e08575b7537d9b7e2b817908f..742662da3497b0042fa0fb6ff3456fc62692473d 100644
+--- a/src/main/java/net/minecraft/world/entity/ai/behavior/BabyFollowAdult.java
++++ b/src/main/java/net/minecraft/world/entity/ai/behavior/BabyFollowAdult.java
+@@ -33,6 +33,13 @@ public class BabyFollowAdult {
+                     } else {
+                         LivingEntity entityageable1 = (AgeableMob) behaviorbuilder_b.get(memoryaccessor); // CraftBukkit - type
+ 
++                        // Luminol start - Fix off world entity following which caused async issue
++                        if (!ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(entityageable1)) {
++                            memoryaccessor.erase();
++                            return true;
++                        }
++                        // Luminol end
++
+                         if (entityageable.closerThan(entityageable1, (double) (executionRange.getMaxValue() + 1)) && !entityageable.closerThan(entityageable1, (double) executionRange.getMinValue())) {
+                             // CraftBukkit start
+                             EntityTargetLivingEntityEvent event = CraftEventFactory.callEntityTargetLivingEvent(entityageable, entityageable1, EntityTargetEvent.TargetReason.FOLLOW_LEADER);
