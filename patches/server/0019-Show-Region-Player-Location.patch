@@ -69,7 +69,7 @@ index 988fe74578065c9464f5639e5cc6af79619edef5..a1d10bac4a1343516bbf8a9f508c9691
  
          static void updateCurrentRegion() {
 diff --git a/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java b/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java
-index 012d3a7da7fe483393a0888c823bd2e78f5c3908..19ea65dae262ee2b8210375c6111015d5b4f41c1 100644
+index 012d3a7da7fe483393a0888c823bd2e78f5c3908..6a02bc8f9c6436a422e6d9ef2286da4ee39dd9cd 100644
 --- a/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java
 +++ b/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java
 @@ -1,12 +1,8 @@
@@ -124,7 +124,7 @@ index 012d3a7da7fe483393a0888c823bd2e78f5c3908..19ea65dae262ee2b8210375c6111015d
  
      private static final TextColor HEADER = TextColor.color(79, 164, 240);
      private static final TextColor PRIMARY = TextColor.color(48, 145, 237);
-@@ -58,30 +50,53 @@ public final class CommandServerHealth extends Command {
+@@ -58,30 +50,63 @@ public final class CommandServerHealth extends Command {
      private static Component formatRegionInfo(final String prefix, final double util, final double mspt, final double tps,
                                                final boolean newline) {
          return Component.text()
@@ -180,11 +180,21 @@ index 012d3a7da7fe483393a0888c823bd2e78f5c3908..19ea65dae262ee2b8210375c6111015d
 +    private static @NotNull TextComponent getTextComponent(ObjectArrayList<ServerPlayer> players) {
 +        TextComponent.@NotNull Builder builder = Component.text();
 +        builder.append(Component.text("Region Player List: ", NamedTextColor.GREEN));
-+        for (final ServerPlayer player : players) {
-+            builder.append(Component.text("\n")).
-+                    append(Component.text(player.gameProfile.getName(), NamedTextColor.YELLOW))
-+                    .append(Component.text(" | In ", NamedTextColor.WHITE))
-+                    .append(Component.text(player.getOnPos().getX() + ", " + player.getOnPos().getY() + ", " + player.getOnPos().getZ(), NamedTextColor.AQUA));
++        int size = players.size();
++        for (int i = 0; i < size; i++) {
++            if (size > 15 && i < 15) {
++                ServerPlayer player = players.get(i);
++                builder.append(Component.text("\n")).
++                        append(Component.text(player.gameProfile.getName(), NamedTextColor.YELLOW))
++                        .append(Component.text(" | In ", NamedTextColor.WHITE))
++                        .append(Component.text(player.getOnPos().getX() + ", " + player.getOnPos().getY() + ", " + player.getOnPos().getZ(), NamedTextColor.AQUA));
++            } else {
++                builder.append(Component.text("\n"))
++                        .append(Component.text("And the remaining ", NamedTextColor.YELLOW))
++                        .append(Component.text(size - 15, NamedTextColor.AQUA))
++                        .append(Component.text(" players", NamedTextColor.YELLOW));
++                break;
++            }
 +        }
 +        return builder.build();
 +    }
@@ -197,7 +207,7 @@ index 012d3a7da7fe483393a0888c823bd2e78f5c3908..19ea65dae262ee2b8210375c6111015d
          if (region == null) {
              sender.sendMessage(Component.text("You are not in a region currently", NamedTextColor.RED));
              return true;
-@@ -109,28 +124,28 @@ public final class CommandServerHealth extends Command {
+@@ -109,28 +134,28 @@ public final class CommandServerHealth extends Command {
          final String location = "[w:'" + world.getWorld().getName() + "'," + centerBlockX + "," + yLoc + "," + centerBlockZ + "]";
  
          final Component line = Component.text()
@@ -242,7 +252,7 @@ index 012d3a7da7fe483393a0888c823bd2e78f5c3908..19ea65dae262ee2b8210375c6111015d
          final int lowestRegionsCount;
          if (args.length < 2) {
              lowestRegionsCount = 3;
-@@ -144,10 +159,10 @@ public final class CommandServerHealth extends Command {
+@@ -144,10 +169,10 @@ public final class CommandServerHealth extends Command {
          }
  
          final List<ThreadedRegionizer.ThreadedRegion<TickRegions.TickRegionData, TickRegions.TickRegionSectionData>> regions =
@@ -255,7 +265,7 @@ index 012d3a7da7fe483393a0888c823bd2e78f5c3908..19ea65dae262ee2b8210375c6111015d
              world.regioniser.computeForAllRegions(regions::add);
          }
  
-@@ -157,7 +172,7 @@ public final class CommandServerHealth extends Command {
+@@ -157,7 +182,7 @@ public final class CommandServerHealth extends Command {
          double totalUtil = 0.0;
  
          final DoubleArrayList tpsByRegion = new DoubleArrayList();
@@ -264,7 +274,7 @@ index 012d3a7da7fe483393a0888c823bd2e78f5c3908..19ea65dae262ee2b8210375c6111015d
          final int maxThreadCount = TickRegions.getScheduler().getTotalThreadCount();
  
          final long currTime = System.nanoTime();
-@@ -194,7 +209,7 @@ public final class CommandServerHealth extends Command {
+@@ -194,7 +219,7 @@ public final class CommandServerHealth extends Command {
          }
  
          final List<ObjectObjectImmutablePair<ThreadedRegionizer.ThreadedRegion<TickRegions.TickRegionData, TickRegions.TickRegionSectionData>, TickData.TickReportData>>
@@ -273,7 +283,7 @@ index 012d3a7da7fe483393a0888c823bd2e78f5c3908..19ea65dae262ee2b8210375c6111015d
  
          for (int i = 0, len = regions.size(); i < len; ++i) {
              final TickData.TickReportData report = reportsByRegion.get(i);
-@@ -214,16 +229,16 @@ public final class CommandServerHealth extends Command {
+@@ -214,16 +239,16 @@ public final class CommandServerHealth extends Command {
  
          final TextComponent.Builder lowestRegionsBuilder = Component.text();
  
@@ -293,7 +303,7 @@ index 012d3a7da7fe483393a0888c823bd2e78f5c3908..19ea65dae262ee2b8210375c6111015d
  
              if (report == null) {
                  // skip regions with no data
-@@ -244,81 +259,86 @@ public final class CommandServerHealth extends Command {
+@@ -244,81 +269,86 @@ public final class CommandServerHealth extends Command {
  
              final int yLoc = 80;
              final String location = "[w:'" + world.getWorld().getName() + "'," + centerBlockX + "," + yLoc + "," + centerBlockZ + "]";
@@ -434,7 +444,7 @@ index 012d3a7da7fe483393a0888c823bd2e78f5c3908..19ea65dae262ee2b8210375c6111015d
          final String type;
          if (args.length < 1) {
              type = "server";
-@@ -326,39 +346,37 @@ public final class CommandServerHealth extends Command {
+@@ -326,39 +356,37 @@ public final class CommandServerHealth extends Command {
              type = args[0];
          }
  
