@@ -4,23 +4,6 @@ Date: Wed, 30 Oct 2024 20:29:31 +0800
 Subject: [PATCH] Show Region Player Location
 
 
-diff --git a/src/main/java/io/papermc/paper/threadedregions/RegionizedWorldData.java b/src/main/java/io/papermc/paper/threadedregions/RegionizedWorldData.java
-index 1b741d4bccfd45beeec43300f44770516c0d850e..6d94e3142d06bba5f22c9a13b95d76fe9e9fc279 100644
---- a/src/main/java/io/papermc/paper/threadedregions/RegionizedWorldData.java
-+++ b/src/main/java/io/papermc/paper/threadedregions/RegionizedWorldData.java
-@@ -545,6 +545,12 @@ public final class RegionizedWorldData {
-         return this.localPlayers.size();
-     }
- 
-+    // Sewlia start - Don't abuse it.
-+    public List<ServerPlayer> getLocalPlayer() {
-+        return this.localPlayers;
-+    }
-+    // Sewlia end
-+
-     public Iterable<Entity> getLocalEntities() {
-         return this.allEntities;
-     }
 diff --git a/src/main/java/io/papermc/paper/threadedregions/TickRegions.java b/src/main/java/io/papermc/paper/threadedregions/TickRegions.java
 index 988fe74578065c9464f5639e5cc6af79619edef5..a1d10bac4a1343516bbf8a9f508c9691a00cd203 100644
 --- a/src/main/java/io/papermc/paper/threadedregions/TickRegions.java
@@ -64,7 +47,7 @@ index 988fe74578065c9464f5639e5cc6af79619edef5..a1d10bac4a1343516bbf8a9f508c9691
              this.playerCount.setRelease(data == null ? 0 : data.getPlayerCount());
              this.chunkCount.setRelease(data == null ? 0 : data.getChunkCount());
 +            this.players.clear();
-+            if (data != null) this.players.addAll(data.getLocalPlayer());
++            if (data != null) this.players.addAll(data.getLocalPlayers());
          }
  
          static void updateCurrentRegion() {
