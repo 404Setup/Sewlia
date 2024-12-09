@@ -5,7 +5,7 @@ Subject: [PATCH] Bump Dependencies
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index a5db128a44c81576ab6a59107dba32b0332a76e1..bea749cb7b93bf44b95ac290b0110f72886a0dc3 100644
+index 571534b42cd9c33d6a7bb6fe3bf3a28e33f8e5de..8940c72e293776a0f1279b4fc38c27d22f012d57 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -12,8 +12,8 @@ java {
@@ -25,10 +25,10 @@ index a5db128a44c81576ab6a59107dba32b0332a76e1..bea749cb7b93bf44b95ac290b0110f72
      // Paper - adventure
 -    api("org.yaml:snakeyaml:2.2")
 +    api("org.yaml:snakeyaml:2.3")
-     api("org.joml:joml:1.10.8")
-     // Paper start
-     api("com.googlecode.json-simple:json-simple:1.1.1") {
-@@ -84,6 +84,10 @@ dependencies {
+     api("org.joml:joml:1.10.8") {
+         isTransitive = false // https://github.com/JOML-CI/JOML/issues/352
+     }
+@@ -86,6 +86,10 @@ dependencies {
      // Paper end
      api("org.jspecify:jspecify:1.0.0") // Paper - add jspecify
  
@@ -39,7 +39,7 @@ index a5db128a44c81576ab6a59107dba32b0332a76e1..bea749cb7b93bf44b95ac290b0110f72
      testImplementation("org.apache.commons:commons-lang3:3.12.0")
      testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
      testImplementation("org.hamcrest:hamcrest:2.2")
-@@ -166,7 +170,7 @@ tasks.withType<Javadoc> {
+@@ -168,7 +172,7 @@ tasks.withType<Javadoc> {
      options.isDocFilesSubDirs = true
      options.links(
          "https://guava.dev/releases/33.3.1-jre/api/docs/",

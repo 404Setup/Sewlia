@@ -61,7 +61,7 @@ index ca47a512452ae425160e30dc7c4a79f40aa97a26..f0df56208f97e5bb629ed266f8c93c6e
  
      public ChunkGeneratorStructureState getGeneratorState() {
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index c682c92842168d47856075dd84e53d2c180298a0..009d611433d8aec0164f7741a6ec8b286e26cba7 100644
+index 07037eb601f9dcae2cad5f3e3d5f9a0ac142b68a..826b81f93a6f37bbe7f2101c10a2d98c73e9357a 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -630,7 +630,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
@@ -761,10 +761,10 @@ index 0000000000000000000000000000000000000000..dd469b2ef5f80541e295751c234ffa62
 +}
 \ No newline at end of file
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
-index 2dd38f40c8c0b48b12ffe557ceeed69213066a6a..5f5a04283cdbeedefc94c41f577e358fc249ae3e 100644
+index c2bffe3450ee9f768e00a23ec09df74d7a06d49b..5a915f8ada796f93689471afa4d285f93dc39603 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
-@@ -205,7 +205,12 @@ public class CraftChunk implements Chunk {
+@@ -206,7 +206,12 @@ public class CraftChunk implements Chunk {
      @Override
      public boolean isSlimeChunk() {
          // 987234911L is deterimined in EntitySlime when seeing if a slime can spawn in a chunk
@@ -779,7 +779,7 @@ index 2dd38f40c8c0b48b12ffe557ceeed69213066a6a..5f5a04283cdbeedefc94c41f577e358f
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 1a5bbb64f4f856ebb79dec6f7436be8fca898eb2..b56f77c5640be683878223d6f094ae88425abece 100644
+index ab4ac384936afa3bc563dcdf9d7186bb10921c9c..821c39000ce1015dad96b2020fcdf3a649809007 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -1428,7 +1428,9 @@ public final class CraftServer implements Server {

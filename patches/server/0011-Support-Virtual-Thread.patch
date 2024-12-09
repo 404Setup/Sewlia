@@ -203,10 +203,10 @@ index 30e3d0d7b0ca8cfa30efb60eefa73d94c65c4690..fd0b8d53f37fd1ab250e636a163661da
      private static final ProtocolInfo<ServerHandshakePacketListener> INITIAL_PROTOCOL = HandshakeProtocols.SERVERBOUND;
      private final PacketFlow receiving;
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index ad8c2831381876e9e8b9b1b3821895436107b608..c8ea2f9b5385ab548e965aa8cbe29cb27857207c 100644
+index 5495f5e2236d241dba223849df40ab0831120f4c..ff52d1381692bcd325be97300d4ed7dc5bdd6d01 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -3134,7 +3134,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -3133,7 +3133,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      }
  
      public final java.util.concurrent.ExecutorService chatExecutor = java.util.concurrent.Executors.newCachedThreadPool(

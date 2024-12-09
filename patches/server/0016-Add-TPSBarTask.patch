@@ -5,7 +5,7 @@ Subject: [PATCH] Add TPSBarTask
 
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index b6f3078fa688ca61cfd45d856b95c160cfe7b2da..aeef1d8685ef867d301afbf6fdb4e4b3783f96ec 100644
+index 23f852ede94bce4d000c8fcaa8fba5d4800b533c..17fd5f676d9c386cc225ffb84e127a8999f12887 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -327,6 +327,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
@@ -33,7 +33,7 @@ index b6f3078fa688ca61cfd45d856b95c160cfe7b2da..aeef1d8685ef867d301afbf6fdb4e4b3
          this.saveEnderPearls(nbt);
      }
  
-@@ -3762,4 +3766,12 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -3763,4 +3767,12 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
          return (CraftPlayer) super.getBukkitEntity();
      }
      // CraftBukkit end

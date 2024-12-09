@@ -69,7 +69,7 @@ index 988fe74578065c9464f5639e5cc6af79619edef5..a1d10bac4a1343516bbf8a9f508c9691
  
          static void updateCurrentRegion() {
 diff --git a/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java b/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java
-index 012d3a7da7fe483393a0888c823bd2e78f5c3908..6a02bc8f9c6436a422e6d9ef2286da4ee39dd9cd 100644
+index 012d3a7da7fe483393a0888c823bd2e78f5c3908..6442276a95469e0c7eed4d608b18250b7c87ced3 100644
 --- a/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java
 +++ b/src/main/java/io/papermc/paper/threadedregions/commands/CommandServerHealth.java
 @@ -1,12 +1,8 @@
@@ -182,7 +182,7 @@ index 012d3a7da7fe483393a0888c823bd2e78f5c3908..6a02bc8f9c6436a422e6d9ef2286da4e
 +        builder.append(Component.text("Region Player List: ", NamedTextColor.GREEN));
 +        int size = players.size();
 +        for (int i = 0; i < size; i++) {
-+            if (size > 15 && i < 15) {
++            if (size <= 15 || i <= 15) {
 +                ServerPlayer player = players.get(i);
 +                builder.append(Component.text("\n")).
 +                        append(Component.text(player.gameProfile.getName(), NamedTextColor.YELLOW))

@@ -7,7 +7,7 @@ Original code by RelativityMC, licensed under MIT
 You can find the original code on https://github.com/RelativityMC/VMP-fabric (Yarn mappings)
 
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index b28e4ac4bb4ad643c81617856ad0f2d01034b368..ab40efa663e8fc91c951e5ace025ed54bfa5d5a3 100644
+index c25d4c7a5ab490fd0d7f4d451b62af2bb4403387..e86e39eb4f32a6657675ca9c43b7adc5f66ecee0 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -282,6 +282,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -31,7 +31,7 @@ index b28e4ac4bb4ad643c81617856ad0f2d01034b368..ab40efa663e8fc91c951e5ace025ed54
          final Vec3 originalMovement = movement; // Paper - Expose pre-collision velocity
          // Paper start - detailed watchdog information
          ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread("Cannot move an entity off-main");
-@@ -5253,6 +5260,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -5255,6 +5262,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
      }
  
      public final void setBoundingBox(AABB boundingBox) {

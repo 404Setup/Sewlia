@@ -6,7 +6,7 @@ Subject: [PATCH] Add RamBarTask
 Reference Object: Purpur
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index aeef1d8685ef867d301afbf6fdb4e4b3783f96ec..51e8c85a78169920c8abd9f8eab6aa88794dba97 100644
+index 17fd5f676d9c386cc225ffb84e127a8999f12887..ef2d5d22ac8922b38986b2a0f45ca02aeab89a5e 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -328,6 +328,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
@@ -33,7 +33,7 @@ index aeef1d8685ef867d301afbf6fdb4e4b3783f96ec..51e8c85a78169920c8abd9f8eab6aa88
          this.saveEnderPearls(nbt);
      }
  
-@@ -3774,4 +3777,12 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -3775,4 +3778,12 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
      public void tpsBar(boolean tpsBar) {
          this.tpsBar = tpsBar;
      }
