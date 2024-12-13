@@ -27,7 +27,7 @@ index 74cd86aea1a82f169cb50dac14a8973c97cca88d..044d1787481eecdf41eaa932e418d748
                  }
                  // CraftBukkit end
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 52c831bded7f98cd6fdf125e7353afb58ab2983c..442aae52e1e5b292e31b275642d222c0d09e4956 100644
+index ea03234494e401623f4203756e8b94efa41bb3fa..324c7ffc6dd1cef9cbf6d23e2aa6466340b016e6 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 @@ -206,7 +206,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
@@ -39,7 +39,7 @@ index 52c831bded7f98cd6fdf125e7353afb58ab2983c..442aae52e1e5b292e31b275642d222c0
      private final Set<UUID> unlistedEntities = new HashSet<>(); // Paper - Add Listing API for Player
      private static final WeakHashMap<Plugin, WeakReference<Plugin>> pluginWeakReferences = new WeakHashMap<>();
      private int hash = 0;
-@@ -2270,9 +2270,16 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2278,9 +2278,16 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
  
      @Override
      public boolean canSee(org.bukkit.entity.Entity entity) {
