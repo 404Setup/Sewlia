@@ -73,7 +73,7 @@ function Get-BuildInfo
             $fileInfo[$key] = @{
                 name = $file.Name
                 sha256 = $fileHash.Hash
-                url = "https://github.com/LevelTranic/$( $repoNameClassic )/releases/download/$mcVersion-$commitHash/$( $file.Name )"
+                url = "https://github.com/404Setup/$( $repoNameClassic )/releases/download/$mcVersion-$commitHash/$( $file.Name )"
             }
         }
     }
