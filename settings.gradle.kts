@@ -1,16 +1,16 @@
-import java.util.Locale
-
 pluginManagement {
     repositories {
         gradlePluginPortal()
+        mavenLocal()
         maven("https://repo.papermc.io/repository/maven-public/")
     }
 }
 
-rootProject.name = "sewlia"
-for (name in listOf("Sewlia-API", "Sewlia-Server")) {
-    val projName = name.lowercase(Locale.ENGLISH)
-    include(projName)
-    file(name).mkdirs()
-    findProject(":$projName")!!.projectDir = file(name)
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.9.0"
 }
+
+rootProject.name = "sewlia"
+
+include("sewlia-api")
+include("sewlia-server")

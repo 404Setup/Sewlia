@@ -52,11 +52,16 @@ run/
 
 # LevelBukkit
 build-data/
-Sewlia-API
-Sewlia-API/*
-Sewlia-Server
-Sewlia-Server/*
-paper-api-generator
 .kotlin/
 *.jar
 .xcodemap/
+/sewlia-server/build.gradle.kts
+/sewlia-server/src
+/sewlia-api/src
+/sewlia-api/build.gradle.kts
+/folia-server/build.gradle.kts
+/folia-server/src/minecraft
+/paper-server
+/folia-api/build.gradle.kts
+/paper-api
+/paper-api-generator
