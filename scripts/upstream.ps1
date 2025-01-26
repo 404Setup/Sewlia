@@ -28,7 +28,7 @@ if (-not $oldHash) {
     exit 1
 }
 
-$newHash = (Invoke-RestMethod -Uri "https://api.github.com/repos/PaperMC/Folia/commits/dev/1.21.4").sha
+$newHash = (Invoke-RestMethod -Uri "https://api.github.com/repos/PaperMC/Folia/commits/dev/hard-fork").sha
 
 if (-not $newHash) {
     Write-Error "Failure to get key information in the API"
@@ -46,8 +46,9 @@ Write-Host "Updating Folia: $oldHash -> $newHash"
 
 git add gradle.properties
 
-./gradlew applyPatches || exit_on_error "An error occurred when merging patches!"
-./gradlew rebuildPatches || exit_on_error "An error occurred when rebuilding patches!"
+./gradlew applyAllPatches || exit_on_error "An error occurred when merging patches!"
+./gradlew rebuildFoliaPatches || exit_on_error "An error occurred when rebuilding patches!"
+./gradlew rebuildFoliaApiPatches || exit_on_error "An error occurred when rebuilding patches!"
 ./gradlew createMojmapPaperclipJar || exit_on_error "An error occurred when building!"
 
 scripts/upstreamCommit.ps1 $oldHash $newHash
