@@ -1,0 +1,12 @@
+--- a/net/minecraft/server/Main.java
++++ b/net/minecraft/server/Main.java
+@@ -108,6 +_,9 @@
+                 JvmProfiler.INSTANCE.start(Environment.SERVER);
+             }
+ 
++            one.tranic.sewlia.config.ConfigUtils.reloadConfiguration(false); // Sewlia
++            new one.tranic.sewlia.preload.Preload(); // Sewlia
++
+             io.papermc.paper.plugin.PluginInitializerManager.load(optionSet); // Paper
+             Bootstrap.bootStrap();
+             Bootstrap.validate();
