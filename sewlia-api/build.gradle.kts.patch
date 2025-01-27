@@ -56,6 +56,24 @@
          "https://javadoc.io/doc/org.jetbrains/annotations/$annotationsVersion/",
          "https://javadoc.io/doc/org.joml/joml/1.10.8/",
          "https://www.javadoc.io/doc/com.google.code.gson/gson/2.11.0",
+@@ -238,7 +_,16 @@
+ // Compile tests with -parameters for better junit parameterized test names
+ tasks.compileTestJava {
+     options.compilerArgs.add("-parameters")
+-}
++    options.compilerArgs.add("-Xlint:-deprecation") // Sewlia
++    options.isWarnings = false // Sewlia
++}
++
++// Sewlia start
++tasks.compileJava {
++    options.compilerArgs.add("-Xlint:-deprecation")
++    options.isWarnings = false
++}
++// Sewlia end
+ 
+ val scanJar = tasks.register("scanJarForBadCalls", io.papermc.paperweight.tasks.ScanJarForBadCalls::class) {
+     badAnnotations.add("Lio/papermc/paper/annotation/DoNotUse;")
 @@ -258,3 +_,10 @@
  tasks.check {
      dependsOn(scanJarForOldGeneratedCode)

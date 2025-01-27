@@ -1,7 +1,7 @@
 --- /dev/null
-+++ b/src/main/java/sewlia/reflect/Reflect.java
++++ b/src/main/java/one/tranic/sewlia/reflect/Reflect.java
 @@ -1,0 +_,103 @@
-+package sewlia.reflect;
++package one.tranic.sewlia.reflect;
 +
 +import com.google.common.collect.ImmutableSet;
 +import com.google.common.reflect.ClassPath;

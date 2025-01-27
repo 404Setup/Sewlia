@@ -1,7 +1,9 @@
 --- /dev/null
-+++ b/src/main/java/sewlia/config/annotation/DisableReload.java
-@@ -1,0 +_,11 @@
-+package sewlia.config.annotation;
++++ b/src/main/java/one/tranic/sewlia/config/annotation/InlineComment.java
+@@ -1,0 +_,14 @@
++package one.tranic.sewlia.config.annotation;
++
++import org.jetbrains.annotations.NotNull;
 +
 +import java.lang.annotation.ElementType;
 +import java.lang.annotation.Retention;
@@ -10,5 +12,6 @@
 +
 +@Retention(RetentionPolicy.RUNTIME)
 +@Target(ElementType.FIELD)
-+public @interface DisableReload {
++public @interface InlineComment {
++    @NotNull String value();
 +}

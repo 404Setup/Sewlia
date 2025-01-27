@@ -1,7 +1,7 @@
 --- /dev/null
-+++ b/src/main/java/sewlia/config/annotation/Comments.java
++++ b/src/main/java/one/tranic/sewlia/config/annotation/Comments.java
 @@ -1,0 +_,14 @@
-+package sewlia.config.annotation;
++package one.tranic.sewlia.config.annotation;
 +
 +import org.jetbrains.annotations.NotNull;
 +

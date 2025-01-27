@@ -34,6 +34,14 @@
  
      spigot {
          buildDataRef = "3edaf46ec1eed4115ce1b18d2846cded42577e42"
+@@ -38,7 +_,6 @@
+     }
+ 
+     reobfPackagesToFix.addAll(
+-        "co.aikar.timings",
+         "com.destroystokyo.paper",
+         "com.mojang",
+         "io.papermc.paper",
 @@ -116,10 +_,14 @@
      main {
          java { srcDir("../paper-server/src/main/java") }
@@ -105,7 +113,7 @@
              "Build-Number" to (build ?: ""),
              "Build-Time" to buildTime.toString(),
              "Git-Branch" to gitBranch,
-@@ -350,3 +_,10 @@
+@@ -350,3 +_,12 @@
      classpath(tasks.createReobfPaperclipJar.flatMap { it.outputZip })
      mainClass.set(null as String?)
  }
@@ -114,5 +122,7 @@
 +tasks.withType<JavaCompile> {
 +    val compilerArgs = options.compilerArgs
 +    compilerArgs.add("--add-modules=jdk.incubator.vector")
++    compilerArgs.add("-Xlint:-deprecation") // Sewlia
++    options.isWarnings = false // Sewlia
 +}
 +// Pufferfish End
