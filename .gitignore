@@ -57,7 +57,8 @@ build-data/
 .xcodemap/
 /sewlia-server/build.gradle.kts
 /sewlia-api/build.gradle.kts
-/folia-server/*
+folia-server
+folia-server/*
 /sewlia-server/src/minecraft
 /paper-server
 /folia-api
