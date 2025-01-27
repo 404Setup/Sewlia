@@ -71,6 +71,19 @@ index 29bd788ae8bc61c1e62a4f84b9e259931a7041ce..797c1dace464379b1bf32cc5690cbef2
                  Charsets.UTF_8
              ).openBufferedStream()) {
                  final JsonObject json = new Gson().fromJson(reader, JsonObject.class);
+diff --git a/src/main/java/com/destroystokyo/paper/console/PaperConsole.java b/src/main/java/com/destroystokyo/paper/console/PaperConsole.java
+index 6ee39b534b8d992655bc0cef3c299d12cbae0034..b4ac59c44e596d8f842ab1c83d70e9b271d7eda1 100644
+--- a/src/main/java/com/destroystokyo/paper/console/PaperConsole.java
++++ b/src/main/java/com/destroystokyo/paper/console/PaperConsole.java
+@@ -20,7 +20,7 @@ public final class PaperConsole extends SimpleTerminalConsole {
+     @Override
+     protected LineReader buildReader(LineReaderBuilder builder) {
+         builder
+-                .appName("Paper")
++                .appName("Sewlia")
+                 .variable(LineReader.HISTORY_FILE, java.nio.file.Paths.get(".console_history"))
+                 .completer(new ConsoleCommandCompleter(this.server))
+                 .option(LineReader.Option.COMPLETE_IN_WORD, true);
 diff --git a/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java b/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java
 index e741201fdbea0dbbc0e42313ebd33368014c9dc4..b0dab0387dd86c235accd6bdcea75a988198c43e 100644
 --- a/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java

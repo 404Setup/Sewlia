@@ -1,0 +1,13 @@
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/feature/maven/Enable.java
+@@ -1,0 +_,10 @@
++package one.tranic.sewlia.config.mod.feature.maven;
++
++import one.tranic.sewlia.config.annotation.Comment;
++import one.tranic.sewlia.config.annotation.DisableReload;
++
++public class Enable {
++    @DisableReload
++    @Comment("Maven Central Repository Acceleration")
++    public static boolean value = true;
++}

@@ -1,0 +1,31 @@
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/util/ThreadConfig.java
+@@ -1,0 +_,28 @@
++package one.tranic.sewlia.config.util;
++
++import one.tranic.sewlia.config.annotation.DisableReload;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++import java.util.concurrent.ThreadFactory;
++
++public abstract class ThreadConfig {
++    @DisableReload
++    public static boolean value = false;
++
++    public static ThreadFactory getThreadFactory() {
++        return value ? Thread.ofVirtual().factory() : Thread.ofPlatform().factory();
++    }
++
++    public static Thread getThread(final Runnable runnable) {
++        return value ? Thread.ofVirtual().unstarted(runnable) : new Thread(runnable);
++    }
++
++    public static Thread getThread(final Runnable runnable, final String name) {
++        return value ? Thread.ofVirtual().name(name).unstarted(runnable) : new Thread(runnable, name);
++    }
++
++    public static Thread getThread(@Nullable ThreadGroup group, Runnable task, @NotNull String name, long stackSize) {
++        return value ? Thread.ofVirtual().name(name).unstarted(task) : new Thread(group, task, name, stackSize);
++    }
++}

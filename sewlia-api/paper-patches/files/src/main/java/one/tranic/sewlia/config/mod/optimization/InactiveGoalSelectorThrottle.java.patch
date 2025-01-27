@@ -1,0 +1,12 @@
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/optimization/InactiveGoalSelectorThrottle.java
+@@ -1,0 +_,9 @@
++package one.tranic.sewlia.config.mod.optimization;
++
++import one.tranic.sewlia.config.annotation.Comments;
++
++public class InactiveGoalSelectorThrottle {
++    @Comments({"Throttles the AI goal selector in entity inactive ticks.",
++            "This can improve performance by a few percent, but has minor gameplay implications."})
++    public static boolean value = false;
++}
