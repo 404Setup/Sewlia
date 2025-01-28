@@ -1,0 +1,167 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Tue, 28 Jan 2025 21:50:22 +0800
+Subject: [PATCH] Do not save some entities
+
+Allows not saving some entities. Disabling saving can have some good effects under certain conditions.
+
+diff --git a/net/minecraft/world/entity/item/FallingBlockEntity.java b/net/minecraft/world/entity/item/FallingBlockEntity.java
+index 1fa5e6a12b943e889bde566038a632a6adcf319e..982c79f83dc9e469ab55deecdf9cfe3f076cdb75 100644
+--- a/net/minecraft/world/entity/item/FallingBlockEntity.java
++++ b/net/minecraft/world/entity/item/FallingBlockEntity.java
+@@ -404,4 +404,11 @@ public class FallingBlockEntity extends Entity {
+         this.forceTickAfterTeleportToDuplicate = entity != null && flag && io.papermc.paper.configuration.GlobalConfiguration.get().unsupportedSettings.allowUnsafeEndPortalTeleportation; // Paper
+         return entity;
+     }
++
++    // Sewlia start
++    @Override
++    public boolean shouldBeSaved() {
++        return !one.tranic.sewlia.config.mod.misc.dont_save.FallingBlock.value;
++    }
++    // Sewlia end
+ }
+diff --git a/net/minecraft/world/entity/item/PrimedTnt.java b/net/minecraft/world/entity/item/PrimedTnt.java
+index 88570bb4aa02896545805d7721c45cf9599befea..3716e6a210a2f5b54acc07ff84d58716a5de445a 100644
+--- a/net/minecraft/world/entity/item/PrimedTnt.java
++++ b/net/minecraft/world/entity/item/PrimedTnt.java
+@@ -251,4 +251,11 @@ public class PrimedTnt extends Entity implements TraceableEntity {
+         return !this.level().paperConfig().fixes.preventTntFromMovingInWater && super.isPushedByFluid();
+     }
+     // Paper end - Option to prevent TNT from moving in water
++
++    // Sewlia start
++    @Override
++    public boolean shouldBeSaved() {
++        return !one.tranic.sewlia.config.mod.misc.dont_save.PrimedTnt.value;
++    }
++    // Sewlia end
+ }
+diff --git a/net/minecraft/world/entity/projectile/Arrow.java b/net/minecraft/world/entity/projectile/Arrow.java
+index 56574f8ef879159edc0114da09300143a2c79a35..3495241979e572dd4e9cc15ee297ba4b880b0989 100644
+--- a/net/minecraft/world/entity/projectile/Arrow.java
++++ b/net/minecraft/world/entity/projectile/Arrow.java
+@@ -172,4 +172,11 @@ public class Arrow extends AbstractArrow {
+             super.handleEntityEvent(id);
+         }
+     }
++
++    // Sewlia start
++    @Override
++    public boolean shouldBeSaved() {
++        return !one.tranic.sewlia.config.mod.misc.dont_save.Arrow.value;
++    }
++    // Sewlia end
+ }
+diff --git a/net/minecraft/world/entity/projectile/Fireball.java b/net/minecraft/world/entity/projectile/Fireball.java
+index 66dcd3c43bab5f18f8a3a891df2ff0612d5b6e6b..278274548850c728858c366411f4cf1ac7b499a4 100644
+--- a/net/minecraft/world/entity/projectile/Fireball.java
++++ b/net/minecraft/world/entity/projectile/Fireball.java
+@@ -84,4 +84,11 @@ public abstract class Fireball extends AbstractHurtingProjectile implements Item
+     public boolean shouldRenderAtSqrDistance(double distance) {
+         return (this.tickCount >= 2 || !(distance < 12.25)) && super.shouldRenderAtSqrDistance(distance);
+     }
++
++    // Sewlia start
++    @Override
++    public boolean shouldBeSaved() {
++        return !one.tranic.sewlia.config.mod.misc.dont_save.Fireball.value;
++    }
++    // Sewlia end
+ }
+diff --git a/net/minecraft/world/entity/projectile/FireworkRocketEntity.java b/net/minecraft/world/entity/projectile/FireworkRocketEntity.java
+index 0cfd2c937f93f1acb4afc01251f882710baf2591..33f907c02fb7a7c8e951cd83571b5ce5c9393d81 100644
+--- a/net/minecraft/world/entity/projectile/FireworkRocketEntity.java
++++ b/net/minecraft/world/entity/projectile/FireworkRocketEntity.java
+@@ -369,4 +369,11 @@ public class FireworkRocketEntity extends Projectile implements ItemSupplier {
+         double d1 = entity.position().z - this.position().z;
+         return DoubleDoubleImmutablePair.of(d, d1);
+     }
++
++    // Sewlia start
++    @Override
++    public boolean shouldBeSaved() {
++        return !one.tranic.sewlia.config.mod.misc.dont_save.Fireworks.value;
++    }
++    // Sewlia end
+ }
+diff --git a/net/minecraft/world/entity/projectile/LargeFireball.java b/net/minecraft/world/entity/projectile/LargeFireball.java
+index 4a752ace041228f095af7b1b4878a03c5ed2381f..a8f8bd9ba9deced5eb84817b36251f385b292cf7 100644
+--- a/net/minecraft/world/entity/projectile/LargeFireball.java
++++ b/net/minecraft/world/entity/projectile/LargeFireball.java
+@@ -71,4 +71,11 @@ public class LargeFireball extends Fireball {
+             this.bukkitYield = this.explosionPower = compound.getByte("ExplosionPower");
+         }
+     }
++
++    // Sewlia start
++    @Override
++    public boolean shouldBeSaved() {
++        return !one.tranic.sewlia.config.mod.misc.dont_save.LargeFireball.value;
++    }
++    // Sewlia end
+ }
+diff --git a/net/minecraft/world/entity/projectile/ShulkerBullet.java b/net/minecraft/world/entity/projectile/ShulkerBullet.java
+index 45ccfa92fe06a3f5041dac1ddd5550e5a89d8d80..fc36c92fa06c25c648c45b1474b5ad2166b5270f 100644
+--- a/net/minecraft/world/entity/projectile/ShulkerBullet.java
++++ b/net/minecraft/world/entity/projectile/ShulkerBullet.java
+@@ -375,4 +375,11 @@ public class ShulkerBullet extends Projectile {
+         double za = packet.getZa();
+         this.setDeltaMovement(xa, ya, za);
+     }
++
++    // Sewlia start
++    @Override
++    public boolean shouldBeSaved() {
++        return !one.tranic.sewlia.config.mod.misc.dont_save.ShulkerBullet.value;
++    }
++    // Sewlia end
+ }
+diff --git a/net/minecraft/world/entity/projectile/SmallFireball.java b/net/minecraft/world/entity/projectile/SmallFireball.java
+index ba70ce3df630532b646eab0a5fabca15d67c379b..994bee5752594ed56978479b746ed52b39c002b9 100644
+--- a/net/minecraft/world/entity/projectile/SmallFireball.java
++++ b/net/minecraft/world/entity/projectile/SmallFireball.java
+@@ -79,4 +79,11 @@ public class SmallFireball extends Fireball {
+             this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.HIT); // CraftBukkit - add Bukkit remove cause
+         }
+     }
++
++    // Sewlia start
++    @Override
++    public boolean shouldBeSaved() {
++        return !one.tranic.sewlia.config.mod.misc.dont_save.SmallFireball.value;
++    }
++    // Sewlia end
+ }
+diff --git a/net/minecraft/world/entity/projectile/Snowball.java b/net/minecraft/world/entity/projectile/Snowball.java
+index c57bbdc13221d2ce349f3f1d894193f80ff1e24b..32bef6e4ea86bc6bfee6c2954beebf38ca16d7cb 100644
+--- a/net/minecraft/world/entity/projectile/Snowball.java
++++ b/net/minecraft/world/entity/projectile/Snowball.java
+@@ -64,4 +64,11 @@ public class Snowball extends ThrowableItemProjectile {
+             this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.HIT); // CraftBukkit - add Bukkit remove cause
+         }
+     }
++
++    // Sewlia start
++    @Override
++    public boolean shouldBeSaved() {
++        return !one.tranic.sewlia.config.mod.misc.dont_save.Snowball.value;
++    }
++    // Sewlia end
+ }
+diff --git a/net/minecraft/world/entity/projectile/WitherSkull.java b/net/minecraft/world/entity/projectile/WitherSkull.java
+index a83839fce264429e2a8fd3b19cd2d0a6d88585e0..0147a2e65a2dd6b924726e9cdc3ffcf365f240e4 100644
+--- a/net/minecraft/world/entity/projectile/WitherSkull.java
++++ b/net/minecraft/world/entity/projectile/WitherSkull.java
+@@ -132,4 +132,11 @@ public class WitherSkull extends AbstractHurtingProjectile {
+         super.readAdditionalSaveData(tag);
+         this.setDangerous(tag.getBoolean("dangerous"));
+     }
++
++    // Sewlia start
++    @Override
++    public boolean shouldBeSaved() {
++        return !one.tranic.sewlia.config.mod.misc.dont_save.WitherSkull.value;
++    }
++    // Sewlia end
+ }
