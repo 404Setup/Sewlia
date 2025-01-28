@@ -1,0 +1,14 @@
+--- a/net/minecraft/world/entity/item/FallingBlockEntity.java
++++ b/net/minecraft/world/entity/item/FallingBlockEntity.java
+@@ -404,4 +_,11 @@
+         this.forceTickAfterTeleportToDuplicate = entity != null && flag && io.papermc.paper.configuration.GlobalConfiguration.get().unsupportedSettings.allowUnsafeEndPortalTeleportation; // Paper
+         return entity;
+     }
++
++    // Sewlia start
++    @Override
++    public boolean shouldBeSaved() {
++        return !one.tranic.sewlia.config.mod.misc.dont_save.FallingBlock.value;
++    }
++    // Sewlia end
+ }

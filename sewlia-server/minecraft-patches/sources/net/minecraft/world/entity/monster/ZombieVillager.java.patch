@@ -1,0 +1,17 @@
+--- a/net/minecraft/world/entity/monster/ZombieVillager.java
++++ b/net/minecraft/world/entity/monster/ZombieVillager.java
+@@ -260,6 +_,14 @@
+                 if (!this.isSilent()) {
+                     serverLevel.levelEvent(null, 1027, this.blockPosition(), 0);
+                 }
++
++                // Leaf start - Fix MC-200418
++                // Related MC issue: https://bugs.mojang.com/browse/MC-200418
++                if (villager.isPassenger() && villager.getVehicle() instanceof net.minecraft.world.entity.animal.Chicken && villager.isBaby()) {
++                    villager.removeVehicle();
++                }
++                // Leaf end
++
+                 // CraftBukkit start
+             }, org.bukkit.event.entity.EntityTransformEvent.TransformReason.CURED, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.CURED // CraftBukkit
+         );

@@ -1,0 +1,14 @@
+--- a/net/minecraft/world/entity/projectile/ShulkerBullet.java
++++ b/net/minecraft/world/entity/projectile/ShulkerBullet.java
+@@ -375,4 +_,11 @@
+         double za = packet.getZa();
+         this.setDeltaMovement(xa, ya, za);
+     }
++
++    // Sewlia start
++    @Override
++    public boolean shouldBeSaved() {
++        return !one.tranic.sewlia.config.mod.misc.dont_save.ShulkerBullet.value;
++    }
++    // Sewlia end
+ }

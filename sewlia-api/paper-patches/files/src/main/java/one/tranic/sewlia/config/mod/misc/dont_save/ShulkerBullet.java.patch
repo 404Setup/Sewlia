@@ -1,0 +1,8 @@
+--- /dev/null
++++ b/src/main/java/one/tranic/sewlia/config/mod/misc/dont_save/ShulkerBullet.java
+@@ -1,0 +_,5 @@
++package one.tranic.sewlia.config.mod.misc.dont_save;
++
++public class ShulkerBullet {
++    public static boolean value = false;
++}

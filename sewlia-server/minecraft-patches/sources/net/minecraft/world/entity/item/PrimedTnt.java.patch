@@ -1,0 +1,14 @@
+--- a/net/minecraft/world/entity/item/PrimedTnt.java
++++ b/net/minecraft/world/entity/item/PrimedTnt.java
+@@ -251,4 +_,11 @@
+         return !this.level().paperConfig().fixes.preventTntFromMovingInWater && super.isPushedByFluid();
+     }
+     // Paper end - Option to prevent TNT from moving in water
++
++    // Sewlia start
++    @Override
++    public boolean shouldBeSaved() {
++        return !one.tranic.sewlia.config.mod.misc.dont_save.PrimedTnt.value;
++    }
++    // Sewlia end
+ }

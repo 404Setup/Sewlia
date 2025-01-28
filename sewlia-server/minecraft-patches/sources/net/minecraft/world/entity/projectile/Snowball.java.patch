@@ -1,0 +1,14 @@
+--- a/net/minecraft/world/entity/projectile/Snowball.java
++++ b/net/minecraft/world/entity/projectile/Snowball.java
+@@ -64,4 +_,11 @@
+             this.discard(org.bukkit.event.entity.EntityRemoveEvent.Cause.HIT); // CraftBukkit - add Bukkit remove cause
+         }
+     }
++
++    // Sewlia start
++    @Override
++    public boolean shouldBeSaved() {
++        return !one.tranic.sewlia.config.mod.misc.dont_save.Snowball.value;
++    }
++    // Sewlia end
+ }

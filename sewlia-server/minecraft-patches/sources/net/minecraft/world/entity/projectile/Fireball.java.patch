@@ -1,0 +1,14 @@
+--- a/net/minecraft/world/entity/projectile/Fireball.java
++++ b/net/minecraft/world/entity/projectile/Fireball.java
+@@ -84,4 +_,11 @@
+     public boolean shouldRenderAtSqrDistance(double distance) {
+         return (this.tickCount >= 2 || !(distance < 12.25)) && super.shouldRenderAtSqrDistance(distance);
+     }
++
++    // Sewlia start
++    @Override
++    public boolean shouldBeSaved() {
++        return !one.tranic.sewlia.config.mod.misc.dont_save.Fireball.value;
++    }
++    // Sewlia end
+ }
