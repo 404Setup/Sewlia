@@ -1,3 +1,5 @@
+#!/usr/bin/env pwsh
+
 # Powered by Transoft, distributed in the GPL-3 protocol.
 # https://github.com/LevelTranic
 

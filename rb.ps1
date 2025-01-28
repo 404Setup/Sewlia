@@ -1,3 +1,4 @@
+#!/usr/bin/env pwsh
 ./gradlew fixupPaperApiFilePatches
 ./gradlew fixupPaperServerFilePatches
 ./gradlew fixupMinecraftSourcePatches

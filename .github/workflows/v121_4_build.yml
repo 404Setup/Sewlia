@@ -30,15 +30,15 @@ jobs:
       - name: Configure Git User Details
         run: git config --global user.email "no-reply@tranic.one" && git config --global user.name "TranicDev"
       - name: Apply Patches
-        run: gradle applyPatches
+        run: ./patch.ps1
       - name: CreateJar
         run: gradle createMojmapPaperclipJar
       - name: SetENV
-        run: pwsh scripts/SetEnv.ps1
+        run: ./scripts/SetEnv.ps1
       - name: Clear Build
-        run: pwsh scripts/clear_build.ps1
+        run: ./scripts/clear_build.ps1
       - name: Upload to Mars API
-        run: pwsh scripts/create_build.ps1 ${{ env.mcversion }} ${{ secrets.MARS_TOKEN }}
+        run: ./scripts/create_build.ps1 ${{ env.mcversion }} ${{ secrets.MARS_TOKEN }}
       - name: Upload Artifact
         uses: "actions/upload-artifact@v4"
         with:
