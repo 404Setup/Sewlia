@@ -10,5 +10,39 @@ Sewlia. 1.21.4
 
 ----
 
-## Features
 **Sewlia is arranging to migrate to a hard-fork, during which most patches will be unavailable.**
+
+## What is Sewlia?
+
+It is built on Folia.
+
+As stitched-together server software,
+Sewlia stitches patches from multiple server software
+onto itself in an attempt to get a strange result.
+
+But it's not unstable, or maybe it is.
+
+I only do some simple tests in it, such as whether this
+optimization or functional patch can work properly,
+and occasionally I will accidentally push the wrong patch to the repo,
+which is usually fixed quickly.
+
+Sewlia is another way for me to pass the time after Vine,
+which can relieve me from boredom.
+
+## Features
+- Some vanilla abilities
+- Some strange optimizations
+- I don't know
+
+## Thanks
+Sewlia gets patches or inspiration from the following server software or projects. 
+Thanks to these developers for their contributions.
+
+- Dreeam-qwq/Gale
+- LumminolMC/Luminol 
+- LeavesMC/Leaves
+- Winds-Studio/Leaf
+- SparklyPower/SparklyPaper
+- pufferfish-gg/Pufferfish
+- KaiijuMC/Kaiiju
