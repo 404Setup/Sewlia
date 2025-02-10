@@ -46,9 +46,8 @@ Write-Host "Updating Folia: $oldHash -> $newHash"
 
 git add gradle.properties
 
-./gradlew applyAllPatches || exit_on_error "An error occurred when merging patches!"
-./gradlew rebuildFoliaPatches || exit_on_error "An error occurred when rebuilding patches!"
-./gradlew rebuildFoliaApiPatches || exit_on_error "An error occurred when rebuilding patches!"
+./patch.ps1 || exit_on_error "An error occurred when merging patches!"
+./rb.ps1 || exit_on_error "An error occurred when rebuilding patches!"
 ./gradlew createMojmapPaperclipJar || exit_on_error "An error occurred when building!"
 
 scripts/upstreamCommit.ps1 $oldHash $newHash
