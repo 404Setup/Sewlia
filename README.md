@@ -33,7 +33,16 @@ which can relieve me from boredom.
 ## Features
 - Some vanilla abilities
 - Some strange optimizations
+- Some fixes
 - I don't know
+
+## Temporarily unavailable
+This refers to patches that once existed in Sewlia, but have not been provided due to version upgrades.
+
+- Full VT2 > A small part is broken, but it doesn't affect much. There is no time to process the complete TickThread for the time being.
+- Secure Seed > Low priority
+- Other patches > In order
+- Vine patches > There are too many, and many of them no longer work in the current version and require additional fixes.
 
 ## Thanks
 Sewlia gets patches or inspiration from the following server software or projects. 
