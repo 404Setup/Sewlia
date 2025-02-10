@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Mon, 10 Feb 2025 16:53:58 +0800
+Subject: [PATCH] SparklyPaper: Skip dirty stats copy when requesting player
+ stats
+
+There's literally only one getDirty call. Because the map was only retrieved once, we don't actually need to create a copy of the map just to iterate it, we can just access it directly and clear it manually after use.
+
+diff --git a/net/minecraft/stats/ServerStatsCounter.java b/net/minecraft/stats/ServerStatsCounter.java
+index 6c5205fe1dc6387a77b1edbdcab748d39e775d7f..0a82cc49fc0ed3dfc5ed7f324b5f9cab7b9473cd 100644
+--- a/net/minecraft/stats/ServerStatsCounter.java
++++ b/net/minecraft/stats/ServerStatsCounter.java
+@@ -81,11 +81,11 @@ public class ServerStatsCounter extends StatsCounter {
+         this.dirty.add(stat);
+     }
+ 
+-    private Set<Stat<?>> getDirty() {
++    /*private Set<Stat<?>> getDirty() { // SparklyPaper start - Skip dirty stats copy when requesting player stats
+         Set<Stat<?>> set = Sets.newHashSet(this.dirty);
+         this.dirty.clear();
+         return set;
+-    }
++    } // SparklyPaper end */
+ 
+     public void parseLocal(DataFixer fixerUpper, String json) {
+         try {
+@@ -190,10 +190,12 @@ public class ServerStatsCounter extends StatsCounter {
+     public void sendStats(ServerPlayer player) {
+         Object2IntMap<Stat<?>> map = new Object2IntOpenHashMap<>();
+ 
+-        for (Stat<?> stat : this.getDirty()) {
++        for (Stat<?> stat : this.dirty) {  // SparklyPaper - Skip dirty stats copy when requesting player stats
+             map.put(stat, this.getValue(stat));
+         }
+ 
++        this.dirty.clear(); // SparklyPaper - Skip dirty stats copy when requesting player stats
++
+         player.connection.send(new ClientboundAwardStatsPacket(map));
+     }
+ }

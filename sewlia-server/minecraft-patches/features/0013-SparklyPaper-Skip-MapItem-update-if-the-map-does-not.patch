@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Mon, 10 Feb 2025 16:58:25 +0800
+Subject: [PATCH] SparklyPaper: Skip "MapItem#update()" if the map does not
+ have the CraftMapRenderer present
+
+Optimizes "image in map" maps, without requiring the map to be locked, which some old map plugins may not do
+
+This has the disadvant
+
+diff --git a/net/minecraft/world/item/MapItem.java b/net/minecraft/world/item/MapItem.java
+index 9f07ce560e265582eec0fff5877a923f62a60e13..bea326e618e6f0b71320e4802226bf13334f6870 100644
+--- a/net/minecraft/world/item/MapItem.java
++++ b/net/minecraft/world/item/MapItem.java
+@@ -282,7 +282,8 @@ public class MapItem extends Item {
+                     savedData.tickCarriedBy(player, stack);
+                 }
+ 
+-                if (!savedData.locked && (isSelected || entity instanceof Player && ((Player)entity).getOffhandItem() == stack)) {
++                // SparklyPaper - don't update maps if they don't have the CraftMapRenderer in the render list
++                if (!savedData.locked && (!one.tranic.sewlia.config.mod.optimization.map.SkipUpdateIfNoRenderer.value || savedData.mapView.getRenderers().stream().anyMatch(mapRenderer -> mapRenderer.getClass() == org.bukkit.craftbukkit.map.CraftMapRenderer.class)) && (isSelected || entity instanceof Player && ((Player)entity).getOffhandItem() == stack)) {
+                     this.update(level, entity, savedData);
+                 }
+                 } // Folia - region threading

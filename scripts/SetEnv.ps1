@@ -23,7 +23,7 @@ $grdversion = Get-Property "version"
 $preVersion = Get-Property "preVersion"
 $release_tag = "$mcversion-$commitid"
 $jarName = "$project_id-paperclip-$mcversion.jar"
-$jarName_dir = "build/libs/$jarName"
+$jarName_dir = "sewlia-server/build/libs/$jarName"
 $make_latest = if ($preVersion -eq "true") { "false" } else { "true" }
 
 Move-Item "build/libs/$project_id-paperclip-$grdversion-mojmap.jar" $jarName_dir

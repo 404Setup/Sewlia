@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Mon, 10 Feb 2025 16:31:57 +0800
+Subject: [PATCH] Luminol: Fix for off region adult following ai behavior
+
+
+diff --git a/net/minecraft/world/entity/ai/behavior/BabyFollowAdult.java b/net/minecraft/world/entity/ai/behavior/BabyFollowAdult.java
+index a9be3acbf4ea52d2988347abfa6f4f8c02b1da26..751f3dde8e6bc2c0365e8672f5079af0379a69de 100644
+--- a/net/minecraft/world/entity/ai/behavior/BabyFollowAdult.java
++++ b/net/minecraft/world/entity/ai/behavior/BabyFollowAdult.java
+@@ -25,6 +25,14 @@ public class BabyFollowAdult {
+                         return false;
+                     } else {
+                         LivingEntity ageableMob = instance.get(nearestVisibleAdult); // CraftBukkit - type
++
++                        // Luminol start - Fix off world entity following which caused async issue
++                        if (!ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(ageableMob)) {
++                            nearestVisibleAdult.erase();
++                            return true;
++                        }
++                        // Luminol end
++
+                         if (mob.closerThan(ageableMob, followRange.getMaxValue() + 1) && !mob.closerThan(ageableMob, followRange.getMinValue())) {
+                             // CraftBukkit start
+                             org.bukkit.event.entity.EntityTargetLivingEntityEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callEntityTargetLivingEvent(mob, ageableMob, org.bukkit.event.entity.EntityTargetEvent.TargetReason.FOLLOW_LEADER);

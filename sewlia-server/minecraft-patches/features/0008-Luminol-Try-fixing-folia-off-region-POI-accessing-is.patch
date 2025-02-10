@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Mon, 10 Feb 2025 16:40:11 +0800
+Subject: [PATCH] Luminol: Try fixing folia off region POI accessing issue
+
+
+diff --git a/net/minecraft/world/entity/ai/village/poi/PoiManager.java b/net/minecraft/world/entity/ai/village/poi/PoiManager.java
+index c10810bf00d75f459c3c6a9415c1e09f0519d50e..d7920834d769cc1fb2ffbe675c814462cc23c7de 100644
+--- a/net/minecraft/world/entity/ai/village/poi/PoiManager.java
++++ b/net/minecraft/world/entity/ai/village/poi/PoiManager.java
+@@ -212,7 +212,7 @@ public class PoiManager extends SectionStorage<PoiSection, PoiSection.Packed> im
+ 
+     public Stream<PoiRecord> getInSquare(Predicate<Holder<PoiType>> typePredicate, BlockPos pos, int distance, PoiManager.Occupancy status) {
+         int i = Math.floorDiv(distance, 16) + 1;
+-        return ChunkPos.rangeClosed(new ChunkPos(pos), i).flatMap(chunkPos -> this.getInChunk(typePredicate, chunkPos, status)).filter(poiRecord -> {
++        return ChunkPos.rangeClosed(new ChunkPos(pos), i).filter(cpos -> !one.tranic.sewlia.config.mod.fix.POIAccessOffRegion.value || ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(this.world, cpos)).flatMap(chunkPos -> this.getInChunk(typePredicate, chunkPos, status)).filter(poiRecord -> { // Luminol - Fix off region POI access
+             BlockPos pos1 = poiRecord.getPos();
+             return Math.abs(pos1.getX() - pos.getX()) <= distance && Math.abs(pos1.getZ() - pos.getZ()) <= distance;
+         });

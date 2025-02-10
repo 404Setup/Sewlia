@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Mon, 10 Feb 2025 16:52:02 +0800
+Subject: [PATCH] SparklyPaper: Reset dirty flag when loading maps from the
+ disk
+
+By default, the server will start rewriting all map datas to the disk after loading it, even if the map didn't have any changes
+
+This also slows down world saving a lot if you have a lot of maps
+
+diff --git a/net/minecraft/world/level/saveddata/maps/MapItemSavedData.java b/net/minecraft/world/level/saveddata/maps/MapItemSavedData.java
+index cf827e018eec4910b8319cee7202d480fee573f6..581f6342f32b04442942304f0e069312db6cc523 100644
+--- a/net/minecraft/world/level/saveddata/maps/MapItemSavedData.java
++++ b/net/minecraft/world/level/saveddata/maps/MapItemSavedData.java
+@@ -197,6 +197,7 @@ public class MapItemSavedData extends SavedData {
+             }
+         }
+ 
++        mapItemSavedData.setDirty(false); // SparklyPaper - reset dirty flag when loading maps from the disk
+         return mapItemSavedData;
+     }
+ 

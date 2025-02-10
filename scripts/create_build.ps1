@@ -50,7 +50,7 @@ function Get-GitInfo
 
 function Get-BuildInfo
 {
-    $buildLibsDir = "build/libs"
+    $buildLibsDir = "sewlia-server/build/libs"
     Write-Host (Get-ChildItem $buildLibsDir)
     $filePattern = "$buildLibsDir/*.jar"
     $files = Get-ChildItem -Path $filePattern

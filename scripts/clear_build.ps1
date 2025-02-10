@@ -8,7 +8,7 @@ $currentDirectory = Get-Location
 if (Test-Path "$currentDirectory\.git") {
     $gitRepoName = (git rev-parse --show-toplevel | Split-Path -Leaf).ToLower()
 
-    $jarDirectory = Join-Path -Path $currentDirectory -ChildPath "build/libs"
+    $jarDirectory = Join-Path -Path $currentDirectory -ChildPath "sewlia-server/build/libs"
 
     if (Test-Path $jarDirectory) {
         $regexPattern = "$gitRepoName-bundler-(\d+\.\d+\.\d+)(-[^\-]+)*\.jar"

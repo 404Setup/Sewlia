@@ -1,0 +1,52 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Mon, 10 Feb 2025 16:37:55 +0800
+Subject: [PATCH] Luminol: Teleport async if entity was moving to another
+ region at once
+
+
+diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
+index 00130ead57c56c44a3a8e20b246d3d51bacebc35..1d3f85189fff304b44e177544f6b83302dc880f7 100644
+--- a/net/minecraft/world/entity/Entity.java
++++ b/net/minecraft/world/entity/Entity.java
+@@ -1099,6 +1099,8 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+     }
+     // Paper end - detailed watchdog information
+ 
++    private volatile boolean preventMoving = false; // Luminol - Fix large pos moving
++
+     public void move(MoverType type, Vec3 movement) {
+         final Vec3 originalMovement = movement; // Paper - Expose pre-collision velocity
+         // Paper start - detailed watchdog information
+@@ -1109,6 +1111,31 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+             this.moveStartZ = this.getZ();
+             this.moveVector = movement;
+         }
++        // Luminol start - Fix high position moving
++        if (one.tranic.sewlia.config.mod.fix.entity_moving.Enable.value && ca.spottedleaf.moonrise.common.util.TickThread.isTickThread()){ //Except the threads because it may be called by the chunk system worker thread
++            var finalPosition = movement.add(this.position);
++            if (this.preventMoving || Double.isNaN(finalPosition.x) || Double.isNaN(finalPosition.y) || Double.isNaN(finalPosition.z)){
++                return;
++            }
++
++            if (!ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(((ServerLevel) this.level),finalPosition)){
++                this.preventMoving = true;
++                this.teleportAsync(
++                        (ServerLevel) this.level(),
++                        finalPosition,
++                        this.getYRot(), this.getXRot(),
++                        null, org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.UNKNOWN,
++                        Entity.TELEPORT_FLAG_LOAD_CHUNK | Entity.TELEPORT_FLAG_TELEPORT_PASSENGERS,
++                        result -> {
++                            this.preventMoving = false;
++                        }
++                        );
++                if (one.tranic.sewlia.config.mod.fix.entity_moving.WarnOnDetected.value)
++                    MinecraftServer.LOGGER.warn("Entity {} with entityId {} has tried moving to another region!",this.type.getCategory().getName(),this.getId());
++                return;
++            }
++        }
++        //Luminol end
+         try {
+         // Paper end - detailed watchdog information
+         if (this.noPhysics) {
