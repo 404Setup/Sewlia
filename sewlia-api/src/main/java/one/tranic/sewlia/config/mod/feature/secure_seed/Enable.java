@@ -1,0 +1,11 @@
+package one.tranic.sewlia.config.mod.feature.secure_seed;
+
+import one.tranic.sewlia.config.annotation.Comments;
+import one.tranic.sewlia.config.annotation.DisableReload;
+
+public class Enable {
+    @DisableReload
+    @Comments({"Rejected possible hacking attempts by upgrading the world seed generator to 1024-bit.",
+            "You must delete the existing map before you can toggle it on or off."})
+    public static boolean value = false;
+}

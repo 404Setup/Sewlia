@@ -1,0 +1,12 @@
+package one.tranic.sewlia.config.mod.feature.virtual_thread.folia;
+
+import one.tranic.sewlia.config.annotation.DisableReload;
+
+public class AsyncScheduler {
+    @DisableReload
+    public static boolean value = false;
+
+    public static Thread getThread(final Runnable runnable) {
+        return value ? Thread.ofVirtual().unstarted(runnable) : new Thread(runnable);
+    }
+}

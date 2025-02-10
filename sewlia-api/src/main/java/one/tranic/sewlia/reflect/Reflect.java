@@ -1,0 +1,103 @@
+package one.tranic.sewlia.reflect;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.common.reflect.ClassPath;
+import it.unimi.dsi.fastutil.objects.ObjectArraySet;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
+import java.util.Set;
+
+public class Reflect {
+    public static <T extends Class<?>> @Nullable Set<T> scanPackage(@Nullable T clazz, @NotNull String packageName) {
+        @Nullable Set<String> set = scanPackageString(clazz, packageName);
+        if (set == null || set.isEmpty()) return null;
+        try {
+
+            Set<T> builder = new ObjectArraySet<>();
+            for (String s : set) builder.add((T) Class.forName(s));
+            return builder;
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
+    }
+
+    public static <T extends Class<?>> @Nullable Set<T> scanPackage(@NotNull String packageName) {
+        return scanPackage(null, packageName);
+    }
+
+    public static <T extends Class<?>> @Nullable Set<String> scanPackageString(@Nullable T clazz, @NotNull String packageName) {
+        try {
+            ClassPath classs = ClassPath.from(Thread.currentThread().getContextClassLoader());
+            ImmutableSet<ClassPath.ClassInfo> cla = classs.getTopLevelClassesRecursive(packageName);
+            if (cla.isEmpty()) return null;
+
+            Set<String> builder = new ObjectArraySet<>();
+            if (clazz == null) {
+                for (ClassPath.ClassInfo c : cla) builder.add(c.getName());
+            } else for (ClassPath.ClassInfo c : cla) if (c.getClass().isAssignableFrom(clazz)) builder.add(c.getName());
+            return builder;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static @Nullable Set<String> scanPackageString(@NotNull String packageName) {
+        return scanPackageString(null, packageName);
+    }
+
+    public static <T> @Nullable Set<T> findObjectClass(String packageName, Class<T> type) throws IOException {
+        return findClass(packageName, type, true, false);
+    }
+
+    public static <T> @Nullable Set<T> findAllObjectClass(String packageName, Class<T> type) throws IOException {
+        return findClass(packageName, type, true, true);
+    }
+
+    public static <T> @Nullable Set<T> findClass(String packageName, Class<T> type) throws IOException {
+        return findClass(packageName, type, false, false);
+    }
+
+    public static <T> @Nullable Set<T> findAllClass(String packageName, Class<T> type) throws IOException {
+        return findClass(packageName, type, false, true);
+    }
+
+    private static <T> @Nullable Set<T> findClass(String packageName, Class<T> type, boolean isObject, boolean allClass) throws IOException {
+        Set<T> implSet = new ObjectArraySet<>();
+        ClassPath classPath = ClassPath.from(Thread.currentThread().getContextClassLoader());
+        Iterable<ClassPath.ClassInfo> classes = allClass ? classPath.getTopLevelClassesRecursive(packageName) : classPath.getTopLevelClasses(packageName);
+
+        for (ClassPath.ClassInfo classInfo : classes) {
+            try {
+                Class<?> clazz = Class.forName(classInfo.getName());
+                if (!type.isAssignableFrom(clazz)) continue;
+
+                T objInstance = null;
+                if (isObject) {
+                    objInstance = getObjectInstance(clazz, type);
+                } else {
+                    if (!clazz.isAnnotation() && !clazz.isEnum() && !clazz.isInterface()) {
+                        objInstance = (T) clazz.getDeclaredConstructor().newInstance();
+                    }
+                }
+
+                if (objInstance != null) {
+                    implSet.add(objInstance);
+                }
+            } catch (Exception e) {
+                // Handle exceptions (logging or ignoring based on requirements)
+            }
+        }
+        return implSet;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> T getObjectInstance(Class<?> clazz, Class<T> type) {
+        try {
+            return (T) clazz.getField("INSTANCE").get(null);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+}

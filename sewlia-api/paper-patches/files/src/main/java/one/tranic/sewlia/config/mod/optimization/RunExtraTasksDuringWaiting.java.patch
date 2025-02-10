@@ -1,8 +1,0 @@
---- /dev/null
-+++ b/src/main/java/one/tranic/sewlia/config/mod/optimization/RunExtraTasksDuringWaiting.java
-@@ -1,0 +_,5 @@
-+package one.tranic.sewlia.config.mod.optimization;
-+
-+public class RunExtraTasksDuringWaiting {
-+    public static boolean value = false;
-+}

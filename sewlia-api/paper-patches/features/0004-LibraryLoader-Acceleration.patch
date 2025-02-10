@@ -1,0 +1,66 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Mon, 10 Feb 2025 14:42:02 +0800
+Subject: [PATCH] LibraryLoader Acceleration
+
+
+diff --git a/src/main/java/io/papermc/paper/plugin/loader/library/impl/MavenLibraryResolver.java b/src/main/java/io/papermc/paper/plugin/loader/library/impl/MavenLibraryResolver.java
+index 107705db2d82b7c191e5e625ec888e0bc3b03831..e15d99b4e9662c336f6b04b19ad50f81d39fbb99 100644
+--- a/src/main/java/io/papermc/paper/plugin/loader/library/impl/MavenLibraryResolver.java
++++ b/src/main/java/io/papermc/paper/plugin/loader/library/impl/MavenLibraryResolver.java
+@@ -6,6 +6,8 @@ import io.papermc.paper.plugin.loader.library.LibraryStore;
+ import java.io.File;
+ import java.util.ArrayList;
+ import java.util.List;
++
++import one.tranic.sewlia.maven.Accelerate;
+ import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+ import org.eclipse.aether.DefaultRepositorySystemSession;
+ import org.eclipse.aether.RepositorySystem;
+@@ -105,7 +107,7 @@ public class MavenLibraryResolver implements ClassPathLibrary {
+      * dependencies from
+      */
+     public void addRepository(final RemoteRepository remoteRepository) {
+-        this.repositories.add(remoteRepository);
++        this.repositories.add(Accelerate.get(remoteRepository)); // Sewlia
+     }
+ 
+     /**
+diff --git a/src/main/java/org/bukkit/plugin/SimplePluginManager.java b/src/main/java/org/bukkit/plugin/SimplePluginManager.java
+index 6d1276917d75490148062617956d81a51656109a..a33b20c33a2d53e7a13674d6526a21b71d891800 100644
+--- a/src/main/java/org/bukkit/plugin/SimplePluginManager.java
++++ b/src/main/java/org/bukkit/plugin/SimplePluginManager.java
+@@ -117,6 +117,7 @@ public final class SimplePluginManager implements PluginManager {
+     @Override
+     @NotNull
+     public Plugin[] loadPlugins(@NotNull File directory) {
++        one.tranic.sewlia.maven.Accelerate.ping(); // Sewlia - Start a ping in advance
+         // Paper start - extra jars
+         return this.loadPlugins(directory, java.util.Collections.emptyList());
+     }
+diff --git a/src/main/java/org/bukkit/plugin/java/LibraryLoader.java b/src/main/java/org/bukkit/plugin/java/LibraryLoader.java
+index c66252802c51174bc26f266cb5cdecdd856ff220..34128377f12a14cb273a0cbe26cb0dd62f7f729b 100644
+--- a/src/main/java/org/bukkit/plugin/java/LibraryLoader.java
++++ b/src/main/java/org/bukkit/plugin/java/LibraryLoader.java
+@@ -7,9 +7,12 @@ import java.net.URL;
+ import java.net.URLClassLoader;
+ import java.util.ArrayList;
+ import java.util.Arrays;
++import java.util.Collections;
+ import java.util.List;
+ import java.util.logging.Level;
+ import java.util.logging.Logger;
++
++import one.tranic.sewlia.maven.Accelerate;
+ import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+ import org.bukkit.plugin.PluginDescriptionFile;
+ import org.eclipse.aether.DefaultRepositorySystemSession;
+@@ -78,7 +81,7 @@ public class LibraryLoader
+         session.setSystemProperties( System.getProperties() );
+         session.setReadOnly();
+ 
+-        this.repositories = repository.newResolutionRepositories( session, Arrays.asList( new RemoteRepository.Builder( "central", "default", "https://repo.maven.apache.org/maven2" ).build() ) );
++        this.repositories = repository.newResolutionRepositories(session, Collections.singletonList(Accelerate.get())); // Sewlia
+     }
+ 
+     @Nullable

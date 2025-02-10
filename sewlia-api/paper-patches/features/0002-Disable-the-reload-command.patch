@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Mon, 10 Feb 2025 14:30:11 +0800
+Subject: [PATCH] Disable the `reload` command
+
+It shouldn't be available in folia, and when you really need it you should use a plugin like PlugManX, or restart the server.
+
+diff --git a/src/main/java/org/bukkit/command/defaults/ReloadCommand.java b/src/main/java/org/bukkit/command/defaults/ReloadCommand.java
+index bdfe68b386b5ca2878475e548d3c9a3808fce848..40b8b2a8d079e968da10722e17530a7d837ccd31 100644
+--- a/src/main/java/org/bukkit/command/defaults/ReloadCommand.java
++++ b/src/main/java/org/bukkit/command/defaults/ReloadCommand.java
+@@ -25,6 +25,12 @@ public class ReloadCommand extends BukkitCommand {
+     public boolean execute(@NotNull CommandSender sender, @NotNull String currentAlias, @NotNull String[] args) { // Paper
+         if (!testPermission(sender)) return true;
+ 
++        // Sewlia - Disable reload command
++        if (true) {
++            Command.broadcastCommandMessage(sender, net.kyori.adventure.text.Component.text("The reload command has been disabled!", net.kyori.adventure.text.format.NamedTextColor.RED));
++            return true;
++        }
++
+         // Paper start - Reload permissions.yml & require confirm
+         boolean confirmed = System.getProperty("LetMeReload") != null;
+         if (args.length == 1) {
