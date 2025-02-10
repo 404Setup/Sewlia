@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
-@@ -1367,7 +_,8 @@
+@@ -1372,7 +_,8 @@
                  player.setRealHealth(health);
              }
  

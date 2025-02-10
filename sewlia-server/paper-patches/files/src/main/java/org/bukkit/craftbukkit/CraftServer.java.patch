@@ -8,7 +8,7 @@
              this.helpMap.initializeCommands();
              this.syncCommands();
          }
-@@ -3225,6 +_,7 @@
+@@ -3241,6 +_,7 @@
          if (!io.papermc.paper.configuration.GlobalConfiguration.get().misc.loadPermissionsYmlBeforePlugins) loadCustomPermissions();
          DefaultPermissions.registerCorePermissions();
          CraftDefaultPermissions.registerCorePermissions();
