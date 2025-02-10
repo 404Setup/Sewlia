@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Tue, 8 Aug 2023 20:43:20 +0200
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Mon, 10 Feb 2025 22:46:03 +0800
 Subject: [PATCH] Gale: Use platform math functions
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
@@ -99,28 +99,28 @@ public class Main {
 }
 ```
 
-diff --git a/src/main/java/net/minecraft/util/Mth.java b/src/main/java/net/minecraft/util/Mth.java
-index ef93fc37759e0b54387c8a59adc2b19258cfeb7d..6b21782ad18cd5dbd1b9a59e5dc12c670c2a42fb 100644
---- a/src/main/java/net/minecraft/util/Mth.java
-+++ b/src/main/java/net/minecraft/util/Mth.java
+diff --git a/net/minecraft/util/Mth.java b/net/minecraft/util/Mth.java
+index d5d8134da9423cec199cf44762460104677194d6..e0eed27cb33348fcb46858c40014b5fe5dbaf426 100644
+--- a/net/minecraft/util/Mth.java
++++ b/net/minecraft/util/Mth.java
 @@ -58,18 +58,15 @@ public class Mth {
      }
  
      public static int floor(float value) {
 -        int i = (int)value;
--        return value < (float)i ? i - 1 : i;
+-        return value < i ? i - 1 : i;
 +        return (int) Math.floor(value); // Gale - use platform math functions
      }
  
      public static int floor(double value) {
 -        int i = (int)value;
--        return value < (double)i ? i - 1 : i;
+-        return value < i ? i - 1 : i;
 +        return (int) Math.floor(value); // Gale - use platform math functions
      }
  
      public static long lfloor(double value) {
 -        long l = (long)value;
--        return value < (double)l ? l - 1L : l;
+-        return value < l ? l - 1L : l;
 +        return (long) Math.floor(value); // Gale - use platform math functions
      }
  
@@ -130,13 +130,13 @@ index ef93fc37759e0b54387c8a59adc2b19258cfeb7d..6b21782ad18cd5dbd1b9a59e5dc12c67
  
      public static int ceil(float value) {
 -        int i = (int)value;
--        return value > (float)i ? i + 1 : i;
+-        return value > i ? i + 1 : i;
 +        return (int) Math.ceil(value); // Gale - use platform math functions
      }
  
      public static int ceil(double value) {
 -        int i = (int)value;
--        return value > (double)i ? i + 1 : i;
+-        return value > i ? i + 1 : i;
 +        return (int) Math.ceil(value); // Gale - use platform math functions
      }
  
@@ -144,17 +144,17 @@ index ef93fc37759e0b54387c8a59adc2b19258cfeb7d..6b21782ad18cd5dbd1b9a59e5dc12c67
 @@ -123,15 +118,7 @@ public class Mth {
      }
  
-     public static double absMax(double a, double b) {
--        if (a < 0.0) {
--            a = -a;
+     public static double absMax(double x, double y) {
+-        if (x < 0.0) {
+-            x = -x;
 -        }
 -
--        if (b < 0.0) {
--            b = -b;
+-        if (y < 0.0) {
+-            y = -y;
 -        }
 -
--        return Math.max(a, b);
-+        return Math.max(Math.abs(a), Math.abs(b)); // Gale - use platform math functions
+-        return Math.max(x, y);
++        return Math.max(Math.abs(x), Math.abs(y)); // Gale - use platform math functions
      }
  
      public static int floorDiv(int dividend, int divisor) {

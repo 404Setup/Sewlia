@@ -1,15 +1,15 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Paul Sauve <paul@technove.co>
-Date: Sun, 13 Dec 2020 17:52:35 -0600
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Mon, 10 Feb 2025 21:43:41 +0800
 Subject: [PATCH] Pufferfish: Reduce projectile chunk loading
 
 
-diff --git a/src/main/java/net/minecraft/world/entity/projectile/Projectile.java b/src/main/java/net/minecraft/world/entity/projectile/Projectile.java
-index 85ffb40af72c93ab46c5f8b103dc8919aa7c719e..f19d4b3298e6817357c54a863cfa2a2376c972be 100644
---- a/src/main/java/net/minecraft/world/entity/projectile/Projectile.java
-+++ b/src/main/java/net/minecraft/world/entity/projectile/Projectile.java
-@@ -58,6 +58,41 @@ public abstract class Projectile extends Entity implements TraceableEntity {
-         super(type, world);
+diff --git a/net/minecraft/world/entity/projectile/Projectile.java b/net/minecraft/world/entity/projectile/Projectile.java
+index 6e1de9252ac1236e0c5196e2511c72c0d7eb3502..8b2959ed08364cc96341d36e53161521ee143a2b 100644
+--- a/net/minecraft/world/entity/projectile/Projectile.java
++++ b/net/minecraft/world/entity/projectile/Projectile.java
+@@ -49,6 +49,41 @@ public abstract class Projectile extends Entity implements TraceableEntity {
+         super(entityType, level);
      }
  
 +    // Pufferfish start
@@ -47,6 +47,6 @@ index 85ffb40af72c93ab46c5f8b103dc8919aa7c719e..f19d4b3298e6817357c54a863cfa2a23
 +    }
 +    // Pufferfish end
 +
-     public void setOwner(@Nullable Entity entity) {
-         if (entity != null) {
-             this.ownerUUID = entity.getUUID();
+     public void setOwner(@Nullable Entity owner) {
+         if (owner != null) {
+             this.ownerUUID = owner.getUUID();

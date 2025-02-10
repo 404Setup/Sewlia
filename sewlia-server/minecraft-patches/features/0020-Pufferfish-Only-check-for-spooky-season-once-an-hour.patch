@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Paul Sauve <paul@technove.co>
-Date: Fri, 8 Nov 2024 19:50:07 +0800
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Mon, 10 Feb 2025 21:48:30 +0800
 Subject: [PATCH] Pufferfish: Only check for spooky season once an hour
 
 Airplane
@@ -19,11 +19,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-diff --git a/src/main/java/net/minecraft/world/entity/ambient/Bat.java b/src/main/java/net/minecraft/world/entity/ambient/Bat.java
-index 873e1318b33b6cb44c6b268d9345020051602e63..9176b959802c3b15a05a976619428ed4216f85b3 100644
---- a/src/main/java/net/minecraft/world/entity/ambient/Bat.java
-+++ b/src/main/java/net/minecraft/world/entity/ambient/Bat.java
-@@ -242,13 +242,25 @@ public class Bat extends AmbientCreature {
+diff --git a/net/minecraft/world/entity/ambient/Bat.java b/net/minecraft/world/entity/ambient/Bat.java
+index 4e19843aa777c7b1d57a1e80d3b636883b182f90..b75cf920b6b0c96de346cf82104c2a5062409832 100644
+--- a/net/minecraft/world/entity/ambient/Bat.java
++++ b/net/minecraft/world/entity/ambient/Bat.java
+@@ -243,12 +243,25 @@ public class Bat extends AmbientCreature {
          }
      }
  
@@ -33,11 +33,10 @@ index 873e1318b33b6cb44c6b268d9345020051602e63..9176b959802c3b15a05a976619428ed4
 +    private static int lastSpookyCheck = -ONE_HOUR;
      private static boolean isHalloween() {
          if (!one.tranic.sewlia.config.mod.optimization.Halloween.value) return false;
--        LocalDate localdate = LocalDate.now();
--        int i = localdate.get(ChronoField.DAY_OF_MONTH);
--        int j = localdate.get(ChronoField.MONTH_OF_YEAR);
--
--        return j == 10 && i >= 20 || j == 11 && i <= 3;
+-        LocalDate localDate = LocalDate.now();
+-        int i = localDate.get(ChronoField.DAY_OF_MONTH);
+-        int i1 = localDate.get(ChronoField.MONTH_OF_YEAR);
+-        return i1 == 10 && i >= 20 || i1 == 11 && i <= 3;
 +        final io.papermc.paper.threadedregions.ThreadedRegionizer.ThreadedRegion<io.papermc.paper.threadedregions.TickRegions.TickRegionData, io.papermc.paper.threadedregions.TickRegions.TickRegionSectionData> region =
 +                io.papermc.paper.threadedregions.TickRegionScheduler.getCurrentRegion();
 +        final long tickCount = region.getData().getCurrentTick();

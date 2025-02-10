@@ -333,6 +333,28 @@ index 09469ad131622158fe5579216fc4164251ff2220..9af4a971c0ba654013ffa567df847d53
      );
      final MinecraftServer server;
      public volatile boolean running;
+diff --git a/net/minecraft/server/network/ServerLoginPacketListenerImpl.java b/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
+index 159f2f169d26b436a70006f7bc9bdc481315dd32..15753e2c0cd47ff9883027c39b84750df2d523a6 100644
+--- a/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
++++ b/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
+@@ -41,6 +41,8 @@ import net.minecraft.util.Crypt;
+ import net.minecraft.util.CryptException;
+ import net.minecraft.util.RandomSource;
+ import net.minecraft.util.StringUtil;
++import one.tranic.sewlia.config.mod.feature.virtual_thread.minecraft.network.Authenticator;
++import one.tranic.sewlia.config.util.ThreadConfig;
+ import org.apache.commons.lang3.Validate;
+ import org.slf4j.Logger;
+ // CraftBukkit start
+@@ -55,7 +57,7 @@ public class ServerLoginPacketListenerImpl implements ServerLoginPacketListener,
+     // CraftBukkit end
+     private static final AtomicInteger UNIQUE_THREAD_ID = new AtomicInteger(0);
+     static final Logger LOGGER = LogUtils.getLogger();
+-    private static final java.util.concurrent.ExecutorService authenticatorPool = java.util.concurrent.Executors.newCachedThreadPool(new com.google.common.util.concurrent.ThreadFactoryBuilder().setNameFormat("User Authenticator #%d").setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(LOGGER)).build()); // Paper - Cache authenticator threads
++    private static final java.util.concurrent.ExecutorService authenticatorPool = java.util.concurrent.Executors.newCachedThreadPool(new com.google.common.util.concurrent.ThreadFactoryBuilder().setNameFormat("User Authenticator #%d").setThreadFactory(ThreadConfig.getThreadFactory(Authenticator.value)).setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(LOGGER)).build()); // Paper - Cache authenticator threads
+     private static final int MAX_TICKS_BEFORE_LOGIN = 600;
+     private final byte[] challenge;
+     final MinecraftServer server;
 diff --git a/net/minecraft/server/rcon/thread/GenericThread.java b/net/minecraft/server/rcon/thread/GenericThread.java
 index 08a65cf9d8f64a42df0accc3463cc7077c096b3c..3c4265466f08607564d70e3a56c9db4d723ad1b3 100644
 --- a/net/minecraft/server/rcon/thread/GenericThread.java
