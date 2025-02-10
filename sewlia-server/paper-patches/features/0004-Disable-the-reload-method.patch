@@ -1,18 +1,18 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: 404Setup <153366651+404Setup@users.noreply.github.com>
-Date: Sun, 3 Nov 2024 00:59:00 +0800
+Date: Mon, 10 Feb 2025 15:28:45 +0800
 Subject: [PATCH] Disable the `reload` method
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index bcc4adf7f781b009000e42edc2e1b649f63f8e87..1a5bbb64f4f856ebb79dec6f7436be8fca898eb2 100644
+index cfd62247ca8659670a9c2c0283f876993376d1eb..5d4448ea4557f2cb24b41b398914d5f36c91c61d 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -1085,6 +1085,7 @@ public final class CraftServer implements Server {
+@@ -1086,6 +1086,7 @@ public final class CraftServer implements Server {
  
      @Override
      public void reload() {
-+        if (true) return;
++        if (true) logger.log(Level.WARNING, "Folia/Sewlia does not support reloading the server."); // Sewlia
          // Paper start - lifecycle events
          if (io.papermc.paper.plugin.lifecycle.event.LifecycleEventRunner.INSTANCE.blocksPluginReloading()) {
              throw new IllegalStateException(org.bukkit.command.defaults.ReloadCommand.RELOADING_DISABLED_MESSAGE);

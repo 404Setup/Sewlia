@@ -1,5 +1,35 @@
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
+@@ -394,6 +_,9 @@
+     public @Nullable String clientBrandName = null; // Paper - Brand support
+     public org.bukkit.event.player.PlayerQuitEvent.QuitReason quitReason = null; // Paper - Add API for quit reason; there are a lot of changes to do if we change all methods leading to the event
+ 
++    private boolean tpsBar = false; // Sewlia
++    private boolean ramBar = false; // Sewlia
++
+     // Paper start - rewrite chunk system
+     private ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
+     private final ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.ViewDistanceHolder viewDistanceHolder = new ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.ViewDistanceHolder();
+@@ -702,6 +_,9 @@
+         if (tag != null) {
+             BlockPos.CODEC.parse(NbtOps.INSTANCE, tag).resultOrPartial(LOGGER::error).ifPresent(pos -> this.raidOmenPosition = pos);
+         }
++
++        if (compound.contains("Sewlia.TPSBar")) { this.tpsBar = compound.getBoolean("Sewlia.TPSBar"); } // Sewlia
++        if (compound.contains("Sewlia.RamBar")) { this.ramBar = compound.getBoolean("Sewlia.RamBar"); } // Sewlia
+     }
+ 
+     @Override
+@@ -745,6 +_,9 @@
+                 .ifPresent(raidOmenPosition -> compound.put("raid_omen_position", raidOmenPosition));
+         }
+ 
++        compound.putBoolean("Sewlia.TPSBar", this.tpsBar); // Sewlia
++        compound.putBoolean("Sewlia.RamBar", this.ramBar); // Sewlia
++
+         this.saveEnderPearls(compound);
+     }
+ 
 @@ -2684,6 +_,7 @@
              this.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.CHANGE_GAME_MODE, gameMode.getId()));
              if (gameMode == GameType.SPECTATOR) {
@@ -8,3 +38,26 @@
                  this.stopRiding();
                  EnchantmentHelper.stopLocationBasedEffects(this);
              } else {
+@@ -3596,4 +_,22 @@
+         return (org.bukkit.craftbukkit.entity.CraftPlayer) super.getBukkitEntity();
+     }
+     // CraftBukkit end
++
++    // Sewlia start
++    public boolean tpsBar() {
++        return this.tpsBar;
++    }
++
++    public void tpsBar(boolean tpsBar) {
++        this.tpsBar = tpsBar;
++    }
++
++    public boolean ramBar() {
++        return this.ramBar;
++    }
++
++    public void ramBar(boolean ramBar) {
++        this.ramBar = ramBar;
++    }
++    // Sewlia end
+ }

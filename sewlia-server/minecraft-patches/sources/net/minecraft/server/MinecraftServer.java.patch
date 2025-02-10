@@ -1,0 +1,10 @@
+--- a/net/minecraft/server/MinecraftServer.java
++++ b/net/minecraft/server/MinecraftServer.java
+@@ -1174,6 +_,7 @@
+         this.safeShutdown(waitForServer, false);
+     }
+     public void safeShutdown(boolean waitForServer, boolean isRestarting) {
++        one.tranic.sewlia.task.BossBarTask.stopAll(); //Sewlia
+         this.isRestarting = isRestarting;
+         this.hasLoggedStop = true; // Paper - Debugging
+         if (isDebugging()) io.papermc.paper.util.TraceUtil.dumpTraceForThread("Server stopped"); // Paper - Debugging

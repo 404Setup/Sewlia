@@ -39,7 +39,7 @@ public class ConfigUtils {
                 )
         );
 
-        @Nullable Map<Class<?>, String> clz = ConfigScanner.getClasss();
+        @Nullable Map<Class<?>, String> clz = ConfigScanner.getClassConfigurations();
         if (clz != null && !clz.isEmpty()) {
             for (Map.Entry<Class<?>, String> entry : clz.entrySet())
                 ConfigScanner.processStaticValueFieldWithWrite(entry.getKey(), entry.getValue());
@@ -49,7 +49,7 @@ public class ConfigUtils {
     }
 
     private static void readAll(boolean isReload) {
-        @Nullable Map<Class<?>, String> clz = ConfigScanner.getClasss();
+        @Nullable Map<Class<?>, String> clz = ConfigScanner.getClassConfigurations();
         if (clz == null || clz.isEmpty()) return;
         for (Map.Entry<Class<?>, String> entry : clz.entrySet())
             ConfigScanner.processStaticValueFieldWithRead(entry.getKey(), entry.getValue(), isReload);

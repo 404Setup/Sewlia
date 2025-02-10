@@ -151,10 +151,10 @@ index 8834c2ecafdf79577a9c69cd188709da6ee8ea62..a5d7acc89654f1c81c2234ba8005eae6
  
  public class Main {
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index faf72dd6dff74296c73cb058aaabd1f9f475a072..ff0cebc87d7369d72afb1573830e516766393c46 100644
+index e4b16d93e7d0067910304bf5fbcf31e0aad7ef5d..54b55e8da9cbb116f051136fc2b597052eb265d8 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -2851,7 +2851,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -2852,7 +2852,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      }
  
      public final java.util.concurrent.ExecutorService chatExecutor = java.util.concurrent.Executors.newCachedThreadPool(
@@ -194,7 +194,7 @@ index 2fc1c63dd6ba1894ad4d7c70b8e1c8cbac252c57..662bc6f5df8d85864f3ae4d644eec01b
              thread1.start();
          }
 diff --git a/net/minecraft/server/dedicated/DedicatedServer.java b/net/minecraft/server/dedicated/DedicatedServer.java
-index 9ab82b33fd49f529cfde3e731a092f9b62023d67..dde0382c263237f97f1f8dedc539f9236b87cef6 100644
+index 18487a08c4bc358c825367ac5a4272d023e0ec23..e7a757b23171328646b7b18dfb20370e039f8e1d 100644
 --- a/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -1,20 +1,16 @@
@@ -288,7 +288,7 @@ index 9ab82b33fd49f529cfde3e731a092f9b62023d67..dde0382c263237f97f1f8dedc539f923
                  thread1.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandlerWithName(LOGGER));
                  thread1.setName("Server Watchdog");
                  thread1.setDaemon(true);
-@@ -454,7 +409,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -456,7 +411,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
                      sender.sendMessage(net.kyori.adventure.text.Component.text("Failed to dump chunk information, see console", net.kyori.adventure.text.format.NamedTextColor.RED));
                  }
              };

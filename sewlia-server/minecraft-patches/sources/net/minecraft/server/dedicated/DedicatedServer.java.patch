@@ -8,3 +8,12 @@
          this.server.spark.enableEarlyIfRequested(); // Paper - spark
          // Paper start - fix converting txt to json file; convert old users earlier after PlayerList creation but before file load/save
          if (this.convertOldUsers()) {
+@@ -349,6 +_,8 @@
+                 MinecraftServerStatistics.registerJmxMonitoring(this);
+                 LOGGER.info("JMX monitoring enabled");
+             }
++
++            one.tranic.sewlia.task.BossBarTask.startAll(); // Sewlia
+ 
+             return true;
+         }
