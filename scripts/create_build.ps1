@@ -1,135 +1,135 @@
 #!/usr/bin/env pwsh
 
-# Powered by Transoft, distributed in the GPL-3 protocol.
-# https://github.com/LevelTranic
-
-# This is a temporary version and I will roll it back soon.
-# Because of a server-side bug, I found the problem only after six hours of troubleshooting.
-
 param(
     [string]$mcVersion,
     [string]$token,
     [string]$channel = "default"
 )
 
-$currentDirectory = Get-Location
-
-if (-not (Test-Path "$currentDirectory\.git")) {
-    Write-Error "Current directory is not a Git repository."
-    exit 1
+$SCRIPT_CONFIG = @{
+    ApiBaseUrl = "https://mars.tranic.one"
+    BuildLibsPath = "sewlia-server/build/libs"
+    UserAgent = "Mars-Utils/v1"
 }
 
-$repoNameClassic = git rev-parse --show-toplevel | Split-Path -Leaf
-$repoName = $repoNameClassic.ToLower()
-
-$api = "https://mars.tranic.one"
-
-if (-not $token)
-{
-    $token = $env:MARS_TOKEN
-    if (-not $token)
-    {
-        Write-Error 'Mars Token cannot be empty, you need to set $MARS_TOKEN="YOUR_MARS_API_TOKEN" in the environment variable'
-        exit 1
+function Assert-GitRepository {
+    $currentDirectory = Get-Location
+    if (-not (Test-Path "$currentDirectory\.git")) {
+        Exit-WithError "Current directory is not a Git repository."
     }
 }
 
-function Get-GitInfo
-{
-    $commit = git log -1 --pretty=format:"%H"
-    $title = git log -1 --pretty=format:"%s"
-    $message = (git log -1 --pretty=format:"%B") -replace "`r`n", "\n" -replace "`n", "\n"
+function Assert-ValidToken {
+    param([string]$token)
 
+    if (-not $token) {
+        $token = $env:MARS_TOKEN
+        if (-not $token) {
+            Exit-WithError 'Mars Token cannot be empty, you need to set $MARS_TOKEN="YOUR_MARS_API_TOKEN" in the environment variable'
+        }
+    }
+    return $token
+}
+
+function Exit-WithError {
+    param([string]$message)
+    Write-Error $message
+    exit 1
+}
+
+function Get-RepositoryInfo {
+    $repoNameClassic = git rev-parse --show-toplevel | Split-Path -Leaf
+    return @{
+        ClassicName = $repoNameClassic
+        NormalizedName = $repoNameClassic.ToLower()
+    }
+}
+
+function Get-GitInfo {
+    param([string]$repoName)
+
+    $commit = git log -1 --pretty=format:"%H"
     return @{
         Commit = $commit
-        Title = $title
-        Message = $message
+        Title = git log -1 --pretty=format:"%s"
+        Message = (git log -1 --pretty=format:"%B") -replace "`r`n", "\n" -replace "`n", "\n"
         RepoName = $repoName
     }
 }
 
-function Get-BuildInfo
-{
-    $buildLibsDir = "sewlia-server/build/libs"
-    Write-Host (Get-ChildItem $buildLibsDir)
-    $filePattern = "$buildLibsDir/*.jar"
-    $files = Get-ChildItem -Path $filePattern
+function Get-BuildInfo {
+    param(
+        [string]$repoName,
+        [string]$repoNameClassic,
+        [string]$mcVersion
+    )
 
-    if ($files.Count -eq 0)
-    {
-        Write-Error "No jar files found in $buildLibsDir"
-        exit 1
+    $files = Get-ChildItem -Path "$($SCRIPT_CONFIG.BuildLibsPath)/*.jar"
+    if ($files.Count -eq 0) {
+        Exit-WithError "No jar files found in $($SCRIPT_CONFIG.BuildLibsPath)"
     }
 
-    $fileInfo = @{ }
-    foreach ($file in $files)
-    {
-        if ($file.Name -match "$repoName-paperclip-(\d+\.\d+\.\d+)(-[^\-]+)*\.jar")
-        {
+    $fileInfo = @{}
+    foreach ($file in $files) {
+        if ($file.Name -match "$repoName-paperclip-(\d+\.\d+\.\d+)(-[^\-]+)*\.jar") {
             $key = $matches[1]
-            $version = $matches[2]
             $commitHash = (git log -1 --pretty=format:"%H")[0..6] -join ""
             $fileHash = Get-FileHash $file.FullName SHA256
+
             $fileInfo[$key] = @{
                 name = $file.Name
                 sha256 = $fileHash.Hash
-                url = "https://github.com/404Setup/$( $repoNameClassic )/releases/download/$mcVersion-$commitHash/$( $file.Name )"
+                url = "https://github.com/404Setup/$($repoNameClassic)/releases/download/$mcVersion-$commitHash/$($file.Name)"
             }
         }
     }
 
-    if ($fileInfo.Count -eq 0)
-    {
-        Write-Error "No valid jar files found in $buildLibsDir"
-        exit 1
+    if ($fileInfo.Count -eq 0) {
+        Exit-WithError "No valid jar files found in $($SCRIPT_CONFIG.BuildLibsPath)"
     }
 
     return @{
         Files = $fileInfo
-        Version = $version
-        Family = $version -replace "\.\d+$"
+        Version = $mcVersion
+        Family = $mcVersion -replace "\.\d+$"
     }
 }
 
-function Send-JsonData
-{
+function Invoke-MarsApi {
     param (
-        [string]$url,
-        [string]$cookie,
-        [string]$userAgent,
+        [string]$endpoint,
+        [string]$token,
         [hashtable]$data
     )
 
-    $jsonData = $data | ConvertTo-Json -Depth 10
     $headers = @{
-        "Cookie" = $cookie
-        "User-Agent" = $userAgent
+        "Cookie" = "mars_token=$token"
+        "User-Agent" = $SCRIPT_CONFIG.UserAgent
         "Content-Type" = "application/json"
     }
 
-    try
-    {
-        Write-Output "Sending POST request to $url"
-        Write-Output "Headers: $( $headers | ConvertTo-Json -Depth 10 )"
-        Write-Output "Data: $jsonData"
+    try {
+        $url = "$($SCRIPT_CONFIG.ApiBaseUrl)$endpoint"
+        $response = Invoke-RestMethod -Uri $url -Method Post -Body ($data | ConvertTo-Json -Depth 10) -Headers $headers
 
-        $response = Invoke-RestMethod -Uri $url -Method Post -Body $jsonData -Headers $headers
+        if ($response -is [string]) {
+            Exit-WithError "API response is not a valid JSON object."
+        }
         return $response
     }
-    catch
-    {
-        Write-Error "Failed to send POST request to $url"
-        Write-Error "Exception message: $_"
-        Write-Error "StackTrace: $( $_.ScriptStackTrace )"
-        throw $_
+    catch {
+        Exit-WithError "Failed to send request to $url. Error: $_"
     }
 }
 
-$gitInfo = Get-GitInfo
-$buildInfo = Get-BuildInfo
+Assert-GitRepository
+$token = Assert-ValidToken $token
+$repoInfo = Get-RepositoryInfo
+$gitInfo = Get-GitInfo -repoName $repoInfo.NormalizedName
+$buildInfo = Get-BuildInfo -repoName $repoInfo.NormalizedName -repoNameClassic $repoInfo.ClassicName -mcVersion $mcVersion
 
-$jsonData = @{
-    project = $repoName
+$buildData = @{
+    project = $repoInfo.NormalizedName
     version = $buildInfo.Version
     family = $buildInfo.Family
     channel = $channel
@@ -142,63 +142,21 @@ $jsonData = @{
     )
 }
 
-$apiUrl = "$api/v2/new/build"
-$cookie = "mars_token=$token"
-$userAgent = "Mars-Utils/v1"
-
-Write-Output "Starting first API call to $apiUrl"
-$response = Send-JsonData -url $apiUrl -cookie $cookie -userAgent $userAgent -data $jsonData
-Write-Output "First API call response: $response"
-
-if ($response -is [string])
-{
-    Write-Error "API response is not a valid JSON object."
-    exit 1
+$buildResponse = Invoke-MarsApi -endpoint "/v2/new/build" -token $token -data $buildData
+if ($buildResponse.build_id -eq 0) {
+    Exit-WithError "Failed to get valid build_id from API response"
 }
 
-$responseObj = $response
-
-if ($responseObj -and $responseObj.build_id -ne 0)
-{
-    try
-    {
-        $uploadData = @{
-            project = $repoName
-            version = $buildInfo.Version
-            build = $responseObj.build_id
-            file = $buildInfo.Files
-        }
-
-        Write-Host $uploadData
-
-        $uploadAPI = "https://mars.tranic.one/v2/new/external_download"
-
-        $uploadResponse = Send-JsonData -url $uploadAPI -cookie $cookie -userAgent $userAgent -data $uploadData
-        Write-Output "upload API call response: $uploadResponse"
-
-        if ($uploadResponse -is [string])
-        {
-            Write-Error "API response is not a valid JSON object."
-            exit 1
-        }
-
-        if (-not $uploadResponse.result) {
-            Write-Error $uploadResponse
-            exit 1
-        }
-        $result = $uploadResponse.result
-        Write-Host "Server: $result"
-    }
-    catch
-    {
-        Write-Error "Failed to execute upload_files"
-        Write-Error "Exception message: $_"
-        Write-Error "StackTrace: $( $_.ScriptStackTrace )"
-        exit 1
-    }
+$uploadData = @{
+    project = $repoInfo.NormalizedName
+    version = $buildInfo.Version
+    build = $buildResponse.build_id
+    file = $buildInfo.Files
 }
-else
-{
-    Write-Error "Failed to get valid build_id from API response"
-    exit 1
+
+$uploadResponse = Invoke-MarsApi -endpoint "/v2/new/external_download" -token $token -data $uploadData
+if (-not $uploadResponse.result) {
+    Exit-WithError $uploadResponse
 }
+
+Write-Host "Server: $($uploadResponse.result)"
