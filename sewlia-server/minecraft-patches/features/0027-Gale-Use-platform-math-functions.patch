@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: 404Setup <153366651+404Setup@users.noreply.github.com>
-Date: Mon, 10 Feb 2025 22:46:03 +0800
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Tue, 8 Aug 2023 20:43:20 +0200
 Subject: [PATCH] Gale: Use platform math functions
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)

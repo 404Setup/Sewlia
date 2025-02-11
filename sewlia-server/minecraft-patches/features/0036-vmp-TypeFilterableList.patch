@@ -7,21 +7,19 @@ Source in https://github.com/RelativityMC/VMP-fabric
 
 com.ishland.vmp.common.general.collections.ITypeFilterableList;
 
-diff --git a/src/main/java/net/minecraft/util/ClassInstanceMultiMap.java b/src/main/java/net/minecraft/util/ClassInstanceMultiMap.java
-index 038710ba934a9a57815dfe9f414b98223b848385..1e44edd17c2c1b516bfe840b68aa06b17c5b4560 100644
---- a/src/main/java/net/minecraft/util/ClassInstanceMultiMap.java
-+++ b/src/main/java/net/minecraft/util/ClassInstanceMultiMap.java
-@@ -2,8 +2,7 @@ package net.minecraft.util;
- 
- import com.google.common.collect.ImmutableList;
+diff --git a/net/minecraft/util/ClassInstanceMultiMap.java b/net/minecraft/util/ClassInstanceMultiMap.java
+index 2a708ae0d5bb209650b525e3c56051f8b5655074..18f3edd0fb5ae5c9261ffd84e2602e29612e72d0 100644
+--- a/net/minecraft/util/ClassInstanceMultiMap.java
++++ b/net/minecraft/util/ClassInstanceMultiMap.java
+@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
  import com.google.common.collect.Iterators;
--import com.google.common.collect.Lists;
--import com.google.common.collect.Maps;
-+import patch.com.ishland.vmp.common.general.collections.ITypeFilterableList; // Sewlia - vmp
+ import com.google.common.collect.Lists;
+ import com.google.common.collect.Maps;
++import com.ishland.vmp.common.general.collections.ITypeFilterableList; // Sewlia - vmp
  import java.util.AbstractCollection;
  import java.util.Collection;
  import java.util.Collections;
-@@ -13,10 +12,10 @@ import java.util.Map;
+@@ -13,10 +14,10 @@ import java.util.Map;
  import java.util.Map.Entry;
  import net.minecraft.Util;
  
@@ -33,10 +31,10 @@ index 038710ba934a9a57815dfe9f414b98223b848385..1e44edd17c2c1b516bfe840b68aa06b1
 -    private final List<T> allInstances = Lists.newArrayList();
 +    private final List<T> allInstances = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(); // Vine - vmp
  
-     public ClassInstanceMultiMap(Class<T> elementType) {
-         this.baseClass = elementType;
-@@ -55,19 +54,42 @@ public class ClassInstanceMultiMap<T> extends AbstractCollection<T> {
-         return this.find(object.getClass()).contains(object);
+     public ClassInstanceMultiMap(Class<T> baseClass) {
+         this.baseClass = baseClass;
+@@ -55,19 +56,42 @@ public class ClassInstanceMultiMap<T> extends AbstractCollection<T> {
+         return this.find(key.getClass()).contains(key);
      }
  
 +    // Sewlia start - vmp
@@ -57,7 +55,7 @@ index 038710ba934a9a57815dfe9f414b98223b848385..1e44edd17c2c1b516bfe840b68aa06b1
              throw new IllegalArgumentException("Don't know how to search for " + type);
          } else {
 -            List<? extends T> list = this.byClass
--                .computeIfAbsent(type, typeClass -> this.allInstances.stream().filter(typeClass::isInstance).collect(Util.toMutableList()));
+-                .computeIfAbsent(type, clazz -> this.allInstances.stream().filter(clazz::isInstance).collect(Util.toMutableList()));
 -            return (Collection<S>)Collections.unmodifiableCollection(list);
 +            List<? extends T> list = this.byClass.computeIfAbsent(type,
 +                    typeClass -> {
@@ -82,18 +80,3 @@ index 038710ba934a9a57815dfe9f414b98223b848385..1e44edd17c2c1b516bfe840b68aa06b1
      }
  
      public List<T> getAllInstances() {
-diff --git a/src/main/java/patch/com/ishland/vmp/common/general/collections/ITypeFilterableList.java b/src/main/java/patch/com/ishland/vmp/common/general/collections/ITypeFilterableList.java
-new file mode 100644
-index 0000000000000000000000000000000000000000..3a72c86551439c27886b37e50d56d2e535b4f8e0
---- /dev/null
-+++ b/src/main/java/patch/com/ishland/vmp/common/general/collections/ITypeFilterableList.java
-@@ -0,0 +1,8 @@
-+package patch.com.ishland.vmp.common.general.collections;
-+
-+// Source in https://github.com/RelativityMC/VMP-fabric
-+// com.ishland.vmp.common.general.collections.ITypeFilterableList;
-+
-+public interface ITypeFilterableList {
-+    Object[] getBackingArray();
-+}
-\ No newline at end of file
