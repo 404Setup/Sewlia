@@ -109,14 +109,14 @@ index e741201fdbea0dbbc0e42313ebd33368014c9dc4..b0dab0387dd86c235accd6bdcea75a98
              SharedConstants.getCurrentVersion().getName(),
              getManifestAttribute(manifest, ATTRIBUTE_BUILD_NUMBER)
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index ecb0fcd1f3b3f3d7751eded3cdf0977c1889c9ed..6c13f46a71ec4b7a87b1180f692c33e69982a998 100644
+index bf5343b0847e9f57ffbc7f33714ae6ca62f14332..08d6d25d03c04d44b2a924457ce9de6744b68962 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
 @@ -267,7 +267,7 @@ public class Main {
                      if (buildDate.before(deadline.getTime())) {
                          // Paper start - This is some stupid bullshit
                          System.err.println("*** Warning, you've not updated in a while! ***");
--                        System.err.println("*** Please download a new build as per instructions from https://papermc.io/downloads/paper ***"); // Paper
+-                        System.err.println("*** Please download a new build from https://papermc.io/downloads/paper ***"); // Paper
 +                        System.err.println("*** Please download a new build as per instructions from https://tranic.one/downloads/sewlia ***"); // Paper // Sewlia
                          //System.err.println("*** Server will start in 20 seconds ***");
                          //Thread.sleep(TimeUnit.SECONDS.toMillis(20));
