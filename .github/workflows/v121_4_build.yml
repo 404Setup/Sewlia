@@ -20,8 +20,14 @@ jobs:
           gradle-version: 8.12.1
       - name: Setup Powershell
         run: |
-          wget https://github.com/PowerShell/PowerShell/releases/download/v7.5.0/powershell_7.5.0-1.deb_amd64.deb
-          sudo dpkg -i powershell_7.5.0-1.deb_amd64.deb
+          sudo apt-get update
+          sudo apt-get install -y wget apt-transport-https software-properties-common
+          source /etc/os-release
+          wget -q https://packages.microsoft.com/config/ubuntu/$VERSION_ID/packages-microsoft-prod.deb
+          sudo dpkg -i packages-microsoft-prod.deb
+          rm packages-microsoft-prod.deb
+          sudo apt-get update
+          sudo apt-get install -y powershell
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -30,7 +36,7 @@ jobs:
       - name: Configure Git User Details
         run: git config --global user.email "no-reply@tranic.one" && git config --global user.name "TranicDev"
       - name: Apply Patches
-        run: ./patch.ps1
+        run: pwsh patch.ps1
       - name: CreateJar
         run: gradle createMojmapPaperclipJar
       - name: SetENV
