@@ -72,11 +72,10 @@ function Get-BuildInfo {
     $fileInfo = @{}
     foreach ($file in $files) {
         if ($file.Name -match "$repoName-paperclip-(\d+\.\d+\.\d+)(-[^\-]+)*\.jar") {
-            $key = $matches[1]
             $commitHash = (git log -1 --pretty=format:"%H")[0..6] -join ""
             $fileHash = Get-FileHash $file.FullName SHA256
 
-            $fileInfo[$key] = @{
+            $fileInfo["paperclip"] = @{
                 name = $file.Name
                 sha256 = $fileHash.Hash
                 url = "https://github.com/404Setup/$($repoNameClassic)/releases/download/$mcVersion-$commitHash/$($file.Name)"
