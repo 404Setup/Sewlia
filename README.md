@@ -10,8 +10,6 @@ Sewlia. 1.21.4
 
 ----
 
-**Sewlia is arranging to migrate to a hard-fork, during which most patches will be unavailable.**
-
 ## What is Sewlia?
 
 It is built on Folia.
@@ -32,17 +30,16 @@ which can relieve me from boredom.
 
 ## Features
 - Some vanilla abilities
-- Some strange optimizations
+- Optimization borrowed from everywhere
 - Some fixes
 - I don't know
 
 ## Temporarily unavailable
 This refers to patches that once existed in Sewlia, but have not been provided due to version upgrades.
 
-- Full VT2 > A small part is broken, but it doesn't affect much. There is no time to process the complete TickThread for the time being.
+- Full VT2 > A small part was damaged, but it didn't affect much. There are plans to make it compatible with threads that depend on TickThread, but it's a bit cumbersome.
 - Secure Seed > Low priority
 - Other patches > In order
-- Vine patches > There are too many, and many of them no longer work in the current version and require additional fixes.
 
 ## Thanks
 Sewlia gets patches or inspiration from the following server software or projects. 
