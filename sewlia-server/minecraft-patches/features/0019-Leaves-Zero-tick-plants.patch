@@ -1,0 +1,74 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: violetc <58360096+s-yh-china@users.noreply.github.com>
+Date: Sun, 30 Jul 2023 12:20:16 +0800
+Subject: [PATCH] Leaves: Zero tick plants
+
+You can find the original code on https://github.com/LeavesMC/Leaves
+
+diff --git a/net/minecraft/world/level/block/CactusBlock.java b/net/minecraft/world/level/block/CactusBlock.java
+index 913779c68b178dbbfac3b1dcee0c6342028e5570..b7d0e6f992a37ed2422b415d559aa063bd9090f7 100644
+--- a/net/minecraft/world/level/block/CactusBlock.java
++++ b/net/minecraft/world/level/block/CactusBlock.java
+@@ -43,6 +43,10 @@ public class CactusBlock extends Block {
+     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+         if (!state.canSurvive(level, pos)) {
+             level.destroyBlock(pos, true);
++        // Leaves start - zero tick plants
++        } else if (one.tranic.sewlia.config.mod.feature.ZeroTickPlants.value) {
++            this.randomTick(state, level, pos, random);
++            // Leaves end - zero tick plants
+         }
+     }
+ 
+diff --git a/net/minecraft/world/level/block/ChorusFlowerBlock.java b/net/minecraft/world/level/block/ChorusFlowerBlock.java
+index 3af8f150474a8a461c5829850172196b7b9e7bfd..aa17e9dc80a569dd5a2624e06cc294bb7bea8906 100644
+--- a/net/minecraft/world/level/block/ChorusFlowerBlock.java
++++ b/net/minecraft/world/level/block/ChorusFlowerBlock.java
+@@ -49,6 +49,10 @@ public class ChorusFlowerBlock extends Block {
+     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+         if (!state.canSurvive(level, pos)) {
+             level.destroyBlock(pos, true);
++        // Leaves start - zero tick plants
++        } else if (one.tranic.sewlia.config.mod.feature.ZeroTickPlants.value) {
++            this.randomTick(state, level, pos, random);
++            // Leaves end - zero tick plants
+         }
+     }
+ 
+diff --git a/net/minecraft/world/level/block/GrowingPlantHeadBlock.java b/net/minecraft/world/level/block/GrowingPlantHeadBlock.java
+index 0994f7265322d1f33365a1df0faaffd9df05fcc0..ea8fdf5862b5c93cb81f2f9ebeef19d8633ea42e 100644
+--- a/net/minecraft/world/level/block/GrowingPlantHeadBlock.java
++++ b/net/minecraft/world/level/block/GrowingPlantHeadBlock.java
+@@ -42,6 +42,17 @@ public abstract class GrowingPlantHeadBlock extends GrowingPlantBlock implements
+         return state.getValue(AGE) < 25;
+     }
+ 
++    // Leaves start - zero tick plants
++    @Override
++    public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
++        if (!state.canSurvive(world, pos)) {
++            world.destroyBlock(pos, true);
++        } else if (one.tranic.sewlia.config.mod.feature.ZeroTickPlants.value) {
++            this.randomTick(state, world, pos, random);
++        }
++    }
++    // Leaves end - zero tick plants
++
+     @Override
+     protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+         // Spigot start
+diff --git a/net/minecraft/world/level/block/SugarCaneBlock.java b/net/minecraft/world/level/block/SugarCaneBlock.java
+index 63d53f9090caca304c7f8c3f9910c57a6bdbb4d5..4e5346673145f93e4fa5a613ecf5c64ecea6eea5 100644
+--- a/net/minecraft/world/level/block/SugarCaneBlock.java
++++ b/net/minecraft/world/level/block/SugarCaneBlock.java
+@@ -44,6 +44,10 @@ public class SugarCaneBlock extends Block {
+     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+         if (!state.canSurvive(level, pos)) {
+             level.destroyBlock(pos, true);
++        // Leaves start - zero tick plants
++        } else if (one.tranic.sewlia.config.mod.feature.ZeroTickPlants.value) {
++            this.randomTick(state, level, pos, random);
++            // Leaves end - zero tick plants
+         }
+     }
+ 

@@ -48,10 +48,15 @@ This refers to patches that once existed in Sewlia, but have not been provided d
 Sewlia gets patches or inspiration from the following server software or projects. 
 Thanks to these developers for their contributions.
 
+- CaffeineMC/lithium-fabric
 - Dreeam-qwq/Gale
+- KaiijuMC/Kaiiju
 - LumminolMC/Luminol 
 - LeavesMC/Leaves
-- Winds-Studio/Leaf
+- RelativityMC/VMP-fabric 
 - SparklyPower/SparklyPaper
+- TECHNOVE/Airplane
+- Winds-Studio/Leaf
+- MultiPaper/MultiPaper
+- PaperMC/Velocity
 - pufferfish-gg/Pufferfish
-- KaiijuMC/Kaiiju

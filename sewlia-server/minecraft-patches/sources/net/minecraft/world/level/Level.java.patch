@@ -1,0 +1,10 @@
+--- a/net/minecraft/world/level/Level.java
++++ b/net/minecraft/world/level/Level.java
+@@ -1806,7 +_,6 @@
+     public List<Entity> getEntities(@Nullable Entity entity, AABB boundingBox, Predicate<? super Entity> predicate) {
+         ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread((ServerLevel)this, boundingBox, "Cannot getEntities asynchronously"); // Folia - region threading
+         Profiler.get().incrementCounter("getEntities");
+-        List<Entity> list = Lists.newArrayList();
+ 
+         // Paper start - rewrite chunk system
+         final List<Entity> ret = new java.util.ArrayList<>();
