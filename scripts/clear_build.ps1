@@ -12,11 +12,17 @@ if (Test-Path "$currentDirectory\.git") {
 
     if (Test-Path $jarDirectory) {
         $regexPattern = "$gitRepoName-bundler-(\d+\.\d+\.\d+)(-[^\-]+)*\.jar"
+        $regexSPattern = "$gitRepoName-server-(\d+\.\d+\.\d+)(-[^\-]+)*\.jar"
 
         Get-ChildItem -Path $jarDirectory -Filter "*.jar" | Where-Object { $_.Name -match $regexPattern } | ForEach-Object {
             Write-Host "Deleting file: $($_.FullName)"
             Remove-Item -Path $_.FullName -Force
         }
+
+        Get-ChildItem -Path $jarDirectory -Filter "*.jar" | Where-Object { $_.Name -match $regexSPattern } | ForEach-Object {
+                    Write-Host "Deleting file: $($_.FullName)"
+                    Remove-Item -Path $_.FullName -Force
+                }
     } else {
         Write-Error "Directory 'build/libs' does not exist."
         exit 1

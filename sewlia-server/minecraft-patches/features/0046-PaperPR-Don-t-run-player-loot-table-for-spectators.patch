@@ -1,0 +1,20 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Tue, 11 Feb 2025 14:27:58 +0800
+Subject: [PATCH] PaperPR: Don't run player loot table for spectators
+
+source: https://github.com/PaperMC/Paper/pull/11801
+
+diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
+index bc5a97ed58c9b0d7b58111c7ec5e8fdcbc2b9762..0986359baf8a9d5af87d7203b0139f87c94060e9 100644
+--- a/net/minecraft/server/level/ServerPlayer.java
++++ b/net/minecraft/server/level/ServerPlayer.java
+@@ -1276,7 +1276,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+                 }
+             }
+         }
+-        if (this.shouldDropLoot() && this.serverLevel().getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT)) { // Paper - fix player loottables running when mob loot gamerule is false
++        if (!this.isSpectator() && this.shouldDropLoot() && this.serverLevel().getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT)) { // Paper - fix player loottables running when mob loot gamerule is false // Sewlia - PaperPR
+             // SPIGOT-5071: manually add player loot tables (SPIGOT-5195 - ignores keepInventory rule)
+             this.dropFromLootTable(this.serverLevel(), cause, this.lastHurtByPlayerTime > 0);
+             // Paper - Restore vanilla drops behaviour; custom death loot is a noop on server player, remove.

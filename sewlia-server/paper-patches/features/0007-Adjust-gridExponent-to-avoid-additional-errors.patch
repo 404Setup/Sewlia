@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Tue, 11 Feb 2025 14:21:53 +0800
+Subject: [PATCH] Adjust gridExponent to avoid additional errors
+
+
+diff --git a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
+index 39527974210847d025e61868a3f4769d3cc5439f..8bac33548e24451ed0cc3eb43b9ca7cd462c207f 100644
+--- a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
++++ b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
+@@ -401,7 +401,7 @@ public class GlobalConfiguration extends ConfigurationPart {
+     public class ThreadedRegions extends ConfigurationPart {
+ 
+         public int threads = -1;
+-        public int gridExponent = 4;
++        public int gridExponent = 2;
+ 
+         @PostProcess
+         public void postProcess() {

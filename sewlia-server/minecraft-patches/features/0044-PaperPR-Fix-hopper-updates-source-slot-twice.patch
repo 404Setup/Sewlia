@@ -1,0 +1,21 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Tue, 11 Feb 2025 14:07:40 +0800
+Subject: [PATCH] PaperPR: Fix hopper updates source slot twice
+
+Fix: https://github.com/PaperMC/Paper/issues/11740
+
+source: https://github.com/PaperMC/Paper/pull/11945
+
+diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
+index ae988c4910421fb720177178ef6136e595ae6946..bc1b546167f2d0e75d0a8798fad9b022d9bd762c 100644
+--- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
++++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
+@@ -678,6 +678,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+     }
+ 
+     private static ItemStack tryMoveInItem(@Nullable Container source, Container destination, ItemStack stack, int slot, @Nullable Direction direction) {
++        stack = stack.copy(); // Paper - Perf: Optimize Hoppers
+         ItemStack item = destination.getItem(slot);
+         if (canPlaceItemInContainer(destination, stack, slot, direction)) {
+             boolean flag = false;

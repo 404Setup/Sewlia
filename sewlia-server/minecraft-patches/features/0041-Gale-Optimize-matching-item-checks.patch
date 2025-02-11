@@ -1,0 +1,26 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sun, 25 Dec 2022 20:51:32 +0100
+Subject: [PATCH] Gale: Optimize matching item checks
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Gale - https://galemc.org
+
+diff --git a/net/minecraft/world/item/ItemStack.java b/net/minecraft/world/item/ItemStack.java
+index d3b98f1d36b643989708ea22753a0c0d0d4243bc..db1dca668306dd89a07e79d7e916fb68bc57f064 100644
+--- a/net/minecraft/world/item/ItemStack.java
++++ b/net/minecraft/world/item/ItemStack.java
+@@ -885,11 +885,11 @@ public final class ItemStack implements DataComponentHolder {
+     }
+ 
+     public static boolean isSameItem(ItemStack stack, ItemStack other) {
+-        return stack.is(other.getItem());
++        return stack == other || stack.is(other.getItem()); // Gale - optimize identical item checks
+     }
+ 
+     public static boolean isSameItemSameComponents(ItemStack stack, ItemStack other) {
+-        return stack.is(other.getItem()) && (stack.isEmpty() && other.isEmpty() || Objects.equals(stack.components, other.components));
++        return stack == other || stack.is(other.getItem()) && (stack.isEmpty() && other.isEmpty() || Objects.equals(stack.components, other.components)); // Gale - optimize identical item checks
+     }
+ 
+     public static MapCodec<ItemStack> lenientOptionalFieldOf(String fieldName) {
