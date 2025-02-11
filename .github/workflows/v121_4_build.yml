@@ -40,11 +40,11 @@ jobs:
       - name: CreateJar
         run: gradle createMojmapPaperclipJar
       - name: SetENV
-        run: ./scripts/SetEnv.ps1
+        run: pwsh scripts/SetEnv.ps1
       - name: Clear Build
-        run: ./scripts/clear_build.ps1
+        run: pwsh scripts/clear_build.ps1
       - name: Upload to Mars API
-        run: ./scripts/create_build.ps1 ${{ env.mcversion }} ${{ secrets.MARS_TOKEN }}
+        run: pwsh scripts/create_build.ps1 ${{ env.mcversion }} ${{ secrets.MARS_TOKEN }}
       - name: Upload Artifact
         uses: "actions/upload-artifact@v4"
         with:

@@ -64,7 +64,7 @@ function Get-BuildInfo
     $fileInfo = @{ }
     foreach ($file in $files)
     {
-        if ($file.Name -match "$repoName-(bundler|paperclip)-(\d+\.\d+\.\d+)(-[^\-]+)*\.jar")
+        if ($file.Name -match "$repoName-paperclip-(\d+\.\d+\.\d+)(-[^\-]+)*\.jar")
         {
             $key = $matches[1]
             $version = $matches[2]

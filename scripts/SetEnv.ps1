@@ -26,7 +26,7 @@ $jarName = "$project_id-paperclip-$mcversion.jar"
 $jarName_dir = "sewlia-server/build/libs/$jarName"
 $make_latest = if ($preVersion -eq "true") { "false" } else { "true" }
 
-Move-Item "build/libs/$project_id-paperclip-$grdversion-mojmap.jar" $jarName_dir
+Move-Item "sewlia-server/build/libs/$project_id-paperclip-$grdversion-mojmap.jar" $jarName_dir
 
 Add-Content -Path $env:GITHUB_ENV -Value "project_id=$project_id"
 Add-Content -Path $env:GITHUB_ENV -Value "project_id_b=$project_id_b"
