@@ -29,9 +29,14 @@ Sewlia is another way for me to pass the time after Vine,
 which can relieve me from boredom.
 
 ## Features
+- Based on Folia
+- Built-in Maven download source acceleration
+- A little legacy from my first two works
+- Sewlia VT2 (Still a little bit short)
+- Micro-improved TPS commands
 - Some vanilla abilities
-- Optimization borrowed from everywhere
 - Some fixes
+- Optimization borrowed from everywhere
 - I don't know
 
 ## Temporarily unavailable
