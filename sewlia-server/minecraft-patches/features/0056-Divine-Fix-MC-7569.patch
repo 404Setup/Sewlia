@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Wed, 12 Feb 2025 23:04:26 +0800
+Subject: [PATCH] Divine: Fix MC-7569
+
+Original code by NONPLAYT
+You can find the original code on https://github.com/DivineMC/DivineMC
+
+Original post on Mojira: https://bugs.mojang.com/browse/MC-7569
+
+diff --git a/net/minecraft/server/rcon/RconConsoleSource.java b/net/minecraft/server/rcon/RconConsoleSource.java
+index 1fddeb10c5947c52840e55ca66c50dd4ad5425b9..637982fd7def9fbf8173153dd5a5b011cedd52bb 100644
+--- a/net/minecraft/server/rcon/RconConsoleSource.java
++++ b/net/minecraft/server/rcon/RconConsoleSource.java
+@@ -51,7 +51,7 @@ public class RconConsoleSource implements CommandSource {
+ 
+     @Override
+     public void sendSystemMessage(Component component) {
+-        this.buffer.append(component.getString());
++        this.buffer.append(component.getString()).append(System.lineSeparator());
+     }
+ 
+     @Override

@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Wed, 12 Feb 2025 22:49:58 +0800
+Subject: [PATCH] Divine: Fix MC-31819
+
+Original code by NONPLAYT
+You can find the original code on https://github.com/DivineMC/DivineMC
+
+diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
+index 1b16c46a3d8939f6a97b29845a72c250c50ef4eb..9eaf991bbf08098578f71a701dc0b9f0fa92a830 100644
+--- a/net/minecraft/world/entity/player/Player.java
++++ b/net/minecraft/world/entity/player/Player.java
+@@ -1846,6 +1846,9 @@ public abstract class Player extends LivingEntity {
+ 
+     public void causeFoodExhaustion(float exhaustion, org.bukkit.event.entity.EntityExhaustionEvent.ExhaustionReason reason) {
+         // CraftBukkit end
++        // DivineMC start - Fix MC-31819
++        if (this.level().getDifficulty() == Difficulty.PEACEFUL) return;
++        // DivineMC end
+         if (!this.abilities.invulnerable) {
+             if (!this.level().isClientSide) {
+                 // CraftBukkit start

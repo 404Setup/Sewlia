@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Wed, 12 Feb 2025 23:26:55 +0800
+Subject: [PATCH] CarpetFix: incorrectBounceLogicFix
+
+You can find the original code on https://github.com/fxmorin/carpet-fixes
+
+diff --git a/net/minecraft/world/level/block/SlimeBlock.java b/net/minecraft/world/level/block/SlimeBlock.java
+index 3cb84ca78d17bbf5af067e06cbaccaf51da336b7..0debcad642177b94e0bc3e2473bb685d0b1ab45c 100644
+--- a/net/minecraft/world/level/block/SlimeBlock.java
++++ b/net/minecraft/world/level/block/SlimeBlock.java
+@@ -42,6 +42,7 @@ public class SlimeBlock extends HalfTransparentBlock {
+         Vec3 deltaMovement = entity.getDeltaMovement();
+         if (deltaMovement.y < 0.0) {
+             double d = entity instanceof LivingEntity ? 1.0 : 0.8;
++            if (one.tranic.sewlia.config.mod.fix.IncorrectBounceLogic.value) entity.setOnGround(deltaMovement.y > -0.15); // Sewlia - CarpetFix  incorrectBounceLogicFix
+             entity.setDeltaMovement(deltaMovement.x, -deltaMovement.y * d, deltaMovement.z);
+         }
+     }

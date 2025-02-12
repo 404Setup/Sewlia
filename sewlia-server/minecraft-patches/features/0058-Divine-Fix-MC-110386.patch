@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Wed, 12 Feb 2025 23:13:50 +0800
+Subject: [PATCH] Divine: Fix MC-110386
+
+Original code by NONPLAYT
+You can find the original code on https://github.com/DivineMC/DivineMC
+
+See https://bugs.mojang.com/browse/MC-110386
+
+diff --git a/net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal.java b/net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal.java
+index 25fe78116ce01eeefe5c958423734195d27302eb..f536dd9836dad2770ae06ebed55b161dfcd60281 100644
+--- a/net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal.java
++++ b/net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal.java
+@@ -114,6 +114,7 @@ public class HurtByTargetGoal extends TargetGoal {
+     }
+ 
+     protected void alertOther(Mob mob, LivingEntity target) {
++        if (mob == target) return; // DivineMC - Fix MC-110386
+         mob.setTarget(target, org.bukkit.event.entity.EntityTargetEvent.TargetReason.TARGET_ATTACKED_NEARBY_ENTITY, true); // CraftBukkit - reason
+     }
+ }
