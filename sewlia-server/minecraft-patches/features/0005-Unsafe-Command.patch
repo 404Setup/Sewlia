@@ -1,0 +1,108 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Wed, 12 Feb 2025 21:59:53 +0800
+Subject: [PATCH] Unsafe Command
+
+
+diff --git a/net/minecraft/commands/Commands.java b/net/minecraft/commands/Commands.java
+index 39b704391fd77943922db2cac049e9ac62753972..10b8959595cf8e29f094ff831fdeb8c93f3b1455 100644
+--- a/net/minecraft/commands/Commands.java
++++ b/net/minecraft/commands/Commands.java
+@@ -157,8 +157,8 @@ public class Commands {
+         ClearInventoryCommands.register(this.dispatcher, context);
+         //CloneCommands.register(this.dispatcher, context); // Folia - region threading - TODO
+         DamageCommand.register(this.dispatcher, context);
+-        //DataCommands.register(this.dispatcher); // Folia - region threading - TODO
+-        //DataPackCommand.register(this.dispatcher); // Folia - region threading - TODO
++        if (one.tranic.sewlia.config.mod.unsafe.EnableDataCommand.value) DataCommands.register(this.dispatcher); // Folia - region threading - TODO
++        if (one.tranic.sewlia.config.mod.unsafe.EnableDatapackCommand.value) DataPackCommand.register(this.dispatcher); // Folia - region threading - TODO
+         //DebugCommand.register(this.dispatcher); // Folia - region threading - TODO
+         DefaultGameModeCommands.register(this.dispatcher);
+         DifficultyCommand.register(this.dispatcher);
+diff --git a/net/minecraft/server/commands/DataPackCommand.java b/net/minecraft/server/commands/DataPackCommand.java
+index 833434868d2c4adc5b28244bbd3d6f5943e9106d..3a44d50fc1ffb3babc99bb6eb8ae65273fa9be48 100644
+--- a/net/minecraft/server/commands/DataPackCommand.java
++++ b/net/minecraft/server/commands/DataPackCommand.java
+@@ -23,7 +23,7 @@ import net.minecraft.world.flag.FeatureFlagSet;
+ import net.minecraft.world.flag.FeatureFlags;
+ 
+ public class DataPackCommand {
+-    private static final DynamicCommandExceptionType ERROR_UNKNOWN_PACK = new DynamicCommandExceptionType(
++    /*private static final DynamicCommandExceptionType ERROR_UNKNOWN_PACK = new DynamicCommandExceptionType(
+         pack -> Component.translatableEscape("commands.datapack.unknown", pack)
+     );
+     private static final DynamicCommandExceptionType ERROR_PACK_ALREADY_ENABLED = new DynamicCommandExceptionType(
+@@ -54,13 +54,13 @@ public class DataPackCommand {
+                 .map(StringArgumentType::escapeIfRequired),
+             suggestionsBuilder
+         );
+-    };
++    };*/
+ 
+     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+         dispatcher.register(
+             Commands.literal("datapack")
+                 .requires(commandSourceStack -> commandSourceStack.hasPermission(2))
+-                .then(
++                /*.then(
+                     Commands.literal("enable")
+                         .then(
+                             Commands.argument("name", StringArgumentType.string())
+@@ -125,7 +125,7 @@ public class DataPackCommand {
+                                 .suggests(SELECTED_PACKS)
+                                 .executes(context -> disablePack(context.getSource(), getPack(context, "name", false)))
+                         )
+-                )
++                )*/
+                 .then(
+                     Commands.literal("list")
+                         .executes(context -> listPacks(context.getSource()))
+@@ -135,7 +135,7 @@ public class DataPackCommand {
+         );
+     }
+ 
+-    private static int enablePack(CommandSourceStack source, Pack pack, DataPackCommand.Inserter priorityCallback) throws CommandSyntaxException {
++    /*private static int enablePack(CommandSourceStack source, Pack pack, DataPackCommand.Inserter priorityCallback) throws CommandSyntaxException {
+         PackRepository packRepository = source.getServer().getPackRepository();
+         List<Pack> list = Lists.newArrayList(packRepository.getSelectedPacks());
+         priorityCallback.apply(list, pack);
+@@ -151,7 +151,7 @@ public class DataPackCommand {
+         source.sendSuccess(() -> Component.translatable("commands.datapack.modify.disable", pack.getChatLink(true)), true);
+         ReloadCommand.reloadPacks(list.stream().map(Pack::getId).collect(Collectors.toList()), source);
+         return list.size();
+-    }
++    }*/
+ 
+     private static int listPacks(CommandSourceStack source) {
+         return listEnabledPacks(source) + listAvailablePacks(source);
+@@ -198,7 +198,7 @@ public class DataPackCommand {
+         return selectedPacks.size();
+     }
+ 
+-    private static Pack getPack(CommandContext<CommandSourceStack> context, String name, boolean enabling) throws CommandSyntaxException {
++    /*private static Pack getPack(CommandContext<CommandSourceStack> context, String name, boolean enabling) throws CommandSyntaxException {
+         String string = StringArgumentType.getString(context, name);
+         PackRepository packRepository = context.getSource().getServer().getPackRepository();
+         Pack pack = packRepository.getPack(string);
+@@ -222,7 +222,7 @@ public class DataPackCommand {
+                 }
+             }
+         }
+-    }
++    }*/
+ 
+     interface Inserter {
+         void apply(List<Pack> currentPacks, Pack pack) throws CommandSyntaxException;
+diff --git a/net/minecraft/world/level/BaseCommandBlock.java b/net/minecraft/world/level/BaseCommandBlock.java
+index b02b79ccedb8b87bc22270377dfc36e21ebe1724..6443b3bf24e33a1a674567b7f7e2692d7f8946cd 100644
+--- a/net/minecraft/world/level/BaseCommandBlock.java
++++ b/net/minecraft/world/level/BaseCommandBlock.java
+@@ -114,7 +114,7 @@ public abstract class BaseCommandBlock implements CommandSource {
+     }
+ 
+     public boolean performCommand(Level level) {
+-        if (true) return false; // Folia - region threading
++        if (!one.tranic.sewlia.config.mod.unsafe.EnableCommandBlock.value) return false; // Folia - region threading
+         if (level.isClientSide || level.getGameTime() == this.lastExecution) {
+             return false;
+         } else if ("Searge".equalsIgnoreCase(this.command)) {
