@@ -34,6 +34,7 @@ which can relieve me from boredom.
 - A little legacy from my first two works
 - Sewlia VT2 (Still a little bit short)
 - Micro-improved TPS commands
+- Merge [YggdrasilProxy](https://modrinth.com/mod/yggdrasil-proxy)
 - Some vanilla abilities
 - Some fixes
 - Optimization borrowed from everywhere
