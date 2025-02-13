@@ -1,7 +1,6 @@
 package one.tranic.sewlia.preload;
 
-import one.tranic.sewlia.reflect.Reflect;
-import org.jetbrains.annotations.Nullable;
+import one.tranic.sewlia.reflect.NewReflect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,17 +8,13 @@ import java.io.IOException;
 import java.util.Set;
 
 public class Preload {
-    private final Logger logger = LoggerFactory.getLogger("Preload");
 
     public Preload() {
         try {
-            @Nullable Set<Preloads> set = Reflect.findAllClass("one.tranic.sewlia.preload.mod", Preloads.class);
-            if (set != null && !set.isEmpty()) {
-                for (Preloads preload : set) {
-                    preload.doPreload();
-                }
-            }
+            Set<Preloads> set = NewReflect.findAllClass("one.tranic.sewlia.preload.mod", Preloads.class);
+            if (!set.isEmpty()) for (Preloads preload : set) preload.doPreload();
         } catch (IOException e) {
+            Logger logger = LoggerFactory.getLogger("Sewlia-Preload");
             logger.error(e.getMessage());
         }
     }

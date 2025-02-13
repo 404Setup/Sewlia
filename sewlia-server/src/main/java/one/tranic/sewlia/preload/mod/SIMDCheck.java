@@ -6,10 +6,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SIMDCheck extends Preloads {
-    private final Logger logger = LoggerFactory.getLogger("SIMDUtils");
-
     @Override
     public void doPreload() {
+        Logger logger = LoggerFactory.getLogger("SIMDUtils");
+
         // Attempt to detect vectorization
         try {
             SIMDDetection.isEnabled = SIMDDetection.canEnable(logger);

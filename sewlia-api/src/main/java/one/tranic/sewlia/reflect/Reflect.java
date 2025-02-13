@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Set;
 
 public class Reflect {
+    @SuppressWarnings("unchecked")
     public static <T extends Class<?>> @Nullable Set<T> scanPackage(@Nullable T clazz, @NotNull String packageName) {
         @Nullable Set<String> set = scanPackageString(clazz, packageName);
         if (set == null || set.isEmpty()) return null;
@@ -47,23 +48,24 @@ public class Reflect {
         return scanPackageString(null, packageName);
     }
 
-    public static <T> @Nullable Set<T> findObjectClass(String packageName, Class<T> type) throws IOException {
+    public static <T> @NotNull Set<T> findObjectClass(String packageName, Class<T> type) throws IOException {
         return findClass(packageName, type, true, false);
     }
 
-    public static <T> @Nullable Set<T> findAllObjectClass(String packageName, Class<T> type) throws IOException {
+    public static <T> @NotNull Set<T> findAllObjectClass(String packageName, Class<T> type) throws IOException {
         return findClass(packageName, type, true, true);
     }
 
-    public static <T> @Nullable Set<T> findClass(String packageName, Class<T> type) throws IOException {
+    public static <T> @NotNull Set<T> findClass(String packageName, Class<T> type) throws IOException {
         return findClass(packageName, type, false, false);
     }
 
-    public static <T> @Nullable Set<T> findAllClass(String packageName, Class<T> type) throws IOException {
+    public static <T> @NotNull Set<T> findAllClass(String packageName, Class<T> type) throws IOException {
         return findClass(packageName, type, false, true);
     }
 
-    private static <T> @Nullable Set<T> findClass(String packageName, Class<T> type, boolean isObject, boolean allClass) throws IOException {
+    @SuppressWarnings("unchecked")
+    private static <T> @NotNull Set<T> findClass(String packageName, Class<T> type, boolean isObject, boolean allClass) throws IOException {
         Set<T> implSet = new ObjectArraySet<>();
         ClassPath classPath = ClassPath.from(Thread.currentThread().getContextClassLoader());
         Iterable<ClassPath.ClassInfo> classes = allClass ? classPath.getTopLevelClassesRecursive(packageName) : classPath.getTopLevelClasses(packageName);

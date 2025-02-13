@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.Proxy;
 import java.net.URI;
 import java.net.URL;
 import java.util.Map;
@@ -25,7 +26,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * used as the default Maven repository for dependency resolution.
  */
 public class Accelerate {
-    protected static final org.slf4j.Logger logger = LoggerFactory.getLogger("LibraryResolverAccelerate");
+    protected static final org.slf4j.Logger logger = LoggerFactory.getLogger("Sewlia-LibraryResolverAccelerate");
     protected static final String central = "https://repo.maven.apache.org/maven2";
     protected static final String central2 = "https://repo1.maven.org/maven2";
     protected static final URI centralUri = URI.create(central);
@@ -154,9 +155,8 @@ public class Accelerate {
         if (!maven.isEmpty()) return;
         try (ExecutorService executor = Executors.newCachedThreadPool(Thread.ofVirtual().factory())) {
             ObjectArrayList<Future<MirrorResult>> futures = new ObjectArrayList<>();
-            for (Map.Entry<String, String> entry : mirrors.entrySet()) {
+            for (Map.Entry<String, String> entry : mirrors.entrySet())
                 futures.add(executor.submit(() -> testMirror(entry.getKey(), entry.getValue())));
-            }
 
             long bestTime = Long.MAX_VALUE;
             String bestMirror = central;
@@ -196,7 +196,7 @@ public class Accelerate {
         long start = System.currentTimeMillis();
         HttpURLConnection connection = null;
         try {
-            connection = (HttpURLConnection) new URL(url).openConnection();
+            connection = (HttpURLConnection) new URL(url).openConnection(Proxy.NO_PROXY);
             connection.setRequestMethod("GET");
             connection.setConnectTimeout(3000);
             connection.setReadTimeout(3000);

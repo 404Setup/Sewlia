@@ -1,16 +1,18 @@
 package one.tranic.sewlia.config;
+
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import one.tranic.sewlia.config.annotation.*;
 import one.tranic.sewlia.reflect.Reflect;
 import org.jetbrains.annotations.Nullable;
+
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 public class ConfigScanner {
     public static @Nullable Map<Class<?>, String> getClasss() {
         Map<Class<?>, String> builder = new Object2ObjectOpenHashMap<>();
@@ -21,12 +23,14 @@ public class ConfigScanner {
         }
         return builder;
     }
+
     public static String generateKey(String fullClassName) {
         String cleanedName = fullClassName.replaceFirst("^one\\.tranic\\.sewlia\\.config\\.mod\\.", "");
         cleanedName = cleanedName.replaceAll("([a-z])([A-Z])", "$1-$2").toLowerCase();
         cleanedName = cleanedName.replaceAll("_", "-");
         return cleanedName;
     }
+
     public static void processStaticValueFieldWithWrite(Class<?> clazz, String key) {
         try {
             Field valueField = clazz.getDeclaredField("value");
@@ -52,14 +56,19 @@ public class ConfigScanner {
                 } else if (valueField.getAnnotation(InlineComments.class) != null) {
                     ConfigUtils.getConfiguration().setInlineComments(key, List.of(valueField.getAnnotation(InlineComments.class).value()));
                 }
-                Method wd = clazz.getMethod("WriteDo");
-                if (!Modifier.isStatic(wd.getModifiers())) return;
-                wd.setAccessible(true);
-                wd.invoke(null);
+
+                try {
+                    Method wd = clazz.getMethod("WriteDo");
+                    if (!Modifier.isStatic(wd.getModifiers())) return;
+                    wd.setAccessible(true);
+                    wd.invoke(null);
+                } catch (Exception ignored) {
+                }
             }
-        } catch (NoSuchFieldException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ignored) {
+        } catch (NoSuchFieldException | IllegalAccessException ignored) {
         }
     }
+
     public static void processStaticValueFieldWithRead(Class<?> clazz, String key, boolean isReload) {
         try {
             Field valueField = clazz.getDeclaredField("value");
@@ -80,12 +89,16 @@ public class ConfigScanner {
                     case null, default -> {
                     }
                 }
-                Method dd = clazz.getMethod("ReadDo");
-                if (!Modifier.isStatic(dd.getModifiers())) return;
-                dd.setAccessible(true);
-                dd.invoke(null);
+
+                try {
+                    Method rd = clazz.getMethod("ReadDo");
+                    if (!Modifier.isStatic(rd.getModifiers())) return;
+                    rd.setAccessible(true);
+                    rd.invoke(null);
+                } catch (Exception ignored) {
+                }
             }
-        } catch (NoSuchFieldException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ignored) {
+        } catch (NoSuchFieldException | IllegalAccessException ignored) {
         }
     }
 }

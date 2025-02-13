@@ -23,7 +23,10 @@ public class ConfigUtils {
                 configFile.createNewFile();
             }
             configuration = YamlConfiguration.loadConfiguration(configFile);
-            if (!isCommandSource) addDefaults(configFile);
+            if (!isCommandSource) {
+                addDefaults(configFile);
+                addDefaults(configFile);
+            }
             readAll(isCommandSource);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -39,19 +42,19 @@ public class ConfigUtils {
                 )
         );
 
-        @Nullable Map<Class<?>, String> clz = ConfigScanner.getClasss();
+        @Nullable Map<Class<?>, String> clz = NewConfigScanner.getClasses();
         if (clz != null && !clz.isEmpty()) {
             for (Map.Entry<Class<?>, String> entry : clz.entrySet())
-                ConfigScanner.processStaticValueFieldWithWrite(entry.getKey(), entry.getValue());
+                NewConfigScanner.processStaticValueFieldWithWrite(entry.getKey(), entry.getValue());
         }
         configuration.options().copyDefaults(true);
         configuration.save(file);
     }
 
     private static void readAll(boolean isReload) {
-        @Nullable Map<Class<?>, String> clz = ConfigScanner.getClasss();
+        @Nullable Map<Class<?>, String> clz = NewConfigScanner.getClasses();
         if (clz == null || clz.isEmpty()) return;
         for (Map.Entry<Class<?>, String> entry : clz.entrySet())
-            ConfigScanner.processStaticValueFieldWithRead(entry.getKey(), entry.getValue(), isReload);
+            NewConfigScanner.processStaticValueFieldWithRead(entry.getKey(), entry.getValue(), isReload);
     }
 }
