@@ -1,0 +1,58 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Thu, 13 Feb 2025 16:45:39 +0800
+Subject: [PATCH] ModernFix: MojangRegistrySize
+
+This patch is based on following mixins:
+* "org/embeddedt/modernfix/common/mixin/perf/mojang_registry_size/ResourceKeyMixin.java"
+By: embeddedt <42941056+embeddedt@users.noreply.github.com>
+As part of: ModernFix (https://github.com/embeddedt/ModernFix)
+Licensed under: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+
+diff --git a/net/minecraft/resources/ResourceKey.java b/net/minecraft/resources/ResourceKey.java
+index 057ffca1851ac438532c18642d3ffda120b6104d..99f01aaf1a606b9fcc5ef014794caa1c101e1b1e 100644
+--- a/net/minecraft/resources/ResourceKey.java
++++ b/net/minecraft/resources/ResourceKey.java
+@@ -3,14 +3,21 @@ package net.minecraft.resources;
+ import com.google.common.collect.MapMaker;
+ import com.mojang.serialization.Codec;
+ import io.netty.buffer.ByteBuf;
++
++import java.util.Map;
+ import java.util.Optional;
+ import java.util.concurrent.ConcurrentMap;
++
++import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+ import net.minecraft.core.Registry;
+ import net.minecraft.core.registries.Registries;
+ import net.minecraft.network.codec.StreamCodec;
++import org.jetbrains.annotations.Nullable;
+ 
+ public class ResourceKey<T> {
+-    private static final ConcurrentMap<ResourceKey.InternKey, ResourceKey<?>> VALUES = new MapMaker().weakValues().makeMap();
++    private static final boolean Compact = one.tranic.sewlia.config.mod.optimization.MojangRegistrySize.value;
++    private static final @Nullable Map<ResourceLocation, Map<ResourceLocation, ResourceKey<?>>> INTERNING_MAP = Compact ? new Object2ObjectOpenHashMap<>() : null;
++    private static final @Nullable ConcurrentMap<ResourceKey.InternKey, ResourceKey<?>> VALUES = Compact ? null : new MapMaker().weakValues().makeMap();
+     private final ResourceLocation registryName;
+     private final ResourceLocation location;
+ 
+@@ -30,9 +37,18 @@ public class ResourceKey<T> {
+         return create(Registries.ROOT_REGISTRY_NAME, location);
+     }
+ 
++    // Sewlia start
++    @SuppressWarnings("all")
+     private static <T> ResourceKey<T> create(ResourceLocation registryName, ResourceLocation location) {
+-        return (ResourceKey<T>)VALUES.computeIfAbsent(new ResourceKey.InternKey(registryName, location), key -> new ResourceKey(key.registry, key.location));
++        if (!Compact)
++            return (ResourceKey<T>)VALUES.computeIfAbsent(new ResourceKey.InternKey(registryName, location), key -> new ResourceKey(key.registry, key.location));
++        synchronized (ResourceKey.class) {
++            Map<ResourceLocation, ResourceKey<?>> keys = INTERNING_MAP.computeIfAbsent(registryName, k -> new Object2ObjectOpenHashMap<>());
++            ResourceKey<?> key = keys.computeIfAbsent(location, l -> new ResourceKey<>(registryName, l));
++            return (ResourceKey<T>)key;
++        }
+     }
++    // Sewlia end
+ 
+     private ResourceKey(ResourceLocation registryName, ResourceLocation location) {
+         this.registryName = registryName;

@@ -1,0 +1,46 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Thu, 13 Feb 2025 16:19:17 +0800
+Subject: [PATCH] ModernFix: CompactBitStorage
+
+This patch is based on following mixins:
+* "org/embeddedt/modernfix/common/mixin/perf/compact_bit_storage/PalettedContainerMixin.java"
+By: embeddedt <42941056+embeddedt@users.noreply.github.com>
+As part of: ModernFix (https://github.com/embeddedt/ModernFix)
+Licensed under: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+
+diff --git a/net/minecraft/world/level/chunk/PalettedContainer.java b/net/minecraft/world/level/chunk/PalettedContainer.java
+index 5a6e699df0a177ea6a919cad609a508678bff823..cb4ff4deb87cced419ea85f5d805383df6f3ad1c 100644
+--- a/net/minecraft/world/level/chunk/PalettedContainer.java
++++ b/net/minecraft/world/level/chunk/PalettedContainer.java
+@@ -290,6 +290,30 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
+             data.palette.read(buffer);
+             buffer.readLongArray(data.storage.getRaw());
+             this.data = data;
++
++            // Sewlia start - ModernFix CompactBitStorage
++            if (one.tranic.sewlia.config.mod.optimization.CompactBitStorage.value && _byte > 1) {
++                long[] storArray = this.data.storage.getRaw();
++                boolean empty = true;
++                for (long l : storArray) {
++                    if (l != 0) {
++                        empty = false;
++                        break;
++                    }
++                }
++                if (empty && storArray.length > 0) {
++                    T value;
++                    try {
++                        value = this.data.palette.valueFor(0);
++                    } catch (RuntimeException e) {
++                        return;
++                    }
++                    this.data = this.createOrReuseData(null, 0);
++                    this.data.palette.idFor(value);
++                }
++            }
++            // Sewlia end - ModernFix CompactBitStorage
++
+             this.addPresetValues(); // Paper - Anti-Xray - Add preset values (inefficient, but this isn't used by the server)
+             this.updateData(this.data); // Paper - optimise palette reads
+         } finally {
