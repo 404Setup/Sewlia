@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Sun, 10 Nov 2024 21:59:11 +0800
+Subject: [PATCH] C2ME: reduce_allocs
+
+Source in: https://github.com/RelativityMC/C2ME-fabric
+
+diff --git a/net/minecraft/world/level/levelgen/feature/OreFeature.java b/net/minecraft/world/level/levelgen/feature/OreFeature.java
+index c7b46efd4f08067e2c9c5c8b0e8b71a94a79823d..8fb020b7873689d641da1b141e539d1f67af2084 100644
+--- a/net/minecraft/world/level/levelgen/feature/OreFeature.java
++++ b/net/minecraft/world/level/levelgen/feature/OreFeature.java
+@@ -32,7 +32,7 @@ public class OreFeature extends Feature<OreConfiguration> {
+         double d1 = blockPos.getX() - Math.sin(f) * f1;
+         double d2 = blockPos.getZ() + Math.cos(f) * f1;
+         double d3 = blockPos.getZ() - Math.cos(f) * f1;
+-        int i = 2;
++        //int i = 2;
+         double d4 = blockPos.getY() + randomSource.nextInt(3) - 2;
+         double d5 = blockPos.getY() + randomSource.nextInt(3) - 2;
+         int i1 = blockPos.getX() - Mth.ceil(f1) - ceil;
+@@ -69,7 +69,7 @@ public class OreFeature extends Feature<OreConfiguration> {
+         int height
+     ) {
+         int i = 0;
+-        BitSet bitSet = new BitSet(width * height * width);
++        BitSet bitSet = com.ishland.c2me.opts.allocs.common.ObjectCachingUtils.getCachedOrNewBitSet(width * height * width); // C2ME: reduce_allocs
+         BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
+         int i1 = config.size;
+         double[] doubles = new double[i1 * 4];
