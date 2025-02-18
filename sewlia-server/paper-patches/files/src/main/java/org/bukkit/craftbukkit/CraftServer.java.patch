@@ -1,6 +1,6 @@
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -616,6 +_,7 @@
+@@ -617,6 +_,7 @@
              DefaultPermissions.registerCorePermissions();
              CraftDefaultPermissions.registerCorePermissions();
              if (!io.papermc.paper.configuration.GlobalConfiguration.get().misc.loadPermissionsYmlBeforePlugins) this.loadCustomPermissions(); // Paper
@@ -8,7 +8,7 @@
              this.helpMap.initializeCommands();
              this.syncCommands();
          }
-@@ -3231,6 +_,7 @@
+@@ -3237,6 +_,7 @@
          if (!io.papermc.paper.configuration.GlobalConfiguration.get().misc.loadPermissionsYmlBeforePlugins) loadCustomPermissions();
          DefaultPermissions.registerCorePermissions();
          CraftDefaultPermissions.registerCorePermissions();

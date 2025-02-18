@@ -13,10 +13,10 @@ Related to mojang's bug fix:
 https://bugs.mojang.com/browse/MC-92875
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 1d3f85189fff304b44e177544f6b83302dc880f7..2ba8eca49d0df59b3d6475114b181e56b0a8d0df 100644
+index 000ed4edcd4de10cfbb8549130a2003bfbec636a..58a7f9311aa638bbace44787f0c5e8137f47111c 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -1672,6 +1672,11 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -1673,6 +1673,11 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                          return;
                      }
  

@@ -5,12 +5,12 @@ Subject: [PATCH] Pufferfish: Reduce entity allocations
 
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 2ba8eca49d0df59b3d6475114b181e56b0a8d0df..c3c042dabcf4e838a38a37e8d4f6e52ed8fcfab8 100644
+index 58a7f9311aa638bbace44787f0c5e8137f47111c..81bd06025846831758bdd3908df1212084e8b879 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -337,6 +337,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
-     public boolean fixedPose = false; // Paper - Expand Pose API
+@@ -338,6 +338,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
      private final int despawnTime; // Paper - entity despawn time limit
+     public int totalEntityAge; // Paper - age-like counter for all entities
      public final io.papermc.paper.entity.activation.ActivationType activationType = io.papermc.paper.entity.activation.ActivationType.activationTypeFor(this); // Paper - EAR 2/tracking ranges
 +    public final BlockPos.MutableBlockPos cachedBlockPos = new BlockPos.MutableBlockPos(); // Pufferfish - reduce entity allocations
      // Paper start - EAR 2

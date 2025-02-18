@@ -5,7 +5,7 @@ Subject: [PATCH] Kaiiju: Vanilla end portal teleportation
 
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 38eb92ae8fead3b34b1ad9ad8123a10a2ced60c9..f2abe8b717e6c013eb5ffa8ec20a299a6a233b27 100644
+index 9765bee095d244ad0284cc29b5b78895f3131d2f..6c038f22577a098549e4022e2204ca117db6e7f1 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
 @@ -110,6 +110,7 @@ import net.minecraft.world.level.block.Rotation;
@@ -16,7 +16,7 @@ index 38eb92ae8fead3b34b1ad9ad8123a10a2ced60c9..f2abe8b717e6c013eb5ffa8ec20a299a
  import net.minecraft.world.level.entity.EntityAccess;
  import net.minecraft.world.level.entity.EntityInLevelCallback;
  import net.minecraft.world.level.gameevent.DynamicGameEventListener;
-@@ -4285,13 +4286,22 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -4286,14 +4287,23 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                          targetPos, 16, // load 16 blocks to be safe from block physics
                          ca.spottedleaf.concurrentutil.util.Priority.HIGH,
                          (chunks) -> {
@@ -36,12 +36,14 @@ index 38eb92ae8fead3b34b1ad9ad8123a10a2ced60c9..f2abe8b717e6c013eb5ffa8ec20a299a
                              // on the obsidian, we need to spawn at targetPos.y - 1
                              portalInfoCompletable.complete(
                                  new net.minecraft.world.level.portal.TeleportTransition(
--                                    destination, Vec3.atBottomCenterOf(targetPos.below()), Vec3.ZERO, 90.0f, 0.0f,
-+                                    destination, finalPos, Vec3.ZERO, 90.0f, 0.0f,
+-                                    destination, Vec3.atBottomCenterOf(targetPos.below()), Vec3.ZERO, Direction.WEST.toYRot(), 0.0f,
+-                                    Relative.union(Relative.DELTA, Set.of(Relative.X_ROT)),
++                                    destination, finalPos, Vec3.ZERO, Direction.WEST.toYRot(), 0.0f,
++                                        Relative.union(Relative.DELTA, Set.of(Relative.X_ROT)),
                                      TeleportTransition.PLAY_PORTAL_SOUND.then(TeleportTransition.PLACE_PORTAL_TICKET),
                                      org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.END_PORTAL
                                  )
-@@ -4488,6 +4498,15 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -4491,6 +4501,15 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
              return false;
          }
  
@@ -57,7 +59,7 @@ index 38eb92ae8fead3b34b1ad9ad8123a10a2ced60c9..f2abe8b717e6c013eb5ffa8ec20a299a
          Vec3 initialPosition = this.position();
          ChunkPos initialPositionChunk = new ChunkPos(
              ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkX(initialPosition),
-@@ -4551,9 +4570,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -4554,9 +4573,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                          info.postTeleportTransition().onTransition(teleported);
                      }
  

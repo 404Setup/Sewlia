@@ -13,10 +13,10 @@ As part of: Slice (https://github.com/Cryptite/Slice)
 Licensed under: MIT (https://opensource.org/licenses/
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 5b4c69996f6a8144c6d952df01bd1aa2c3b979da..38eb92ae8fead3b34b1ad9ad8123a10a2ced60c9 100644
+index 33d7f21e7ffc464996011ae5777e71ff42781e66..9765bee095d244ad0284cc29b5b78895f3131d2f 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -900,7 +900,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -901,7 +901,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
  
          this.checkBelowWorld();
          if (!this.level().isClientSide) {

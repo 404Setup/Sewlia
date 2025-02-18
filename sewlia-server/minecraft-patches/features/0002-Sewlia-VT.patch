@@ -91,10 +91,10 @@ index 80a7a85e1a03a1ca406259207e1ae3b909b3284f..7387e6568a71e6624950529b01f87af2
              return thread;
          }));
 diff --git a/net/minecraft/commands/Commands.java b/net/minecraft/commands/Commands.java
-index d9b339eaa28aedbc7e7a1d4eebfebbb5ff16afe1..39b704391fd77943922db2cac049e9ac62753972 100644
+index 009e6405a11a391adca41a7c4ecafbf3254d799d..5cb4e3709435e3d38a6484a1511cbda72d6d4d10 100644
 --- a/net/minecraft/commands/Commands.java
 +++ b/net/minecraft/commands/Commands.java
-@@ -462,6 +462,7 @@ public class Commands {
+@@ -477,6 +477,7 @@ public class Commands {
          new java.util.concurrent.LinkedBlockingQueue<>(),
          new com.google.common.util.concurrent.ThreadFactoryBuilder()
              .setNameFormat("Paper Async Command Builder Thread Pool - %1$d")
@@ -103,7 +103,7 @@ index d9b339eaa28aedbc7e7a1d4eebfebbb5ff16afe1..39b704391fd77943922db2cac049e9ac
              .build(),
          new java.util.concurrent.ThreadPoolExecutor.DiscardPolicy()
 diff --git a/net/minecraft/network/Connection.java b/net/minecraft/network/Connection.java
-index 0a219143a9cd593be68fa23661b653b6c1f6a9fe..5f3c971059203092cf65d2dec9afe7c68ae1bcd7 100644
+index 5f963104d67f41eba8a11246acac5c45b9c8beae..2021142e677e028654f26cb9ecfc29e2aefc9825 100644
 --- a/net/minecraft/network/Connection.java
 +++ b/net/minecraft/network/Connection.java
 @@ -74,13 +74,13 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {

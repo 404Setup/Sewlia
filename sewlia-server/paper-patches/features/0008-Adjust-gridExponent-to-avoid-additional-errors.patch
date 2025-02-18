@@ -5,10 +5,10 @@ Subject: [PATCH] Adjust gridExponent to avoid additional errors
 
 
 diff --git a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
-index 39527974210847d025e61868a3f4769d3cc5439f..8bac33548e24451ed0cc3eb43b9ca7cd462c207f 100644
+index de88c3d9d3523a7bd3f3dcbfc62d72658192521d..3f139f16559f53045fad60ce0e2b83f89bc6bc5f 100644
 --- a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
 +++ b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
-@@ -401,7 +401,7 @@ public class GlobalConfiguration extends ConfigurationPart {
+@@ -403,7 +403,7 @@ public class GlobalConfiguration extends ConfigurationPart {
      public class ThreadedRegions extends ConfigurationPart {
  
          public int threads = -1;

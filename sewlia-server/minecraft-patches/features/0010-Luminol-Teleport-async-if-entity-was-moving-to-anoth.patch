@@ -6,10 +6,10 @@ Subject: [PATCH] Luminol: Teleport async if entity was moving to another
 
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 00130ead57c56c44a3a8e20b246d3d51bacebc35..1d3f85189fff304b44e177544f6b83302dc880f7 100644
+index 07b15ea53456a8f8de46a6ac5e2ef266cb83ca79..000ed4edcd4de10cfbb8549130a2003bfbec636a 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -1099,6 +1099,8 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -1100,6 +1100,8 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
      }
      // Paper end - detailed watchdog information
  
@@ -18,7 +18,7 @@ index 00130ead57c56c44a3a8e20b246d3d51bacebc35..1d3f85189fff304b44e177544f6b8330
      public void move(MoverType type, Vec3 movement) {
          final Vec3 originalMovement = movement; // Paper - Expose pre-collision velocity
          // Paper start - detailed watchdog information
-@@ -1109,6 +1111,31 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -1110,6 +1112,31 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
              this.moveStartZ = this.getZ();
              this.moveVector = movement;
          }

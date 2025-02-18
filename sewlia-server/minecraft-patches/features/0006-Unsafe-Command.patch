@@ -5,10 +5,10 @@ Subject: [PATCH] Unsafe Command
 
 
 diff --git a/net/minecraft/commands/Commands.java b/net/minecraft/commands/Commands.java
-index 39b704391fd77943922db2cac049e9ac62753972..10b8959595cf8e29f094ff831fdeb8c93f3b1455 100644
+index 5cb4e3709435e3d38a6484a1511cbda72d6d4d10..2809e459747be73b3fdd222e6d37ba5e0dce81f5 100644
 --- a/net/minecraft/commands/Commands.java
 +++ b/net/minecraft/commands/Commands.java
-@@ -157,8 +157,8 @@ public class Commands {
+@@ -162,8 +162,8 @@ public class Commands {
          ClearInventoryCommands.register(this.dispatcher, context);
          //CloneCommands.register(this.dispatcher, context); // Folia - region threading - TODO
          DamageCommand.register(this.dispatcher, context);
