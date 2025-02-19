@@ -54,7 +54,7 @@ Thanks to these developers for their contributions.
 - CaffeineMC/lithium-fabric
 - Dreeam-qwq/Gale
 - KaiijuMC/Kaiiju
-- LumminolMC/Luminol 
+- LuminolMC/Luminol 
 - LeavesMC/Leaves
 - RelativityMC/VMP-fabric 
 - SparklyPower/SparklyPaper
