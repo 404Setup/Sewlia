@@ -23,7 +23,7 @@
      api("org.joml:joml:1.10.8") {
          isTransitive = false // https://github.com/JOML-CI/JOML/issues/352
      }
-@@ -91,6 +_,11 @@
+@@ -91,6 +_,14 @@
      testImplementation("org.ow2.asm:asm-tree:9.7.1")
      mockitoAgent("org.mockito:mockito-core:5.14.1") { isTransitive = false } // configure mockito agent that is needed in newer java versions
      testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -31,6 +31,9 @@
 +    // Sewlia start
 +    compileOnly("net.java.dev.jna:jna:5.15.0")
 +    compileOnly("net.java.dev.jna:jna-platform:5.15.0")
++
++    api("one.tranic:t-proxy:1.0.0")
++    api("one.tranic:t-utils:1.1.0")
 +    // Sewlia end
  }
  

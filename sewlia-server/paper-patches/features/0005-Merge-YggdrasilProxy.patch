@@ -1,11 +1,11 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: 404Setup <153366651+404Setup@users.noreply.github.com>
 Date: Thu, 13 Feb 2025 14:02:36 +0800
-Subject: [PATCH] Authlib proxy
+Subject: [PATCH] Merge YggdrasilProxy
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/profile/CraftProfileProperty.java b/src/main/java/org/bukkit/craftbukkit/profile/CraftProfileProperty.java
-index 58661fb7cb2d76c7caefdbd0d062a79c4b29dc15..cec618d3feb971ae9c4279618d448fc8968fe79a 100644
+index 58661fb7cb2d76c7caefdbd0d062a79c4b29dc15..e250f7ba718f22a8c1ede2d30c569e1ee59693a7 100644
 --- a/src/main/java/org/bukkit/craftbukkit/profile/CraftProfileProperty.java
 +++ b/src/main/java/org/bukkit/craftbukkit/profile/CraftProfileProperty.java
 @@ -47,7 +47,7 @@ public final class CraftProfileProperty {
@@ -13,7 +13,7 @@ index 58661fb7cb2d76c7caefdbd0d062a79c4b29dc15..cec618d3feb971ae9c4279618d448fc8
      static {
          try {
 -            PUBLIC_KEYS = new YggdrasilAuthenticationService(Proxy.NO_PROXY).getServicesKeySet();
-+            PUBLIC_KEYS = new YggdrasilAuthenticationService(one.tranic.t.base.parse.proxy.ProxyConfigReader.getProxy()).getServicesKeySet(); // Sewlia
++            PUBLIC_KEYS = new YggdrasilAuthenticationService(one.tranic.t.proxy.ProxyConfigReader.getProxy()).getServicesKeySet(); // Sewlia
          } catch (Exception e) {
              throw new Error("Could not load yggdrasil_session_pubkey.der! This indicates a bug.");
          }
