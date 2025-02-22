@@ -9,6 +9,9 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.Set;
 
+/**
+ * @deprecated use {@link NewReflect}
+ */
 public class Reflect {
     @SuppressWarnings("unchecked")
     public static <T extends Class<?>> @Nullable Set<T> scanPackage(@Nullable T clazz, @NotNull String packageName) {

@@ -17,7 +17,7 @@ but is so much cheaper than the suffocation check that it's worth
 keeping it.
 
 diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
-index e58ba496e24c252f77a5aa5bfa6bde1765a0111b..a0991f97fad85d392f8816a98331e4fc35e63c0f 100644
+index 46407f906c40fb52883576bf03fd6f1a3cbfde04..d99ff2a465bd26fe57a87364da5499cf2f61fbdf 100644
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
 @@ -472,7 +472,7 @@ public abstract class LivingEntity extends Entity implements Attackable {

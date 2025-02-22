@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Fri, 21 Feb 2025 23:56:07 +0800
+Subject: [PATCH] Modify CraftPersistentDataTypeRegistry
+
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/persistence/CraftPersistentDataTypeRegistry.java b/src/main/java/org/bukkit/craftbukkit/persistence/CraftPersistentDataTypeRegistry.java
+index 20c53aac0aef180ee12de919a8000e4b4bc619ff..5fca4fde2b5699ef881a57aaf495c1202c8859d4 100644
+--- a/src/main/java/org/bukkit/craftbukkit/persistence/CraftPersistentDataTypeRegistry.java
++++ b/src/main/java/org/bukkit/craftbukkit/persistence/CraftPersistentDataTypeRegistry.java
+@@ -367,7 +367,7 @@ public final class CraftPersistentDataTypeRegistry {
+ 
+         final TagAdapter<P, Tag> elementAdapter = this.getOrCreateAdapter(listPersistentDataType.elementType());
+ 
+-        final List<Tag> values = Lists.newArrayListWithCapacity(list.size());
++        final List<Tag> values = new ObjectArrayList<>(list.size());
+         for (final P primitiveValue : list) {
+             values.add(this.wrap(listPersistentDataType.elementType(), primitiveValue));
+         }

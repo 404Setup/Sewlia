@@ -1,0 +1,21 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Fri, 21 Feb 2025 17:48:32 +0800
+Subject: [PATCH] Modify PaperPluginInstanceManager
+
+
+diff --git a/src/main/java/io/papermc/paper/plugin/manager/PaperPluginInstanceManager.java b/src/main/java/io/papermc/paper/plugin/manager/PaperPluginInstanceManager.java
+index adfd4c16809f6ddd9cc73e4bd845d7aed4925068..deaf7274accdcad4e30672d34c58f43d168a14a6 100644
+--- a/src/main/java/io/papermc/paper/plugin/manager/PaperPluginInstanceManager.java
++++ b/src/main/java/io/papermc/paper/plugin/manager/PaperPluginInstanceManager.java
+@@ -48,8 +48,8 @@ class PaperPluginInstanceManager {
+ 
+     private static final FileProviderSource FILE_PROVIDER_SOURCE = new FileProviderSource("File '%s'"::formatted);
+ 
+-    private final List<Plugin> plugins = new ArrayList<>();
+-    private final Map<String, Plugin> lookupNames = new HashMap<>();
++    private final List<Plugin> plugins = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
++    private final Map<String, Plugin> lookupNames = new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>();
+ 
+     private final PluginManager pluginManager;
+     private final CommandMap commandMap;

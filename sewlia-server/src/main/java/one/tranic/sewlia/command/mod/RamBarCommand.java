@@ -16,7 +16,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class RamBarCommand extends Command {
     public RamBarCommand() {
@@ -61,7 +60,8 @@ public class RamBarCommand extends Command {
     @Override
     public @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
         if (args.length < 1 || !sender.hasPermission("sewlia.command.rambar.another")) return List.of();
-        List<String> completion = Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
+        List<String> completion = new ObjectArrayList<>();
+        for (Player player : Bukkit.getOnlinePlayers()) completion.add(player.getName());
         return StringUtil.copyPartialMatches(args[0], completion, new ObjectArrayList<>(completion.size()));
     }
 }

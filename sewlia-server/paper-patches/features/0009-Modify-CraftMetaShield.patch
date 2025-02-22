@@ -1,0 +1,63 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Sat, 22 Feb 2025 12:34:26 +0800
+Subject: [PATCH] Modify CraftMetaShield
+
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaShield.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaShield.java
+index e229ca6acb6dbc3185f326f6653b3d66d835a9e5..74155d12c8abad8e825a588ee6aecf5e03d7aeb4 100644
+--- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaShield.java
++++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaShield.java
+@@ -43,7 +43,7 @@ public class CraftMetaShield extends CraftMetaItem implements ShieldMeta, BlockS
+ 
+         if (meta instanceof CraftMetaShield craftMetaShield) {
+             // Paper start - general item meta fixes - decoupled base colour and patterns
+-            if (craftMetaShield.patterns != null) this.patterns = new ArrayList<>(craftMetaShield.getPatterns());
++            if (craftMetaShield.patterns != null) this.patterns = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(craftMetaShield.getPatterns());
+             if (craftMetaShield.baseColor != null) this.baseColor = craftMetaShield.baseColor;
+             // Paper end - general item meta fixes - decoupled base colour and patterns
+         } else if (meta instanceof CraftMetaBlockState state && state.hasBlockState() && state.getBlockState() instanceof Banner banner) {
+@@ -103,7 +103,7 @@ public class CraftMetaShield extends CraftMetaItem implements ShieldMeta, BlockS
+         if (this.patterns != null && !this.patterns.isEmpty()) {
+             {
+         // Paper end - general item meta fixes - decoupled base colour and patterns
+-                List<BannerPatternLayers.Layer> newPatterns = new ArrayList<>();
++                List<BannerPatternLayers.Layer> newPatterns = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+ 
+                 for (Pattern p : this.patterns) { // Paper - general item meta fixes - decoupled base colour and patterns
+                     newPatterns.add(new BannerPatternLayers.Layer(CraftPatternType.bukkitToMinecraftHolder(p.getPattern()), net.minecraft.world.item.DyeColor.byId(p.getColor().getWoolData())));
+@@ -117,21 +117,21 @@ public class CraftMetaShield extends CraftMetaItem implements ShieldMeta, BlockS
+     @Override
+     public List<Pattern> getPatterns() {
+         if (this.patterns == null) { // Paper - general item meta fixes - decoupled base colour and patterns
+-            return new ArrayList<>();
++            return new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+         }
+ 
+-        return new ArrayList<>(this.patterns); // Paper - general item meta fixes - decoupled base colour and patterns
++        return new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(this.patterns); // Paper - general item meta fixes - decoupled base colour and patterns
+     }
+ 
+     @Override
+     public void setPatterns(List<Pattern> patterns) {
+-        this.patterns = new ArrayList<>(patterns); // Paper - general item meta fixes - decoupled base colour and patterns
++        this.patterns = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(patterns); // Paper - general item meta fixes - decoupled base colour and patterns
+     }
+ 
+     @Override
+     public void addPattern(Pattern pattern) {
+         // Paper start - general item meta fixes - decoupled base colour and patterns
+-        if (this.patterns == null) this.patterns = new ArrayList<>();
++        if (this.patterns == null) this.patterns = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+         this.patterns.add(pattern);
+         // Paper end - general item meta fixes - decoupled base colour and patterns
+     }
+@@ -280,7 +280,7 @@ public class CraftMetaShield extends CraftMetaItem implements ShieldMeta, BlockS
+         CraftMetaShield meta = (CraftMetaShield) super.clone();
+         // Paper start - general item meta fixes - decoupled base colour and patterns
+         meta.baseColor = this.baseColor;
+-        meta.patterns = this.patterns == null ? null : new ArrayList<>(this.patterns);
++        meta.patterns = this.patterns == null ? null : new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(this.patterns);
+         // Paper start - general item meta fixes - decoupled base colour and patterns
+         return meta;
+     }

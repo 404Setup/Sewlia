@@ -6,7 +6,7 @@ Subject: [PATCH] Leaves: Zero tick plants
 You can find the original code on https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/world/level/block/CactusBlock.java b/net/minecraft/world/level/block/CactusBlock.java
-index 913779c68b178dbbfac3b1dcee0c6342028e5570..b7d0e6f992a37ed2422b415d559aa063bd9090f7 100644
+index 8c3aca2430eac2a31d1e0b1137e3324ec5b29a20..c4286d9cf321727e769ddf88dcecead9cb881b0c 100644
 --- a/net/minecraft/world/level/block/CactusBlock.java
 +++ b/net/minecraft/world/level/block/CactusBlock.java
 @@ -43,6 +43,10 @@ public class CactusBlock extends Block {

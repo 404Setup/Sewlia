@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Sat, 22 Feb 2025 13:48:00 +0800
+Subject: [PATCH] Modify NaturalSpawner
+
+
+diff --git a/net/minecraft/world/level/NaturalSpawner.java b/net/minecraft/world/level/NaturalSpawner.java
+index 5ce81eafee33d22b69029c088d4be497131338a2..25f7a4836bcee0a31e7bc7647773980f24928956 100644
+--- a/net/minecraft/world/level/NaturalSpawner.java
++++ b/net/minecraft/world/level/NaturalSpawner.java
+@@ -127,9 +127,9 @@ public final class NaturalSpawner {
+     public static List<MobCategory> getFilteredSpawningCategories(
+         NaturalSpawner.SpawnState spawnState, boolean spawnFriendlies, boolean spawnEnemies, boolean spawnPassives, ServerLevel level
+     ) {
+-        LevelData worlddata = level.getLevelData(); // CraftBukkit - Other mob type spawn tick rate
++        //LevelData worlddata = level.getLevelData(); // CraftBukkit - Other mob type spawn tick rate
+         // CraftBukkit end
+-        List<MobCategory> list = new ArrayList<>(SPAWNING_CATEGORIES.length);
++        List<MobCategory> list = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(SPAWNING_CATEGORIES.length);
+ 
+         for (MobCategory mobCategory : SPAWNING_CATEGORIES) {
+             // CraftBukkit start - Use per-world spawn limits
+@@ -255,7 +255,7 @@ public final class NaturalSpawner {
+             for (int i1 = 0; i1 < 3; i1++) {
+                 int x = pos.getX();
+                 int z = pos.getZ();
+-                int i2 = 6;
++                //int i2 = 6;
+                 MobSpawnSettings.SpawnerData spawnerData = null;
+                 SpawnGroupData spawnGroupData = null;
+                 int ceil = Mth.ceil(level.random.nextFloat() * 4.0F);

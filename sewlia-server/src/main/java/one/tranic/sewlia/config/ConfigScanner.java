@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * @deprecated use {@link NewConfigScanner}
+ */
 public class ConfigScanner {
     public static @Nullable Map<Class<?>, String> getClasss() {
         Map<Class<?>, String> builder = new Object2ObjectOpenHashMap<>();

@@ -1,0 +1,86 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Sat, 22 Feb 2025 00:45:27 +0800
+Subject: [PATCH] Modify Player
+
+
+diff --git a/net/minecraft/world/entity/player/Inventory.java b/net/minecraft/world/entity/player/Inventory.java
+index 839cbb67d3d38960d9114a4db5bab911b66a573c..8cc7324256ac783acc25e5cc5e455cd7a6da0bc2 100644
+--- a/net/minecraft/world/entity/player/Inventory.java
++++ b/net/minecraft/world/entity/player/Inventory.java
+@@ -37,11 +37,11 @@ public class Inventory implements Container, Nameable {
+     private int timesChanged;
+ 
+     // CraftBukkit start - add fields and methods
+-    public List<org.bukkit.entity.HumanEntity> transaction = new java.util.ArrayList<>();
++    public List<org.bukkit.entity.HumanEntity> transaction = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+     private int maxStack = MAX_STACK;
+ 
+     public List<ItemStack> getContents() {
+-        List<ItemStack> combined = new java.util.ArrayList<>(this.items.size() + this.armor.size() + this.offhand.size());
++        List<ItemStack> combined = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(this.items.size() + this.armor.size() + this.offhand.size());
+         for (List<ItemStack> sub : this.compartments) {
+             combined.addAll(sub);
+         }
+diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
+index e70919757dee4b02384ded3551c8f580d289584a..dd0839f2966c9744a9e24a03d93429bd3b5c987f 100644
+--- a/net/minecraft/world/entity/player/Player.java
++++ b/net/minecraft/world/entity/player/Player.java
+@@ -319,7 +319,7 @@ public abstract class Player extends LivingEntity {
+             }
+         }
+ 
+-        int i = 29999999;
++        //int i = 29999999;
+         double d = Mth.clamp(this.getX(), -2.9999999E7, 2.9999999E7);
+         double d1 = Mth.clamp(this.getZ(), -2.9999999E7, 2.9999999E7);
+         if (d != this.getX() || d1 != this.getZ()) {
+@@ -410,7 +410,7 @@ public abstract class Player extends LivingEntity {
+         double d = this.getX() - this.xCloak;
+         double d1 = this.getY() - this.yCloak;
+         double d2 = this.getZ() - this.zCloak;
+-        double d3 = 10.0;
++        //double d3 = 10.0;
+         if (d > 10.0) {
+             this.xCloak = this.getX();
+             this.xCloakO = this.xCloak;
+@@ -607,7 +607,7 @@ public abstract class Player extends LivingEntity {
+             }
+ 
+             List<Entity> entities = this.level().getEntities(this, aabb);
+-            List<Entity> list = Lists.newArrayList();
++            List<Entity> list = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+ 
+             for (Entity entity : entities) {
+                 if (entity.getType() == EntityType.EXPERIENCE_ORB) {
+@@ -1153,7 +1153,7 @@ public abstract class Player extends LivingEntity {
+             && this.isAboveGround(f)) {
+             double d = vec.x;
+             double d1 = vec.z;
+-            double d2 = 0.05;
++            //double d2 = 0.05;
+             double d3 = Math.signum(d) * 0.05;
+ 
+             double d4;
+@@ -1963,7 +1963,7 @@ public abstract class Player extends LivingEntity {
+ 
+     @Override
+     public Iterable<ItemStack> getHandSlots() {
+-        return Lists.newArrayList(this.getMainHandItem(), this.getOffhandItem());
++        return one.tranic.t.utils.Collections.newArrayList(this.getMainHandItem(), this.getOffhandItem());
+     }
+ 
+     @Override
+diff --git a/net/minecraft/world/entity/player/StackedContents.java b/net/minecraft/world/entity/player/StackedContents.java
+index a3fea6c8397046596afe3c8b5589f2ed37fcdfc3..fb4011af91016837c1525a6f2ccb5a52a880041a 100644
+--- a/net/minecraft/world/entity/player/StackedContents.java
++++ b/net/minecraft/world/entity/player/StackedContents.java
+@@ -47,7 +47,7 @@ public class StackedContents<T> {
+     }
+ 
+     List<T> getUniqueAvailableIngredientItems(Iterable<? extends StackedContents.IngredientInfo<T>> ingredients) {
+-        List<T> list = new ArrayList<>();
++        List<T> list = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+ 
+         for (it.unimi.dsi.fastutil.objects.Object2IntMap.Entry<T> entry : it.unimi.dsi.fastutil.objects.Object2IntMaps.fastIterable(this.amounts)) { // Paper - Improve exact choice recipe ingredients (don't use "reference" map)
+             if (entry.getIntValue() > 0 && anyIngredientMatches(ingredients, entry.getKey())) {

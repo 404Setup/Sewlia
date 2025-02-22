@@ -1,0 +1,55 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Fri, 21 Feb 2025 17:00:57 +0800
+Subject: [PATCH] Modify ChunkDebugCommand
+
+
+diff --git a/io/papermc/paper/command/subcommands/ChunkDebugCommand.java b/io/papermc/paper/command/subcommands/ChunkDebugCommand.java
+index 2dca7afbd93cfbb8686f336fcd3b45dd01fba0fc..3e953f5697c6d52a6634b38ab362b908017b9fb2 100644
+--- a/io/papermc/paper/command/subcommands/ChunkDebugCommand.java
++++ b/io/papermc/paper/command/subcommands/ChunkDebugCommand.java
+@@ -51,7 +51,7 @@ public final class ChunkDebugCommand implements PaperSubcommand {
+                 }
+             }
+             case "holderinfo" -> {
+-                List<String> worldNames = new ArrayList<>();
++                List<String> worldNames = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+                 worldNames.add("*");
+                 for (org.bukkit.World world : Bukkit.getWorlds()) {
+                     worldNames.add(world.getName());
+@@ -61,7 +61,7 @@ public final class ChunkDebugCommand implements PaperSubcommand {
+                 }
+             }
+             case "chunkinfo" -> {
+-                List<String> worldNames = new ArrayList<>();
++                List<String> worldNames = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+                 worldNames.add("*");
+                 for (org.bukkit.World world : Bukkit.getWorlds()) {
+                     worldNames.add(world.getName());
+@@ -79,7 +79,7 @@ public final class ChunkDebugCommand implements PaperSubcommand {
+         if (args.length < 1 || args[0].equals("*")) {
+             worlds = Bukkit.getWorlds();
+         } else {
+-            worlds = new ArrayList<>(args.length);
++            worlds = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(args.length);
+             for (final String arg : args) {
+                 org.bukkit.@Nullable World world = Bukkit.getWorld(arg);
+                 if (world == null) {
+@@ -109,7 +109,7 @@ public final class ChunkDebugCommand implements PaperSubcommand {
+                 final NewChunkHolder.ChunkCompletion completion = holder.getLastChunkCompletion();
+                 final ChunkAccess chunk = completion == null ? null : completion.chunk();
+ 
+-                if (!(chunk instanceof LevelChunk fullChunk)) {
++                if (!(chunk instanceof LevelChunk)) {
+                     continue;
+                 }
+ 
+@@ -167,7 +167,7 @@ public final class ChunkDebugCommand implements PaperSubcommand {
+         if (args.length < 1 || args[0].equals("*")) {
+             worlds = Bukkit.getWorlds();
+         } else {
+-            worlds = new ArrayList<>(args.length);
++            worlds = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(args.length);
+             for (final String arg : args) {
+                 org.bukkit.@Nullable World world = Bukkit.getWorld(arg);
+                 if (world == null) {

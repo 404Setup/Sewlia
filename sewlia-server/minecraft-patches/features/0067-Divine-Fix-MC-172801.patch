@@ -9,7 +9,7 @@ You can find the original code on https://github.com/DivineMC/DivineMC
 Original post on Mojira: https://bugs.mojang.com/browse/MC-172801
 
 diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
-index 0a7c630e1c73d97bc8f7f444a3a4878b90af0a83..4eb5218b2257e7c35d421b5bcc61287ec031bf66 100644
+index 3329064355e428375b315e1bc358e63d0e3734a2..8b9e24929a10656cf60284c1ea05013386624df8 100644
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
 @@ -3131,7 +3131,13 @@ public abstract class LivingEntity extends Entity implements Attackable {

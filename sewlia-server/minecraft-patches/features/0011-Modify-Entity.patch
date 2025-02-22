@@ -1,0 +1,111 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Fri, 21 Feb 2025 18:13:43 +0800
+Subject: [PATCH] Modify Entity
+
+
+diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
+index 1e59c21d26baf50fd74bc99c04dbea0faede446a..4fa567be558412a37e195819066326e3c24a3135 100644
+--- a/net/minecraft/world/entity/Entity.java
++++ b/net/minecraft/world/entity/Entity.java
+@@ -261,7 +261,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+     public boolean wasTouchingWater;
+     protected Object2DoubleMap<TagKey<Fluid>> fluidHeight = new Object2DoubleArrayMap<>(2);
+     protected boolean wasEyeInWater;
+-    private final Set<TagKey<Fluid>> fluidOnEyes = new HashSet<>();
++    private final Set<TagKey<Fluid>> fluidOnEyes = new it.unimi.dsi.fastutil.objects.ObjectOpenHashSet<>();
+     public int invulnerableTime;
+     protected boolean firstTick = true;
+     protected final SynchedEntityData entityData;
+@@ -306,7 +306,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+     public boolean hasVisualFire;
+     @Nullable
+     private BlockState inBlockState = null;
+-    private final List<Entity.Movement> movementThisTick = new ArrayList<>();
++    private final List<Entity.Movement> movementThisTick = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+     private final Set<BlockState> blocksInside = new ReferenceArraySet<>();
+     private final LongSet visitedBlocks = new LongOpenHashSet();
+     // CraftBukkit start
+@@ -674,7 +674,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+                 return;
+             }
+             final net.minecraft.server.level.ServerEntity serverEntity = tracker.serverEntity;
+-            final List<net.minecraft.network.protocol.Packet<? super net.minecraft.network.protocol.game.ClientGamePacketListener>> list = new java.util.ArrayList<>();
++            final List<net.minecraft.network.protocol.Packet<? super net.minecraft.network.protocol.game.ClientGamePacketListener>> list = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+             serverEntity.sendPairingData(player, list::add);
+             player.connection.send(new net.minecraft.network.protocol.game.ClientboundBundlePacket(list));
+         }
+@@ -686,7 +686,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+             return;
+         }
+ 
+-        final List<SynchedEntityData.DataValue<?>> values = new java.util.ArrayList<>(keys.size());
++        final List<SynchedEntityData.DataValue<?>> values = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(keys.size());
+         for (final EntityDataAccessor<?> key : keys) {
+             final SynchedEntityData.DataItem<?> synchedValue = this.entityData.getItem(key);
+             values.add(synchedValue.value());
+@@ -1457,8 +1457,8 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+ 
+         final AABB currentBox = this.getBoundingBox();
+ 
+-        final List<VoxelShape> potentialCollisionsVoxel = new ArrayList<>();
+-        final List<AABB> potentialCollisionsBB = new ArrayList<>();
++        final List<VoxelShape> potentialCollisionsVoxel = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
++        final List<AABB> potentialCollisionsBB = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+ 
+         final AABB initialCollisionBox;
+         if (xZero & zZero) {
+@@ -1470,7 +1470,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+             initialCollisionBox = currentBox.expandTowards(movement);
+         }
+ 
+-        final List<AABB> entityAABBs = new ArrayList<>();
++        final List<AABB> entityAABBs = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+         ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.getEntityHardCollisions(
+             this.level, (Entity)(Object)this, initialCollisionBox, entityAABBs, 0, null
+         );
+@@ -1500,7 +1500,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+             stepRetrievalBox = stepRetrievalBox.expandTowards(0.0, (double)-1.0E-5F, 0.0);
+         }
+ 
+-        final List<VoxelShape> stepVoxels = new ArrayList<>();
++        final List<VoxelShape> stepVoxels = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+         final List<AABB> stepAABBs = entityAABBs;
+ 
+         ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.getCollisionsForBlocksOrWorldBorder(
+@@ -3767,7 +3767,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+         }
+ 
+         public List<EntityTreeNode> getFullTree() {
+-            List<EntityTreeNode> ret = new java.util.ArrayList<>();
++            List<EntityTreeNode> ret = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+             ret.add(this);
+ 
+             // this is just a BFS except we don't remove from head, we just advance down the list
+@@ -3797,7 +3797,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+                     continue;
+                 }
+ 
+-                List<Entity> newPassengers = new java.util.ArrayList<>();
++                List<Entity> newPassengers = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+                 for (EntityTreeNode passenger : passengers) {
+                     newPassengers.add(passenger.root);
+                     passenger.root.vehicle = curr.root;
+@@ -4615,7 +4615,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+ 
+     private Entity teleportCrossDimension(ServerLevel level, TeleportTransition teleportTransition) {
+         List<Entity> passengers = this.getPassengers();
+-        List<Entity> list = new ArrayList<>(passengers.size());
++        List<Entity> list = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(passengers.size());
+         this.ejectPassengers();
+ 
+         for (Entity entity : passengers) {
+@@ -5162,7 +5162,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+ 
+     public Iterable<Entity> getIndirectPassengers() {
+         // Paper start - optimise entity tracker
+-        final List<Entity> ret = new ArrayList<>();
++        final List<Entity> ret = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+ 
+         if (this.passengers.isEmpty()) {
+             return ret;
