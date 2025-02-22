@@ -1,16 +1,19 @@
 package one.tranic.sewlia.task;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.kyori.adventure.bossbar.BossBar;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public abstract class BossBarTask implements Runnable {
@@ -18,6 +21,27 @@ public abstract class BossBarTask implements Runnable {
     private final Logger logger = LoggerFactory.getLogger("BossBarTask");
     private Thread thread;
     private boolean running = false;
+
+    public static void startAll() {
+        TPSBarTask.instance().start();
+        RamBarTask.instance().start();
+    }
+
+    public static void stopAll() {
+        TPSBarTask.instance().stop();
+        RamBarTask.instance().stop();
+    }
+
+    public static void addToAll(ServerPlayer player) {
+        Player bukkit = player.getBukkitEntity();
+        if (player.tpsBar()) TPSBarTask.instance().addPlayer(bukkit);
+        if (player.ramBar()) RamBarTask.instance().addPlayer(bukkit);
+    }
+
+    public static void removeFromAll(Player player) {
+        TPSBarTask.instance().removePlayer(player);
+        RamBarTask.instance().removePlayer(player);
+    }
 
     abstract BossBar createBossBar();
 
@@ -41,9 +65,9 @@ public abstract class BossBarTask implements Runnable {
         running = false;
         if (null != this.thread) {
             int i = 0;
+            try {
+                while (this.thread.isAlive()) {
 
-            while (this.thread.isAlive()) {
-                try {
                     this.thread.join(1000L);
                     if (++i >= 5) {
                         logger.warn("Waited {} seconds attempting force stop!", i);
@@ -51,12 +75,12 @@ public abstract class BossBarTask implements Runnable {
                         logger.warn("Thread {} ({}) failed to exit after {} second(s)", this, this.thread.getState(), i, new Exception("Stack:"));
                         this.thread.interrupt();
                     }
-                } catch (InterruptedException ignored) {
                 }
+            } catch (InterruptedException ignored) {
             }
             this.thread = null;
         }
-        new ObjectOpenHashSet<>(this.listBossbar.keySet()).forEach(uuid -> {
+        new ObjectArraySet<>(this.listBossbar.keySet()).forEach(uuid -> {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) removePlayer(player);
         });
@@ -99,33 +123,13 @@ public abstract class BossBarTask implements Runnable {
                     this.run();
                     TimeUnit.MILLISECONDS.sleep(75);
                 }
-            } catch (InterruptedException ignored) {}
+            } catch (InterruptedException ignored) {
+            }
         });
         thread.start();
     }
 
     public void stop() {
         cancel();
-    }
-
-    public static void startAll() {
-        TPSBarTask.instance().start();
-        RamBarTask.instance().start();
-    }
-
-    public static void stopAll() {
-        TPSBarTask.instance().stop();
-        RamBarTask.instance().stop();
-    }
-
-    public static void addToAll(ServerPlayer player) {
-        Player bukkit = player.getBukkitEntity();
-        if (player.tpsBar()) TPSBarTask.instance().addPlayer(bukkit);
-        if (player.ramBar()) RamBarTask.instance().addPlayer(bukkit);
-    }
-
-    public static void removeFromAll(Player player) {
-        TPSBarTask.instance().removePlayer(player);
-        RamBarTask.instance().removePlayer(player);
     }
 }

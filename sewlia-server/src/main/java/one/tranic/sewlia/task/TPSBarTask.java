@@ -24,18 +24,6 @@ public class TPSBarTask extends BossBarTask {
         return instance;
     }
 
-    private static Component getChunkHotComponent(long chunkHot) {
-        final String color = barColorFromChunkHot(chunkHot);
-        return MiniMessage.miniMessage().deserialize(color, Placeholder.parsed("text", String.valueOf(chunkHot)));
-    }
-
-    private static String barColorFromChunkHot(long chunkHot) {
-        if (chunkHot == -1) return TPSConstants.TEXT_COLOR_LOW;
-        if (chunkHot <= 300000L) return TPSConstants.TEXT_COLOR_GOOD;
-        if (chunkHot <= 500000L) return TPSConstants.TEXT_COLOR_MEDIUM;
-        return TPSConstants.TEXT_COLOR_LOW;
-    }
-
     @Override
     BossBar createBossBar() {
         double currentTPS = Bukkit.getTPS()[0];
@@ -71,7 +59,7 @@ public class TPSBarTask extends BossBarTask {
                 Placeholder.component("tps", createColoredComponent(tps, FillMode.TPS)),
                 Placeholder.component("mspt", createColoredComponent(mspt, FillMode.MSPT)),
                 Placeholder.component("ping", createColoredComponent(ping, FillMode.PING)),
-                Placeholder.component("chunkhot", getChunkHotComponent(chunkHot))
+                Placeholder.component("chunkhot", createColoredComponent(chunkHot, FillMode.CHUNKHOT))
         );
     }
 
@@ -79,6 +67,12 @@ public class TPSBarTask extends BossBarTask {
         String color = determineColor(value, mode);
         return MiniMessage.miniMessage().deserialize(color,
                 Placeholder.parsed("text", String.format("%.2f", value)));
+    }
+
+    private Component createColoredComponent(long value, FillMode mode) {
+        String color = determineColor(value, mode);
+        return MiniMessage.miniMessage().deserialize(color,
+                Placeholder.parsed("text", String.format("%,d", value)));
     }
 
     private String determineColor(double value, FillMode mode) {
@@ -127,6 +121,7 @@ public class TPSBarTask extends BossBarTask {
             case MSPT -> value < 40;
             case TPS -> value >= 19;
             case PING -> value < 100;
+            case CHUNKHOT -> value < 300000L;
         };
     }
 
@@ -135,11 +130,12 @@ public class TPSBarTask extends BossBarTask {
             case MSPT -> value < 50;
             case TPS -> value >= 15;
             case PING -> value < 200;
+            case CHUNKHOT -> value < 500000L;
         };
     }
 
     public enum FillMode {
-        TPS, MSPT, PING
+        TPS, MSPT, PING, CHUNKHOT
     }
 
     private static class TPSConstants {
