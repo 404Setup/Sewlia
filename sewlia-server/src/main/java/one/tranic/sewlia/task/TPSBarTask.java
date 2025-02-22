@@ -151,6 +151,6 @@ public class TPSBarTask extends BossBarTask {
         static final String TEXT_COLOR_GOOD = "<gradient:#55ff55:#00aa00><text></gradient>";
         static final String TEXT_COLOR_MEDIUM = "<gradient:#ffff55:#ffaa00><text></gradient>";
         static final String TEXT_COLOR_LOW = "<gradient:#ff5555:#aa0000><text></gradient>";
-        static final String BAR_TITLE_FORMAT = "<gray>TPS<yellow>:</yellow> <tps> MSPT<yellow>:</yellow> <mspt> Ping<yellow>:</yellow> <ping>ms";
+        static final String BAR_TITLE_FORMAT = "<gray>TPS<yellow>:</yellow> <tps> MSPT<yellow>:</yellow> <mspt> Ping<yellow>:</yellow> <ping>ms ChunkHot<yellow>:</yellow> <chunkhot>";
     }
 }
