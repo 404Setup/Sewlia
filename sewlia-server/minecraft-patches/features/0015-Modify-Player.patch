@@ -4,6 +4,72 @@ Date: Sat, 22 Feb 2025 00:45:27 +0800
 Subject: [PATCH] Modify Player
 
 
+diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
+index 557a3cfae7b7cda44cdf4a439c71a65fd74e5aec..8d80841257fa853a69ecbc7ae6cfc24454446bbb 100644
+--- a/net/minecraft/server/players/PlayerList.java
++++ b/net/minecraft/server/players/PlayerList.java
+@@ -3,6 +3,7 @@ package net.minecraft.server.players;
+ import com.google.common.collect.Lists;
+ import com.google.common.collect.Maps;
+ import com.google.common.collect.Sets;
++import com.google.common.primitives.Ints;
+ import com.mojang.authlib.GameProfile;
+ import com.mojang.logging.LogUtils;
+ import com.mojang.serialization.Dynamic;
+@@ -134,13 +135,13 @@ public abstract class PlayerList {
+ 
+     // CraftBukkit start
+     private org.bukkit.craftbukkit.CraftServer cserver;
+-    private final Map<String,ServerPlayer> playersByName = new java.util.HashMap<>();
++    private final Map<String,ServerPlayer> playersByName = new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>();
+     public @Nullable String collideRuleTeamName; // Paper - Configurable player collision
+ 
+     // Folia start - region threading
+     private final Object connectionsStateLock = new Object();
+-    private final Map<String, Connection> connectionByName = new java.util.HashMap<>();
+-    private final Map<UUID, Connection> connectionById = new java.util.HashMap<>();
++    private final Map<String, Connection> connectionByName = new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>();
++    private final Map<UUID, Connection> connectionById = new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>();
+     private final it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet<Connection> usersCountedAgainstLimit = new it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet<>();
+ 
+     public boolean pushPendingJoin(String userName, UUID byId, Connection conn) {
+@@ -435,7 +436,8 @@ public abstract class PlayerList {
+         // CraftBukkit start - sendAll above replaced with this loop
+         ClientboundPlayerInfoUpdatePacket packet = ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(player)); // Paper - Add Listing API for Player
+ 
+-        final List<ServerPlayer> onlinePlayers = Lists.newArrayListWithExpectedSize(this.players.size() - 1); // Paper - Use single player info update packet on join
++        int arraySize = this.players.size() - 1;
++        final List<ServerPlayer> onlinePlayers = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(Ints.saturatedCast(5L + arraySize + (arraySize / 10))); // Paper - Use single player info update packet on join
+         for (ServerPlayer entityplayer1 : this.players) { // Folia - region threading
+ 
+             if (entityplayer1.getBukkitEntity().canSee(bukkitPlayer)) {
+@@ -504,7 +506,7 @@ public abstract class PlayerList {
+     }
+ 
+     public void updateEntireScoreboard(ServerScoreboard scoreboard, ServerPlayer player) {
+-        Set<Objective> set = Sets.newHashSet();
++        Set<Objective> set = new it.unimi.dsi.fastutil.objects.ObjectOpenHashSet<>();
+ 
+         for (PlayerTeam playerTeam : scoreboard.getPlayerTeams()) {
+             player.connection.send(ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(playerTeam, true));
+@@ -1043,7 +1045,7 @@ public abstract class PlayerList {
+     }
+ 
+     public String[] getPlayerNamesArray() {
+-        List<ServerPlayer> players = new java.util.ArrayList<>(this.players); // Folia - region threading
++        List<ServerPlayer> players = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(this.players); // Folia - region threading
+         String[] strings = new String[this.players.size()];
+ 
+         for (int i = 0; i < players.size(); i++) { // Folia - region threading
+@@ -1257,7 +1259,7 @@ public abstract class PlayerList {
+     }
+ 
+     public List<ServerPlayer> getPlayersWithAddress(String address) {
+-        List<ServerPlayer> list = Lists.newArrayList();
++        List<ServerPlayer> list = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+ 
+         for (ServerPlayer serverPlayer : this.players) {
+             if (serverPlayer.getIpAddress().equals(address)) {
 diff --git a/net/minecraft/world/entity/player/Inventory.java b/net/minecraft/world/entity/player/Inventory.java
 index 839cbb67d3d38960d9114a4db5bab911b66a573c..8cc7324256ac783acc25e5cc5e455cd7a6da0bc2 100644
 --- a/net/minecraft/world/entity/player/Inventory.java
