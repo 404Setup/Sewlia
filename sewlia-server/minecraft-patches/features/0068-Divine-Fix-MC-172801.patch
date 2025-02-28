@@ -9,10 +9,10 @@ You can find the original code on https://github.com/DivineMC/DivineMC
 Original post on Mojira: https://bugs.mojang.com/browse/MC-172801
 
 diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
-index 3329064355e428375b315e1bc358e63d0e3734a2..8b9e24929a10656cf60284c1ea05013386624df8 100644
+index c1ae44c25240d422a4f303ec8f76485ce12f193f..79227045ab349242ba1035a1b0fce6d736eae833 100644
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
-@@ -3131,7 +3131,13 @@ public abstract class LivingEntity extends Entity implements Attackable {
+@@ -3138,7 +3138,13 @@ public abstract class LivingEntity extends Entity implements Attackable {
      }
  
      protected float getFlyingSpeed() {
