@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Sat, 22 Feb 2025 22:09:46 +0800
+Subject: [PATCH] Modify AntiXray
+
+
+diff --git a/src/main/java/io/papermc/paper/antixray/ChunkPacketBlockControllerAntiXray.java b/src/main/java/io/papermc/paper/antixray/ChunkPacketBlockControllerAntiXray.java
+index ee2d3a54d760f9c26542eab03c51651a30e279a0..14e6a39efe5ef5379997384f8ac7f4cf94064b47 100644
+--- a/src/main/java/io/papermc/paper/antixray/ChunkPacketBlockControllerAntiXray.java
++++ b/src/main/java/io/papermc/paper/antixray/ChunkPacketBlockControllerAntiXray.java
+@@ -82,8 +82,8 @@ public final class ChunkPacketBlockControllerAntiXray extends ChunkPacketBlockCo
+             presetBlockStateBitsNetherrackGlobal = new int[]{GLOBAL_BLOCKSTATE_PALETTE.idFor(Blocks.NETHERRACK.defaultBlockState())};
+             presetBlockStateBitsEndStoneGlobal = new int[]{GLOBAL_BLOCKSTATE_PALETTE.idFor(Blocks.END_STONE.defaultBlockState())};
+         } else {
+-            toObfuscate = new ArrayList<>(paperWorldConfig.replacementBlocks);
+-            List<BlockState> presetBlockStateList = new LinkedList<>();
++            toObfuscate = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(paperWorldConfig.replacementBlocks);
++            List<BlockState> presetBlockStateList = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+ 
+             for (Block block : paperWorldConfig.hiddenBlocks) {
+ 
+@@ -94,7 +94,7 @@ public final class ChunkPacketBlockControllerAntiXray extends ChunkPacketBlockCo
+             }
+ 
+             // The doc of the LinkedHashSet(Collection<? extends E>) constructor doesn't specify that the insertion order is the predictable iteration order of the specified Collection, although it is in the implementation
+-            Set<BlockState> presetBlockStateSet = new LinkedHashSet<>();
++            Set<BlockState> presetBlockStateSet = new it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet<>();
+             // Therefore addAll(Collection<? extends E>) is used, which guarantees this order in the doc
+             presetBlockStateSet.addAll(presetBlockStateList);
+             presetBlockStates = presetBlockStateSet.isEmpty() ? new BlockState[]{Blocks.DIAMOND_ORE.defaultBlockState()} : presetBlockStateSet.toArray(new BlockState[0]);
