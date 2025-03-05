@@ -1,0 +1,66 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Taiyou06 <kaandindar21@gmail.com>
+Date: Fri, 14 Feb 2025 14:58:59 +0100
+Subject: [PATCH] Leaf: Alternative Brain Behaviour
+
+In the test, this can give ~54.87% improvement (~25712ms -> ~11604ms),
+under 1024 villagers situation.
+
+diff --git a/net/minecraft/world/entity/ai/Brain.java b/net/minecraft/world/entity/ai/Brain.java
+index 65b2b3ece213d901cdd585093e2fafcd2ef4a7cd..7fd042e709eb94ca7cb6411432c651f0918f169c 100644
+--- a/net/minecraft/world/entity/ai/Brain.java
++++ b/net/minecraft/world/entity/ai/Brain.java
+@@ -248,9 +248,39 @@ public class Brain<E extends LivingEntity> {
+         return this.activeActivities;
+     }
+ 
++    // Leaf start - Alternative Brain Behaviour
++    private ObjectArrayList<BehaviorControl<? super E>> runningBehaviorsCache;
++    private long lastRunningBehaviorCheck = -1;
++    // Leaf end - Alternative Brain Behaviour
++
+     @Deprecated
+     @VisibleForDebug
+     public List<BehaviorControl<? super E>> getRunningBehaviors() {
++        if (one.tranic.sewlia.config.mod.optimization.brain.running_behaviors.Enabled.value) {
++            // Leaf start - Alternative Brain Behaviour
++            long currentTick = getCurrentTick();
++
++            // Use cached result if within update interval
++            if (runningBehaviorsCache != null && (currentTick - lastRunningBehaviorCheck) < one.tranic.sewlia.config.mod.optimization.brain.running_behaviors.CacheUpdateInterval.value) {
++                return runningBehaviorsCache;
++            }
++
++            // Initialize or reuse cache list
++            if (runningBehaviorsCache == null) runningBehaviorsCache = new ObjectArrayList<>(32);
++            else runningBehaviorsCache.clear();
++
++            for (Map<Activity, Set<BehaviorControl<? super E>>> activityMap : availableBehaviorsByPriority.values()) {
++                for (Set<BehaviorControl<? super E>> behaviors : activityMap.values()) {
++                    if (behaviors.isEmpty()) continue;
++                    for (BehaviorControl<? super E> behavior : behaviors)
++                        if (behavior.getStatus() == Behavior.Status.RUNNING)
++                            runningBehaviorsCache.add(behavior);
++                }
++            }
++            lastRunningBehaviorCheck = currentTick;
++
++            return runningBehaviorsCache;
++        }
+         List<BehaviorControl<? super E>> list = new ObjectArrayList<>();
+ 
+         for (Map<Activity, Set<BehaviorControl<? super E>>> map : this.availableBehaviorsByPriority.values()) {
+@@ -266,6 +296,13 @@ public class Brain<E extends LivingEntity> {
+         return list;
+     }
+ 
++    // Helper method to get current tick
++    private long getCurrentTick() {
++        // This should be implemented to return the current game tick
++        return System.nanoTime() / 50_000_000; // Approximate tick time of 50ms
++    }
++    // Leaf end - Alternative Brain Behaviour
++
+     public void useDefaultActivity() {
+         this.setActiveActivity(this.defaultActivity);
+     }

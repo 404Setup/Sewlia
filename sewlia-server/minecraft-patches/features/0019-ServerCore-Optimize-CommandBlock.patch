@@ -1,0 +1,77 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Wed, 5 Mar 2025 11:19:39 +0800
+Subject: [PATCH] ServerCore Optimize CommandBlock
+
+This patch optimizes command block executions by caching the parsed command results.
+* Command parsing is a relatively expensive operation.
+* By caching it we avoid parsing the same command every time it is executed.
+* <p>
+* This works because the only thing that changes between command executions is the command source.
+* During parsing the source is only used to determine whether it is allowed to execute the command, which never changes in vanilla.
+
+This patch is based on following mixins:
+* "me/wesley1808/servercore/mixin/optimizations/command_blocks/BaseCommandBlockMixin.java"
+
+By: Wesley1808 <74668381+Wesley1808@users.noreply.github.com>
+As part of: ServerCore (https://github.com/Wesley1808/ServerCore)
+Licensed under: MIT
+
+
+diff --git a/net/minecraft/world/level/BaseCommandBlock.java b/net/minecraft/world/level/BaseCommandBlock.java
+index 6443b3bf24e33a1a674567b7f7e2692d7f8946cd..e162322562d831328ce0a59477191cf9fed17866 100644
+--- a/net/minecraft/world/level/BaseCommandBlock.java
++++ b/net/minecraft/world/level/BaseCommandBlock.java
+@@ -36,6 +36,7 @@ public abstract class BaseCommandBlock implements CommandSource {
+     @Override
+     public abstract org.bukkit.command.CommandSender getBukkitSender(CommandSourceStack wrapper);
+     // CraftBukkit end
++    private com.mojang.brigadier.ParseResults<CommandSourceStack> servercore$parsed; // Sewlia
+ 
+ 
+     public int getSuccessCount() {
+@@ -102,17 +103,31 @@ public abstract class BaseCommandBlock implements CommandSource {
+         } else {
+             this.lastExecution = -1L;
+         }
++        this.servercore$parsed = null; // Sewlia - ServerCore optimize Command Block
+     }
+ 
+     public void setCommand(String command) {
+         this.command = command;
+         this.successCount = 0;
++        this.servercore$parsed = null; // Sewlia - ServerCore optimize Command Block
+     }
+ 
+     public String getCommand() {
+         return this.command;
+     }
+ 
++    // Sewlia start - ServerCore optimize Command Block
++    private void servercore$useCachedParseResults(net.minecraft.commands.Commands commands, CommandSourceStack source, String command) {
++        String cmd = command.startsWith("/") ? command.substring(1) : command;
++        if (this.servercore$parsed == null) {
++            this.servercore$parsed = commands.getDispatcher().parse(cmd, source);
++            commands.performCommand(this.servercore$parsed, cmd);
++        } else {
++            commands.performCommand(net.minecraft.commands.Commands.mapSource(this.servercore$parsed, (s) -> source), cmd);
++        }
++    }
++    // Sewlia end - ServerCore optimize Command Block
++
+     public boolean performCommand(Level level) {
+         if (!one.tranic.sewlia.config.mod.unsafe.EnableCommandBlock.value) return false; // Folia - region threading
+         if (level.isClientSide || level.getGameTime() == this.lastExecution) {
+@@ -132,7 +147,11 @@ public abstract class BaseCommandBlock implements CommandSource {
+                             this.successCount++;
+                         }
+                     });
+-                    server.getCommands().dispatchServerCommand(commandSourceStack, this.command); // CraftBukkit
++                    // Sewlia start - ServerCore optimize Command Block
++                    if (one.tranic.sewlia.config.mod.unsafe.optimization.CommandBlocks.value)
++                        servercore$useCachedParseResults(server.getCommands(), commandSourceStack, this.command);
++                    else server.getCommands().dispatchServerCommand(commandSourceStack, this.command); // CraftBukkit
++                    // Sewlia end - ServerCore optimize Command Block
+                 } catch (Throwable var6) {
+                     CrashReport crashReport = CrashReport.forThrowable(var6, "Executing command block");
+                     CrashReportCategory crashReportCategory = crashReport.addCategory("Command to be executed");

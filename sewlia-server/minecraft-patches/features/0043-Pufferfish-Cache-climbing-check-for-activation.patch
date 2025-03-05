@@ -18,7 +18,7 @@ index c260741a87513b89a5cc62c543fb9f990f86491e..efe2dca0d4c3f929afc40a396a9cb4df
              }
              if (entity instanceof final Mob mob && mob.getTarget() != null) {
 diff --git a/net/minecraft/world/entity/LivingEntity.java b/net/minecraft/world/entity/LivingEntity.java
-index d99ff2a465bd26fe57a87364da5499cf2f61fbdf..3329064355e428375b315e1bc358e63d0e3734a2 100644
+index 1e17d1a0884913c127da733bd401e40f9063eebf..c1ae44c25240d422a4f303ec8f76485ce12f193f 100644
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
 @@ -2058,6 +2058,19 @@ public abstract class LivingEntity extends Entity implements Attackable {
