@@ -17,7 +17,6 @@ By: Wesley1808 <74668381+Wesley1808@users.noreply.github.com>
 As part of: ServerCore (https://github.com/Wesley1808/ServerCore)
 Licensed under: MIT
 
-
 diff --git a/net/minecraft/world/level/BaseCommandBlock.java b/net/minecraft/world/level/BaseCommandBlock.java
 index 6443b3bf24e33a1a674567b7f7e2692d7f8946cd..e162322562d831328ce0a59477191cf9fed17866 100644
 --- a/net/minecraft/world/level/BaseCommandBlock.java
