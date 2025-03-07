@@ -52,14 +52,20 @@ Sewlia gets patches or inspiration from the following server software or project
 Thanks to these developers for their contributions.
 
 - CaffeineMC/lithium-fabric
+- DivineMC/DivineMC
 - Dreeam-qwq/Gale
+- embeddedt/ModernFix
+- fxmorin/carpet-fixes
 - KaiijuMC/Kaiiju
-- LuminolMC/Luminol 
+- KIOCG
 - LeavesMC/Leaves
-- RelativityMC/VMP-fabric 
-- SparklyPower/SparklyPaper
-- TECHNOVE/Airplane
-- Winds-Studio/Leaf
+- LuminolMC/Luminol
 - MultiPaper/MultiPaper
 - PaperMC/Velocity
 - pufferfish-gg/Pufferfish
+- RelativityMC/C2ME-fabric
+- RelativityMC/VMP-fabric
+- SparklyPower/SparklyPaper
+- TECHNOVE/Airplane
+- Wesley1808/ServerCore
+- Winds-Studio/Leaf
