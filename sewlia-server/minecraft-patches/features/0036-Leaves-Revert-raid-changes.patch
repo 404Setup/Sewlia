@@ -5,7 +5,7 @@ Subject: [PATCH] Leaves: Revert raid changes
 
 
 diff --git a/net/minecraft/world/effect/BadOmenMobEffect.java b/net/minecraft/world/effect/BadOmenMobEffect.java
-index 80f17f33f670018240c854df589cf90cdeab6e70..0fb30899c873bcaf83c18447969c3ba85694a10b 100644
+index 80f17f33f670018240c854df589cf90cdeab6e70..cab1308abf2cdc27f32322e35e0d06aadf2da671 100644
 --- a/net/minecraft/world/effect/BadOmenMobEffect.java
 +++ b/net/minecraft/world/effect/BadOmenMobEffect.java
 @@ -22,6 +22,11 @@ class BadOmenMobEffect extends MobEffect {
@@ -13,7 +13,7 @@ index 80f17f33f670018240c854df589cf90cdeab6e70..0fb30899c873bcaf83c18447969c3ba8
              && level.getDifficulty() != Difficulty.PEACEFUL
              && level.isVillage(serverPlayer.blockPosition())) {
 +            // Leaves start - Revert raid changes
-+            if (one.tranic.sewlia.config.mod.feature.raid.AllowBadOmenTriggerRaid.value) {
++            if (one.tranic.sewlia.config.mod.unsafe.raid.AllowBadOmenTriggerRaid.value) {
 +                return level.getRaids().createOrExtendRaid(serverPlayer, serverPlayer.blockPosition()) != null;
 +            }
 +            // Leaves end - Revert raid changes
@@ -21,67 +21,46 @@ index 80f17f33f670018240c854df589cf90cdeab6e70..0fb30899c873bcaf83c18447969c3ba8
              if (raidAt == null || raidAt.getRaidOmenLevel() < raidAt.getMaxRaidOmenLevel()) {
                  serverPlayer.addEffect(new MobEffectInstance(MobEffects.RAID_OMEN, 600, amplifier));
 diff --git a/net/minecraft/world/entity/raid/Raider.java b/net/minecraft/world/entity/raid/Raider.java
-index 7c385baae81b9a987c0e1e4deb017884600331bc..ce45ac6733861da2f202066041180bbb50811767 100644
+index 7c385baae81b9a987c0e1e4deb017884600331bc..c36a3ec913a2c61401ce0feb617820e1bf8a4c13 100644
 --- a/net/minecraft/world/entity/raid/Raider.java
 +++ b/net/minecraft/world/entity/raid/Raider.java
-@@ -16,8 +16,11 @@ import net.minecraft.network.syncher.EntityDataSerializers;
- import net.minecraft.network.syncher.SynchedEntityData;
- import net.minecraft.server.level.ServerLevel;
- import net.minecraft.sounds.SoundEvent;
-+import net.minecraft.util.Mth;
- import net.minecraft.world.DifficultyInstance;
- import net.minecraft.world.damagesource.DamageSource;
-+import net.minecraft.world.effect.MobEffectInstance;
-+import net.minecraft.world.effect.MobEffects;
- import net.minecraft.world.entity.Entity;
- import net.minecraft.world.entity.EntitySpawnReason;
- import net.minecraft.world.entity.EntityType;
-@@ -31,10 +34,13 @@ import net.minecraft.world.entity.ai.targeting.TargetingConditions;
- import net.minecraft.world.entity.ai.util.DefaultRandomPos;
- import net.minecraft.world.entity.ai.village.poi.PoiManager;
- import net.minecraft.world.entity.ai.village.poi.PoiTypes;
-+import net.minecraft.world.entity.animal.Wolf;
- import net.minecraft.world.entity.item.ItemEntity;
- import net.minecraft.world.entity.monster.AbstractIllager;
- import net.minecraft.world.entity.monster.PatrollingMonster;
-+import net.minecraft.world.entity.player.Player;
- import net.minecraft.world.item.ItemStack;
-+import net.minecraft.world.level.GameRules;
- import net.minecraft.world.level.Level;
- import net.minecraft.world.level.ServerLevelAccessor;
- import net.minecraft.world.level.pathfinder.Path;
-@@ -125,6 +131,38 @@ public abstract class Raider extends PatrollingMonster {
+@@ -125,6 +125,43 @@ public abstract class Raider extends PatrollingMonster {
  
                  currentRaid.removeFromRaid(this, false);
              }
 +
 +            // Leaves start - Revert raid changes
 +            if (this.level() instanceof ServerLevel serverLevel) {
-+                if (one.tranic.sewlia.config.mod.feature.raid.GiveBadOmenWhenKillPatrolLeader.value && this.isPatrolLeader() && raid == null && serverLevel.getRaidAt(this.blockPosition()) == null) {
++                if (one.tranic.sewlia.config.mod.unsafe.raid.GiveBadOmenWhenKillPatrolLeader.value && this.isPatrolLeader() && raid == null && serverLevel.getRaidAt(this.blockPosition()) == null) {
 +                    ItemStack itemstack = this.getItemBySlot(EquipmentSlot.HEAD);
-+                    Player entityhuman = null;
-+
-+                    if (entity instanceof Player) {
-+                        entityhuman = (Player) entity;
-+                    } else if (entity instanceof Wolf entitywolf) {
-+                        LivingEntity entityliving = entitywolf.getOwner();
-+                        if (entitywolf.isTame() && entityliving instanceof Player)
-+                            entityhuman = (Player) entityliving;
++                    net.minecraft.world.entity.player.Player entityhuman = null;
++                    if (entity instanceof net.minecraft.world.entity.player.Player player) {
++                        entityhuman = player;
++                    } else if (entity instanceof net.minecraft.world.entity.animal.Wolf wolf) {
++                        LivingEntity entityliving = wolf.getOwner();
++                        if (wolf.isTame() && entityliving instanceof net.minecraft.world.entity.player.Player player) {
++                            entityhuman = player;
++                        }
 +                    }
 +
-+                    if (!itemstack.isEmpty() && ItemStack.matches(itemstack, Raid.getOminousBannerInstance(this.registryAccess().lookupOrThrow(Registries.BANNER_PATTERN))) && entityhuman != null) {
-+                        MobEffectInstance mobeffect = entityhuman.getEffect(MobEffects.BAD_OMEN);
++                    if (entityhuman != null && !itemstack.isEmpty() && this.isCaptain()) {
++                        net.minecraft.world.effect.MobEffectInstance mobeffect = entityhuman.getEffect(net.minecraft.world.effect.MobEffects.BAD_OMEN);
 +                        int i = 1;
 +
 +                        if (mobeffect != null) {
 +                            i += mobeffect.getAmplifier();
-+                            entityhuman.removeEffectNoUpdate(MobEffects.BAD_OMEN);
-+                        } else --i;
++                            entityhuman.removeEffectNoUpdate(net.minecraft.world.effect.MobEffects.BAD_OMEN);
++                        } else {
++                            --i;
++                        }
 +
-+                        i = Mth.clamp(i, 0, 4);
-+                        MobEffectInstance mobeffect1 = new MobEffectInstance(MobEffects.BAD_OMEN, 120000, i, false, false, true);
-+                        if (!serverLevel.getGameRules().getBoolean(GameRules.RULE_DISABLE_RAIDS))
++                        i = net.minecraft.util.Mth.clamp(i, 0, 4);
++                        net.minecraft.world.effect.MobEffectInstance mobeffect1 = new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.BAD_OMEN, 120000, i, false, false, true);
++
++                        if (!serverLevel.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DISABLE_RAIDS)) {
 +                            entityhuman.addEffect(mobeffect1, org.bukkit.event.entity.EntityPotionEffectEvent.Cause.PATROL_CAPTAIN); // CraftBukkit
++                        }
++                        this.setPatrolLeader(false);
 +                    }
 +                }
 +            }
