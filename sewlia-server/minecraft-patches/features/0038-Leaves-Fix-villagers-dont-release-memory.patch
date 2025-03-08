@@ -5,10 +5,10 @@ Subject: [PATCH] Leaves: Fix villagers dont release memory
 
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 9f7022308836d9e66046eba069d2fa42612b9525..c26055e86ad8020a1f748356cc0333bac5a75c16 100644
+index 053f0fe9c7c6d8c26e450f8cefdb817788fe66b7..29be8c4bd8ea14b1316ed4b211eacbfc50dd7ce9 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -4645,7 +4645,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -4640,7 +4640,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
          return this;
      }
  

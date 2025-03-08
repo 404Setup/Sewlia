@@ -13,7 +13,7 @@ As part of: Slice (https://github.com/Cryptite/Slice)
 Licensed under: MIT (https://opensource.org/licenses/
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 5513884c189f9ef18f7d10069829aaa13347ea60..bb3a7947258cfbeaddd7c4e024cab0650cf5a37a 100644
+index aa1b52b1895a570592c288fbafab95f869b82a7d..7a4d2c1b45e4fc47a6110e5935c3ddf4185f634f 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
 @@ -901,7 +901,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess

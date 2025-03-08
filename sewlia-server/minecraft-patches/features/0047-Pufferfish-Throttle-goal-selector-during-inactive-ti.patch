@@ -5,7 +5,7 @@ Subject: [PATCH] Pufferfish: Throttle goal selector during inactive ticking
 
 
 diff --git a/net/minecraft/world/entity/Mob.java b/net/minecraft/world/entity/Mob.java
-index af7dbb0f2df0ec42c2c16bc58ba16b6c65d3ebcb..620a77d267acc083fca9ef6933917de0778e9e25 100644
+index 94a7b95f41c2954561f9c3cb0f61210c0c058f1d..e72d2f19108663005c36e53842ba638943d4bdae 100644
 --- a/net/minecraft/world/entity/Mob.java
 +++ b/net/minecraft/world/entity/Mob.java
 @@ -215,11 +215,13 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
