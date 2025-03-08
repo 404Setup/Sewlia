@@ -59,7 +59,7 @@ index 51ba64ed90aa4be0484ed11794fb1ca758a9867c..7502f2f124af13202cf5d25f83d31806
              this.lastServerStatus = nanos;
              this.status = this.buildServerStatus();
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
-index 7fb6cfe0484a4cc1e30fd8e344de307a0c734b68..b8855335fb3623d3262f55b6c698d62e9a4a64b4 100644
+index f2d2ddfd964bff914e41c0b4150fe1aad7866ebf..b3877a35297472e0cafbd1b4351f839f6f12f606 100644
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
 @@ -1339,6 +1339,8 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
@@ -177,10 +177,10 @@ index f003a65b34027dff14455860815c7d719c5289fa..6f9f8e52d2311343a0c0c3900a466c6a
 +    // KioCG end
  }
 diff --git a/net/minecraft/world/entity/Mob.java b/net/minecraft/world/entity/Mob.java
-index 6394b0899095b047ca9266135fc44aa0c32467cf..af7dbb0f2df0ec42c2c16bc58ba16b6c65d3ebcb 100644
+index da922d4c0ffa0f40d5e8dd69487bf30dbbbeed87..94a7b95f41c2954561f9c3cb0f61210c0c058f1d 100644
 --- a/net/minecraft/world/entity/Mob.java
 +++ b/net/minecraft/world/entity/Mob.java
-@@ -1720,4 +1720,11 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
+@@ -1722,4 +1722,11 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
      public float[] getArmorDropChances() {
          return this.armorDropChances;
      }
