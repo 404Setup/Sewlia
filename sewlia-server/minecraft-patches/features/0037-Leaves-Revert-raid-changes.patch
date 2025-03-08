@@ -21,7 +21,7 @@ index 80f17f33f670018240c854df589cf90cdeab6e70..cab1308abf2cdc27f32322e35e0d06aa
              if (raidAt == null || raidAt.getRaidOmenLevel() < raidAt.getMaxRaidOmenLevel()) {
                  serverPlayer.addEffect(new MobEffectInstance(MobEffects.RAID_OMEN, 600, amplifier));
 diff --git a/net/minecraft/world/entity/raid/Raider.java b/net/minecraft/world/entity/raid/Raider.java
-index 7c385baae81b9a987c0e1e4deb017884600331bc..c36a3ec913a2c61401ce0feb617820e1bf8a4c13 100644
+index 7c385baae81b9a987c0e1e4deb017884600331bc..51fcffe5cdbdb8dbd0a4e9cca186410738f19fc9 100644
 --- a/net/minecraft/world/entity/raid/Raider.java
 +++ b/net/minecraft/world/entity/raid/Raider.java
 @@ -125,6 +125,43 @@ public abstract class Raider extends PatrollingMonster {

@@ -6,7 +6,7 @@ Subject: [PATCH] Luminol: Teleport async if entity was moving to another
 
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index ec5b7750e219a59e4fcacd7b322d7eaa90600240..9f4280c8a0bee28d1e3ad14888c5943c593af996 100644
+index 0f59acd17b90770626ff468fbf13b8f53aedd254..053f0fe9c7c6d8c26e450f8cefdb817788fe66b7 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
 @@ -1100,6 +1100,8 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess

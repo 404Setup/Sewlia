@@ -1,0 +1,43 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: violetc <58360096+s-yh-china@users.noreply.github.com>
+Date: Sat, 22 Jul 2023 12:00:59 +0800
+Subject: [PATCH] Leaves: Fix villagers dont release memory
+
+
+diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
+index 9f7022308836d9e66046eba069d2fa42612b9525..c26055e86ad8020a1f748356cc0333bac5a75c16 100644
+--- a/net/minecraft/world/entity/Entity.java
++++ b/net/minecraft/world/entity/Entity.java
+@@ -4645,7 +4645,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+         return this;
+     }
+ 
+-    private Entity teleportCrossDimension(ServerLevel level, TeleportTransition teleportTransition) {
++    protected Entity teleportCrossDimension(ServerLevel level, TeleportTransition teleportTransition) { // Leaves - private -> protected
+         List<Entity> passengers = this.getPassengers();
+         List<Entity> list = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(passengers.size());
+         this.ejectPassengers();
+diff --git a/net/minecraft/world/entity/npc/Villager.java b/net/minecraft/world/entity/npc/Villager.java
+index 7ea74aeb905b95e5919d74df5fbc5e8f7a9985e3..792ab00905e2a731406813dd74d7e8a4de62d36c 100644
+--- a/net/minecraft/world/entity/npc/Villager.java
++++ b/net/minecraft/world/entity/npc/Villager.java
+@@ -1020,4 +1020,19 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+         Optional<Long> memory = this.brain.getMemory(MemoryModuleType.LAST_SLEPT);
+         return memory.filter(_long -> gameTime - _long < 24000L).isPresent();
+     }
++
++    // Leaves start - fixes a memory leak when villagers get moved to another world
++    @Override
++    public Entity teleportCrossDimension(ServerLevel world, net.minecraft.world.level.portal.TeleportTransition transition) {
++        if (one.tranic.sewlia.config.mod.fix.VillagersDontReleaseMemory.value) {
++            this.releaseAllPois();
++            this.getBrain().eraseMemory(MemoryModuleType.HOME);
++            this.getBrain().eraseMemory(MemoryModuleType.JOB_SITE);
++            this.getBrain().eraseMemory(MemoryModuleType.POTENTIAL_JOB_SITE);
++            this.getBrain().eraseMemory(MemoryModuleType.MEETING_POINT);
++            this.refreshBrain(transition.newLevel());
++        }
++        return super.teleportCrossDimension(world, transition);
++    }
++    // Leaves end - fixes a memory leak when villagers get moved to another world
+ }

@@ -1,0 +1,134 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Fri, 7 Mar 2025 15:04:46 +0800
+Subject: [PATCH] Modify advancements
+
+
+diff --git a/net/minecraft/advancements/AdvancementProgress.java b/net/minecraft/advancements/AdvancementProgress.java
+index 81c19b3fb404cac9eb1475ba6d9ac5a7c35f307d..3bd06a2899a55a3f4622f808107473f396e2cf2a 100644
+--- a/net/minecraft/advancements/AdvancementProgress.java
++++ b/net/minecraft/advancements/AdvancementProgress.java
+@@ -48,7 +48,7 @@ public class AdvancementProgress implements Comparable<AdvancementProgress> {
+     }
+ 
+     public AdvancementProgress() {
+-        this.criteria = Maps.newHashMap();
++        this.criteria = new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>();
+     }
+ 
+     public void update(AdvancementRequirements requirements) {
+@@ -150,7 +150,7 @@ public class AdvancementProgress implements Comparable<AdvancementProgress> {
+     }
+ 
+     public Iterable<String> getRemainingCriteria() {
+-        List<String> list = Lists.newArrayList();
++        List<String> list = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+ 
+         for (Entry<String, CriterionProgress> entry : this.criteria.entrySet()) {
+             if (!entry.getValue().isDone()) {
+@@ -162,7 +162,7 @@ public class AdvancementProgress implements Comparable<AdvancementProgress> {
+     }
+ 
+     public Iterable<String> getCompletedCriteria() {
+-        List<String> list = Lists.newArrayList();
++        List<String> list = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+ 
+         for (Entry<String, CriterionProgress> entry : this.criteria.entrySet()) {
+             if (entry.getValue().isDone()) {
+diff --git a/net/minecraft/advancements/AdvancementTree.java b/net/minecraft/advancements/AdvancementTree.java
+index 6a69b081fe004c6da4e06455e7a6a0fe6608f04a..036bd889280f5b5c35fb4308c1e2eba99a89986f 100644
+--- a/net/minecraft/advancements/AdvancementTree.java
++++ b/net/minecraft/advancements/AdvancementTree.java
+@@ -53,7 +53,7 @@ public class AdvancementTree {
+     }
+ 
+     public void addAll(Collection<AdvancementHolder> advancements) {
+-        List<AdvancementHolder> list = new ArrayList<>(advancements);
++        List<AdvancementHolder> list = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(advancements);
+ 
+         while (!list.isEmpty()) {
+             if (!list.removeIf(this::tryInsert)) {
+diff --git a/net/minecraft/advancements/TreeNodePosition.java b/net/minecraft/advancements/TreeNodePosition.java
+index 6eca1ca54c4175d78c25b367e1ea34e4272bcf43..8e9c91460a17b2b71b31ac20d9ecd31eb8a1bca9 100644
+--- a/net/minecraft/advancements/TreeNodePosition.java
++++ b/net/minecraft/advancements/TreeNodePosition.java
+@@ -11,7 +11,7 @@ public class TreeNodePosition {
+     @Nullable
+     private final TreeNodePosition previousSibling;
+     private final int childIndex;
+-    private final List<TreeNodePosition> children = Lists.newArrayList();
++    private final List<TreeNodePosition> children = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+     private TreeNodePosition ancestor;
+     @Nullable
+     private TreeNodePosition thread;
+diff --git a/net/minecraft/advancements/critereon/InventoryChangeTrigger.java b/net/minecraft/advancements/critereon/InventoryChangeTrigger.java
+index 52eebc36951097d8fdcce0ece518e779e6f41319..eda5c6e04c9a7b1ceb49956c3b16f3c7b50177ac 100644
+--- a/net/minecraft/advancements/critereon/InventoryChangeTrigger.java
++++ b/net/minecraft/advancements/critereon/InventoryChangeTrigger.java
+@@ -23,6 +23,7 @@ public class InventoryChangeTrigger extends SimpleCriterionTrigger<InventoryChan
+     }
+ 
+     public void trigger(ServerPlayer player, Inventory inventory, ItemStack stack) {
++        if (stack.isEmpty()) return; // Sewlia
+         int i = 0;
+         int i1 = 0;
+         int i2 = 0;
+diff --git a/net/minecraft/server/PlayerAdvancements.java b/net/minecraft/server/PlayerAdvancements.java
+index 64dbee1f67eaa17c93c13bfa38fbe27de57651e4..ed88c9d4229f7134b32cad06f831880d4d6906e6 100644
+--- a/net/minecraft/server/PlayerAdvancements.java
++++ b/net/minecraft/server/PlayerAdvancements.java
+@@ -51,10 +51,10 @@ public class PlayerAdvancements {
+     private final PlayerList playerList;
+     private final Path playerSavePath;
+     private AdvancementTree tree;
+-    private final Map<AdvancementHolder, AdvancementProgress> progress = new LinkedHashMap<>();
+-    private final Set<AdvancementHolder> visible = new HashSet<>();
+-    private final Set<AdvancementHolder> progressChanged = new HashSet<>();
+-    private final Set<AdvancementNode> rootsToUpdate = new HashSet<>();
++    private final Map<AdvancementHolder, AdvancementProgress> progress = new it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap<>();
++    private final Set<AdvancementHolder> visible = new it.unimi.dsi.fastutil.objects.ObjectOpenHashSet<>();
++    private final Set<AdvancementHolder> progressChanged = new it.unimi.dsi.fastutil.objects.ObjectOpenHashSet<>();
++    private final Set<AdvancementNode> rootsToUpdate = new it.unimi.dsi.fastutil.objects.ObjectOpenHashSet<>();
+     private ServerPlayer player;
+     @Nullable
+     private AdvancementHolder lastSelectedTab;
+@@ -67,7 +67,7 @@ public class PlayerAdvancements {
+         this.playerSavePath = playerSavePath;
+         this.player = player;
+         this.tree = manager.tree();
+-        int i = 1343;
++        //int i = 1343; // Sewlia
+         this.codec = DataFixTypes.ADVANCEMENTS.wrapCodec(PlayerAdvancements.Data.CODEC, dataFixer, 1343);
+         this.load(manager);
+     }
+@@ -158,7 +158,7 @@ public class PlayerAdvancements {
+     }
+ 
+     private PlayerAdvancements.Data asData() {
+-        Map<ResourceLocation, AdvancementProgress> map = new LinkedHashMap<>();
++        Map<ResourceLocation, AdvancementProgress> map = new it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap<>();
+         this.progress.forEach((advancementHolder, progress) -> {
+             if (progress.hasProgress()) {
+                 map.put(advancementHolder.id(), progress);
+diff --git a/net/minecraft/server/ServerAdvancementManager.java b/net/minecraft/server/ServerAdvancementManager.java
+index 920eb7141df0105618b604567246cd4a20f21d44..27dcb030edfad79029faf5b3c4721a8ac09ed8db 100644
+--- a/net/minecraft/server/ServerAdvancementManager.java
++++ b/net/minecraft/server/ServerAdvancementManager.java
+@@ -22,7 +22,7 @@ import org.slf4j.Logger;
+ 
+ public class ServerAdvancementManager extends SimpleJsonResourceReloadListener<Advancement> {
+     private static final Logger LOGGER = LogUtils.getLogger();
+-    public Map<ResourceLocation, AdvancementHolder> advancements = new java.util.HashMap<>(); // CraftBukkit - SPIGOT-7734: mutable
++    public Map<ResourceLocation, AdvancementHolder> advancements = new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>(); // CraftBukkit - SPIGOT-7734: mutable
+     private AdvancementTree tree = new AdvancementTree();
+     private final HolderLookup.Provider registries;
+ 
+@@ -43,7 +43,7 @@ public class ServerAdvancementManager extends SimpleJsonResourceReloadListener<A
+             this.validate(resourceLocation, advancement);
+             builder.put(resourceLocation, new AdvancementHolder(resourceLocation, advancement));
+         });
+-        this.advancements = new java.util.HashMap<>(builder.buildOrThrow()); // CraftBukkit - SPIGOT-7734: mutable
++        this.advancements = new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>(builder.buildOrThrow()); // CraftBukkit - SPIGOT-7734: mutable
+         AdvancementTree advancementTree = new AdvancementTree();
+         advancementTree.addAll(this.advancements.values());
+         LOGGER.info("Loaded {} advancements", advancementTree.nodes().size()); // Paper - Improve logging and errors; moved from AdvancementTree#addAll
