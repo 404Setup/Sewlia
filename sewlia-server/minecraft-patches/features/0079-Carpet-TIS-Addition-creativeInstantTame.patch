@@ -1,0 +1,80 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Mon, 10 Mar 2025 18:22:11 +0800
+Subject: [PATCH] Carpet-TIS-Addition: creativeInstantTame
+
+This patch is based on following mixins:
+* "mixins/rule/creativeInstantTame/HorseBondWithPlayerGoalMixin.java"
+* "mixins/rule/creativeInstantTame/ParrotEntityMixin.java"
+* "mixins/rule/creativeInstantTame/WolfEntityMixin.java"
+* "mixins/rule/creativeInstantTame/CatEntityMixin.java"
+By: Fallen_Breath <yqx791125833@gmail.com>
+As part of: Carpet-TIS-Addition (https://github.com/TISUnion/Carpet-TIS-Addition)
+Licensed under: LGPL-3.0 license (https://www.gnu.org/licenses/lgpl-3.0.html)
+
+diff --git a/net/minecraft/world/entity/ai/goal/RunAroundLikeCrazyGoal.java b/net/minecraft/world/entity/ai/goal/RunAroundLikeCrazyGoal.java
+index 878d7813b3f2f52bef336c6d855d738bc2f83491..ee54843707e3c062170824b3ebad2b09b9ad1dfd 100644
+--- a/net/minecraft/world/entity/ai/goal/RunAroundLikeCrazyGoal.java
++++ b/net/minecraft/world/entity/ai/goal/RunAroundLikeCrazyGoal.java
+@@ -49,16 +49,19 @@ public class RunAroundLikeCrazyGoal extends Goal {
+ 
+     @Override
+     public void tick() {
+-        if (!this.horse.isTamed() && this.horse.getRandom().nextInt(this.adjustedTickDelay(50)) == 0) {
++        if (!this.horse.isTamed()) {
+             Entity firstPassenger = this.horse.getFirstPassenger();
+             if (firstPassenger == null) {
+                 return;
+             }
+ 
+-            if (firstPassenger instanceof Player player) {
++            if (firstPassenger instanceof Player player
++                    && ((one.tranic.sewlia.config.mod.feature.CreativeInstantTame.value && player.isCreative())
++                    || this.horse.getRandom().nextInt(this.adjustedTickDelay(50)) == 0)
++            ) {
+                 int temper = this.horse.getTemper();
+                 int maxTemper = this.horse.getMaxTemper();
+-                if (maxTemper > 0 && this.horse.getRandom().nextInt(maxTemper) < temper && !org.bukkit.craftbukkit.event.CraftEventFactory.callEntityTameEvent(this.horse, ((org.bukkit.craftbukkit.entity.CraftHumanEntity) this.horse.getBukkitEntity().getPassenger()).getHandle()).isCancelled()) { // CraftBukkit - fire EntityTameEvent
++                if (maxTemper > 0 && ((one.tranic.sewlia.config.mod.feature.CreativeInstantTame.value && player.isCreative()) || this.horse.getRandom().nextInt(maxTemper) < temper) && !org.bukkit.craftbukkit.event.CraftEventFactory.callEntityTameEvent(this.horse, ((org.bukkit.craftbukkit.entity.CraftHumanEntity) this.horse.getBukkitEntity().getPassenger()).getHandle()).isCancelled()) { // CraftBukkit - fire EntityTameEvent
+                     this.horse.tameWithName(player);
+                     return;
+                 }
+diff --git a/net/minecraft/world/entity/animal/Cat.java b/net/minecraft/world/entity/animal/Cat.java
+index 740ab58c733d9e3f05157fef6e6725fd72f90653..c3de00113c9ec3ad46d9289be3cf101b86aef772 100644
+--- a/net/minecraft/world/entity/animal/Cat.java
++++ b/net/minecraft/world/entity/animal/Cat.java
+@@ -438,7 +438,7 @@ public class Cat extends TamableAnimal implements VariantHolder<Holder<CatVarian
+     }
+ 
+     private void tryToTame(Player player) {
+-        if (this.random.nextInt(3) == 0 && !org.bukkit.craftbukkit.event.CraftEventFactory.callEntityTameEvent(this, player).isCancelled()) { // CraftBukkit
++        if (((one.tranic.sewlia.config.mod.feature.CreativeInstantTame.value && player.isCreative()) || this.random.nextInt(3) == 0) && !org.bukkit.craftbukkit.event.CraftEventFactory.callEntityTameEvent(this, player).isCancelled()) { // CraftBukkit
+             this.tame(player);
+             this.setOrderedToSit(true);
+             this.level().broadcastEntityEvent(this, (byte)7);
+diff --git a/net/minecraft/world/entity/animal/Parrot.java b/net/minecraft/world/entity/animal/Parrot.java
+index 16cc69b14fba16a5a5dfc05d63a40a5112314031..7fab9271f558e38fd23574775f2480370f03787f 100644
+--- a/net/minecraft/world/entity/animal/Parrot.java
++++ b/net/minecraft/world/entity/animal/Parrot.java
+@@ -257,7 +257,7 @@ public class Parrot extends ShoulderRidingEntity implements VariantHolder<Parrot
+             }
+ 
+             if (!this.level().isClientSide) {
+-                if (this.random.nextInt(10) == 0 && !org.bukkit.craftbukkit.event.CraftEventFactory.callEntityTameEvent(this, player).isCancelled()) { // CraftBukkit
++                if (((one.tranic.sewlia.config.mod.feature.CreativeInstantTame.value && player.isCreative()) || this.random.nextInt(10) == 0) && !org.bukkit.craftbukkit.event.CraftEventFactory.callEntityTameEvent(this, player).isCancelled()) { // CraftBukkit
+                     this.tame(player);
+                     this.level().broadcastEntityEvent(this, (byte)7);
+                 } else {
+diff --git a/net/minecraft/world/entity/animal/Wolf.java b/net/minecraft/world/entity/animal/Wolf.java
+index 133e14efb19f8984061b8cb5922aa4f0c7aaf4d9..9364cf76e63d5ef24cb4e40fd949c7749687194a 100644
+--- a/net/minecraft/world/entity/animal/Wolf.java
++++ b/net/minecraft/world/entity/animal/Wolf.java
+@@ -487,7 +487,7 @@ public class Wolf extends TamableAnimal implements NeutralMob, VariantHolder<Hol
+     }
+ 
+     private void tryToTame(Player player) {
+-        if (this.random.nextInt(3) == 0 && !org.bukkit.craftbukkit.event.CraftEventFactory.callEntityTameEvent(this, player).isCancelled()) { // CraftBukkit - added event call and isCancelled check.
++        if (((one.tranic.sewlia.config.mod.feature.CreativeInstantTame.value && player.isCreative()) || this.random.nextInt(3) == 0) && !org.bukkit.craftbukkit.event.CraftEventFactory.callEntityTameEvent(this, player).isCancelled()) { // CraftBukkit - added event call and isCancelled check.
+             this.tame(player);
+             this.navigation.stop();
+             this.setTarget(null);
