@@ -5,7 +5,7 @@ Subject: [PATCH] Modify CraftPlayer
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 7723b2fbc8a1d1907ded37d7530e34d3cac8bdce..d7aa3fcc84239b8bbcbdad409997d284407cf1b6 100644
+index c9afcd46f6a1b74b82ed68f1df6188369cf53a73..714504664aaed8b6a7a3e46b2b18816263d622cf 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 @@ -213,9 +213,9 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
@@ -138,7 +138,7 @@ index 7723b2fbc8a1d1907ded37d7530e34d3cac8bdce..d7aa3fcc84239b8bbcbdad409997d284
          if (request.replace()) {
              this.clearResourcePacks();
          }
-@@ -3260,7 +3260,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -3257,7 +3257,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
      public void showBossBar(final net.kyori.adventure.bossbar.BossBar bar) {
          net.kyori.adventure.bossbar.BossBarImplementation.get(bar, io.papermc.paper.adventure.BossBarImplementationImpl.class).playerShow(this);
          if (this.activeBossBars == null) {
@@ -147,7 +147,7 @@ index 7723b2fbc8a1d1907ded37d7530e34d3cac8bdce..d7aa3fcc84239b8bbcbdad409997d284
          }
          this.activeBossBars.add(bar);
      }
-@@ -3374,7 +3374,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -3371,7 +3371,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          @Override
          public Set<Player> getHiddenPlayers()
          {
