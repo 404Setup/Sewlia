@@ -26,7 +26,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * used as the default Maven repository for dependency resolution.
  */
 public class Accelerate {
-    protected static final org.slf4j.Logger logger = LoggerFactory.getLogger("Sewlia-LibraryResolverAccelerate");
+    protected static final org.slf4j.Logger logger = LoggerFactory.getLogger("SewliaLibraryBooster");
     protected static final String central = "https://repo.maven.apache.org/maven2";
     protected static final String central2 = "https://repo1.maven.org/maven2";
     protected static final URI centralUri = URI.create(central);

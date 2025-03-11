@@ -4,6 +4,50 @@ Date: Fri, 21 Feb 2025 22:34:03 +0800
 Subject: [PATCH] Modify Level
 
 
+diff --git a/net/minecraft/server/level/ServerEntityGetter.java b/net/minecraft/server/level/ServerEntityGetter.java
+index b715d1fbde9db81a2515249bb9a0fc7a5fee40f0..02884eeacbfdfcf6ef25758ccacf2508bc6b1033 100644
+--- a/net/minecraft/server/level/ServerEntityGetter.java
++++ b/net/minecraft/server/level/ServerEntityGetter.java
+@@ -55,7 +55,7 @@ public interface ServerEntityGetter extends EntityGetter {
+     }
+ 
+     default List<Player> getNearbyPlayers(TargetingConditions targetingConditions, LivingEntity source, AABB area) {
+-        List<Player> list = new ArrayList<>();
++        List<Player> list = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+ 
+         for (Player player : this.getLocalPlayers()) { // Folia - region threading
+             if (area.contains(player.getX(), player.getY(), player.getZ()) && targetingConditions.test(this.getLevel(), source, player)) {
+@@ -68,7 +68,7 @@ public interface ServerEntityGetter extends EntityGetter {
+ 
+     default <T extends LivingEntity> List<T> getNearbyEntities(Class<T> entityClass, TargetingConditions targetingConditions, LivingEntity source, AABB area) {
+         List<T> entitiesOfClass = this.getEntitiesOfClass(entityClass, area, entity -> true);
+-        List<T> list = new ArrayList<>();
++        List<T> list = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+ 
+         for (T livingEntity : entitiesOfClass) {
+             if (targetingConditions.test(this.getLevel(), source, livingEntity)) {
+diff --git a/net/minecraft/world/level/EntityGetter.java b/net/minecraft/world/level/EntityGetter.java
+index c4c7993714ff4189b05e2b4653fd2a5eba6b7da9..468011ea2cbfc0446ad3fb13b348b1ab82490053 100644
+--- a/net/minecraft/world/level/EntityGetter.java
++++ b/net/minecraft/world/level/EntityGetter.java
+@@ -85,7 +85,7 @@ public interface EntityGetter extends ca.spottedleaf.moonrise.patches.chunk_syst
+         // first behavior change is to correctly check for empty AABB
+         if (ca.spottedleaf.moonrise.patches.collisions.CollisionUtil.isEmpty(collisionBox)) {
+             // reduce indirection by always returning type with same class
+-            return new java.util.ArrayList<>();
++            return new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+         }
+ 
+         // to comply with vanilla intersection rules, expand by -epsilon so that we only get stuff we definitely collide with.
+@@ -100,7 +100,7 @@ public interface EntityGetter extends ca.spottedleaf.moonrise.patches.chunk_syst
+             entities = ((ca.spottedleaf.moonrise.patches.chunk_system.world.ChunkSystemEntityGetter) this).moonrise$getHardCollidingEntities(entity, collisionBox, null);
+         }
+ 
+-        final List<VoxelShape> ret = new java.util.ArrayList<>(Math.min(25, entities.size()));
++        final List<VoxelShape> ret = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(Math.min(25, entities.size()));
+ 
+         for (int i = 0, len = entities.size(); i < len; ++i) {
+             final Entity otherEntity = entities.get(i);
 diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Level.java
 index b8fb1d5cbbae708ccc08e1e06f1cf3b065aa84f8..ea077602275374c80661321f2a2c720971ef66a6 100644
 --- a/net/minecraft/world/level/Level.java

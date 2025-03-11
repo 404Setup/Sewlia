@@ -5,7 +5,7 @@ Subject: [PATCH] Pufferfish: Reduce entity allocations
 
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 29be8c4bd8ea14b1316ed4b211eacbfc50dd7ce9..e97063d69a6c65afdac4ddedba1264be7abd7dfe 100644
+index 96f1c5399deb7b1246ce6981c5d1017ae3052df3..40fc9fd2242cdc39819e4c1731b9b8c6eb74f818 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
 @@ -338,6 +338,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess

@@ -6,10 +6,10 @@ Subject: [PATCH] Leaves: Random flatten triangular distribution
 This patch is Powered by Carpet-TIS-Addition(https://github.com/plusls/Carpet-TIS-Addition)
 
 diff --git a/net/minecraft/util/RandomSource.java b/net/minecraft/util/RandomSource.java
-index 98a54bc4de251014342cda6d0951b7fea79ce553..19a92f42dee6fae28631a9f96d487b2173952c27 100644
+index 9ec14e22c6a333950066666c39700a8a0571e95f..27fdbdf6106444ed8dc7fca422f462e91db96685 100644
 --- a/net/minecraft/util/RandomSource.java
 +++ b/net/minecraft/util/RandomSource.java
-@@ -53,7 +53,14 @@ public interface RandomSource {
+@@ -74,7 +74,14 @@ public interface RandomSource {
      double nextGaussian();
  
      default double triangle(double center, double maxDeviation) {

@@ -5,7 +5,7 @@ Subject: [PATCH] Modify Entity
 
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 1e59c21d26baf50fd74bc99c04dbea0faede446a..4fa567be558412a37e195819066326e3c24a3135 100644
+index 2cd2ce1060f567be6c72b7bc9d02651ec7166203..a9ef891d56af44e4f70f2bfcccaf55a664901dcc 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
 @@ -261,7 +261,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -109,3 +109,162 @@ index 1e59c21d26baf50fd74bc99c04dbea0faede446a..4fa567be558412a37e195819066326e3
  
          if (this.passengers.isEmpty()) {
              return ret;
+diff --git a/net/minecraft/world/entity/ai/Brain.java b/net/minecraft/world/entity/ai/Brain.java
+index 65b2b3ece213d901cdd585093e2fafcd2ef4a7cd..c25b2158e7b0363fa8a822dc2f91d18cb62da4aa 100644
+--- a/net/minecraft/world/entity/ai/Brain.java
++++ b/net/minecraft/world/entity/ai/Brain.java
+@@ -45,14 +45,14 @@ public class Brain<E extends LivingEntity> {
+     static final Logger LOGGER = LogUtils.getLogger();
+     private final Supplier<Codec<Brain<E>>> codec;
+     private static final int SCHEDULE_UPDATE_DELAY = 20;
+-    private final Map<MemoryModuleType<?>, Optional<? extends ExpirableValue<?>>> memories = Maps.newHashMap();
+-    private final Map<SensorType<? extends Sensor<? super E>>, Sensor<? super E>> sensors = Maps.newLinkedHashMap();
+-    private final Map<Integer, Map<Activity, Set<BehaviorControl<? super E>>>> availableBehaviorsByPriority = Maps.newTreeMap();
++    private final Map<MemoryModuleType<?>, Optional<? extends ExpirableValue<?>>> memories =  new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>();
++    private final Map<SensorType<? extends Sensor<? super E>>, Sensor<? super E>> sensors = new it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap<>();
++    private final Map<Integer, Map<Activity, Set<BehaviorControl<? super E>>>> availableBehaviorsByPriority = new it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap<>();
+     private Schedule schedule = Schedule.EMPTY;
+-    private final Map<Activity, Set<Pair<MemoryModuleType<?>, MemoryStatus>>> activityRequirements = Maps.newHashMap();
+-    private final Map<Activity, Set<MemoryModuleType<?>>> activityMemoriesToEraseWhenStopped = Maps.newHashMap();
+-    private Set<Activity> coreActivities = Sets.newHashSet();
+-    private final Set<Activity> activeActivities = Sets.newHashSet();
++    private final Map<Activity, Set<Pair<MemoryModuleType<?>, MemoryStatus>>> activityRequirements = new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>();
++    private final Map<Activity, Set<MemoryModuleType<?>>> activityMemoriesToEraseWhenStopped = new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>();
++    private Set<Activity> coreActivities = new it.unimi.dsi.fastutil.objects.ObjectOpenHashSet<>();
++    private final Set<Activity> activeActivities = new it.unimi.dsi.fastutil.objects.ObjectOpenHashSet<>();
+     private Activity defaultActivity = Activity.IDLE;
+     private long lastScheduleUpdate = -9999L;
+ 
+@@ -346,7 +346,7 @@ public class Brain<E extends LivingEntity> {
+     }
+ 
+     public void addActivity(Activity activity, ImmutableList<? extends Pair<Integer, ? extends BehaviorControl<? super E>>> tasks) {
+-        this.addActivityAndRemoveMemoriesWhenStopped(activity, tasks, ImmutableSet.of(), Sets.newHashSet());
++        this.addActivityAndRemoveMemoriesWhenStopped(activity, tasks, ImmutableSet.of(), new it.unimi.dsi.fastutil.objects.ObjectOpenHashSet<>());
+     }
+ 
+     public void addActivityWithConditions(
+@@ -354,7 +354,7 @@ public class Brain<E extends LivingEntity> {
+         ImmutableList<? extends Pair<Integer, ? extends BehaviorControl<? super E>>> tasks,
+         Set<Pair<MemoryModuleType<?>, MemoryStatus>> memoryStatuses
+     ) {
+-        this.addActivityAndRemoveMemoriesWhenStopped(activity, tasks, memoryStatuses, Sets.newHashSet());
++        this.addActivityAndRemoveMemoriesWhenStopped(activity, tasks, memoryStatuses, new it.unimi.dsi.fastutil.objects.ObjectOpenHashSet<>());
+     }
+ 
+     public void addActivityAndRemoveMemoriesWhenStopped(
+@@ -370,8 +370,8 @@ public class Brain<E extends LivingEntity> {
+ 
+         for (Pair<Integer, ? extends BehaviorControl<? super E>> pair : tasks) {
+             this.availableBehaviorsByPriority
+-                .computeIfAbsent(pair.getFirst(), integer -> Maps.newHashMap())
+-                .computeIfAbsent(activity, activity1 -> Sets.newLinkedHashSet())
++                .computeIfAbsent(pair.getFirst(), integer -> new it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap<>())
++                .computeIfAbsent(activity, activity1 -> new it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet<>())
+                 .add((BehaviorControl<? super E>)pair.getSecond());
+         }
+     }
+@@ -414,7 +414,7 @@ public class Brain<E extends LivingEntity> {
+     private void forgetOutdatedMemories() {
+         for (Entry<MemoryModuleType<?>, Optional<? extends ExpirableValue<?>>> entry : this.memories.entrySet()) {
+             if (entry.getValue().isPresent()) {
+-                ExpirableValue<?> expirableValue = (ExpirableValue<?>)entry.getValue().get();
++                ExpirableValue<?> expirableValue = entry.getValue().get();
+                 if (expirableValue.hasExpired()) {
+                     this.eraseMemory(entry.getKey());
+                 }
+diff --git a/net/minecraft/world/entity/ai/behavior/AcquirePoi.java b/net/minecraft/world/entity/ai/behavior/AcquirePoi.java
+index b9174ae7e3a3e2de2d570b95ab5012ac3c3a2eda..aace443368a0013c62e07f12eaf649526a58aee5 100644
+--- a/net/minecraft/world/entity/ai/behavior/AcquirePoi.java
++++ b/net/minecraft/world/entity/ai/behavior/AcquirePoi.java
+@@ -85,9 +85,9 @@ public class AcquirePoi {
+                                 }
+                             };
+                             // Paper start - optimise POI access
+-                            final java.util.List<Pair<Holder<PoiType>, BlockPos>> poiposes = new java.util.ArrayList<>();
++                            final java.util.List<Pair<Holder<PoiType>, BlockPos>> poiposes = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+                             io.papermc.paper.util.PoiAccess.findNearestPoiPositions(poiManager, acquirablePois, predicate1, mob.blockPosition(), 48, 48*48, PoiManager.Occupancy.HAS_SPACE, false, 5, poiposes);
+-                            final Set<Pair<Holder<PoiType>, BlockPos>> set = new java.util.HashSet<>(poiposes.size());
++                            final Set<Pair<Holder<PoiType>, BlockPos>> set = new it.unimi.dsi.fastutil.objects.ObjectOpenHashSet<>(poiposes.size());
+                             for (final Pair<Holder<PoiType>, BlockPos> poiPose : poiposes) {
+                                 if (predicate.test(level, poiPose.getSecond())) {
+                                     set.add(poiPose);
+@@ -125,7 +125,7 @@ public class AcquirePoi {
+         if (poiPositions.isEmpty()) {
+             return null;
+         } else {
+-            Set<BlockPos> set = new HashSet<>();
++            Set<BlockPos> set = new it.unimi.dsi.fastutil.objects.ObjectOpenHashSet<>();
+             int i = 1;
+ 
+             for (Pair<Holder<PoiType>, BlockPos> pair : poiPositions) {
+diff --git a/net/minecraft/world/entity/ai/behavior/ShufflingList.java b/net/minecraft/world/entity/ai/behavior/ShufflingList.java
+index 0d5fd83a30d3ba6838f5b2229b9959e983182437..52199118f2c44f42d2166fb90631cc24d36ccf45 100644
+--- a/net/minecraft/world/entity/ai/behavior/ShufflingList.java
++++ b/net/minecraft/world/entity/ai/behavior/ShufflingList.java
+@@ -35,7 +35,7 @@ public class ShufflingList<U> implements Iterable<U> {
+     private ShufflingList(List<ShufflingList.WeightedEntry<U>> entries, boolean isUnsafe) {
+         this.isUnsafe = isUnsafe;
+         // Paper end - Fix Concurrency issue in ShufflingList during worldgen
+-        this.entries = Lists.newArrayList(entries);
++        this.entries = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(entries);
+     }
+ 
+     public static <U> Codec<ShufflingList<U>> codec(Codec<U> codec) {
+@@ -49,7 +49,7 @@ public class ShufflingList<U> implements Iterable<U> {
+ 
+     public ShufflingList<U> shuffle() {
+         // Paper start - Fix Concurrency issue in ShufflingList during worldgen
+-        List<ShufflingList.WeightedEntry<U>> list = this.isUnsafe ? Lists.newArrayList(this.entries) : this.entries;
++        List<ShufflingList.WeightedEntry<U>> list = this.isUnsafe ? new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(this.entries) : this.entries;
+         list.forEach(entry -> entry.setRandom(this.random.nextFloat()));
+         list.sort(Comparator.comparingDouble(ShufflingList.WeightedEntry::getRandWeight));
+         return this.isUnsafe ? new ShufflingList<>(list, this.isUnsafe) : this;
+diff --git a/net/minecraft/world/entity/ai/memory/NearestVisibleLivingEntities.java b/net/minecraft/world/entity/ai/memory/NearestVisibleLivingEntities.java
+index 814b02a3ab21d4a40cd3f0928ff5c257aff10357..f6e6deb3ce2388b73befe05d23e009514b9e4ac8 100644
+--- a/net/minecraft/world/entity/ai/memory/NearestVisibleLivingEntities.java
++++ b/net/minecraft/world/entity/ai/memory/NearestVisibleLivingEntities.java
+@@ -16,7 +16,7 @@ public class NearestVisibleLivingEntities {
+     private final Predicate<LivingEntity> lineOfSightTest;
+ 
+     private NearestVisibleLivingEntities() {
+-        this.nearbyEntities = List.of();
++        this.nearbyEntities = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+         this.lineOfSightTest = entity -> false;
+     }
+ 
+diff --git a/net/minecraft/world/entity/ai/village/poi/PoiSection.java b/net/minecraft/world/entity/ai/village/poi/PoiSection.java
+index b92ba4d194fd3af94c7af5d8e150fc4297c73ab8..73650e5f269c628217da6baf9997e91e015e387f 100644
+--- a/net/minecraft/world/entity/ai/village/poi/PoiSection.java
++++ b/net/minecraft/world/entity/ai/village/poi/PoiSection.java
+@@ -26,7 +26,7 @@ import org.slf4j.Logger;
+ public class PoiSection implements ca.spottedleaf.moonrise.patches.chunk_system.level.poi.ChunkSystemPoiSection { // Paper - rewrite chunk system
+     private static final Logger LOGGER = LogUtils.getLogger();
+     private final Short2ObjectMap<PoiRecord> records = new Short2ObjectOpenHashMap<>();
+-    private final Map<Holder<PoiType>, Set<PoiRecord>> byType = Maps.newHashMap(); public final Map<Holder<PoiType>, Set<PoiRecord>> getData() { return this.byType; } // Paper - public accessor
++    private final Map<Holder<PoiType>, Set<PoiRecord>> byType = new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>(); public final Map<Holder<PoiType>, Set<PoiRecord>> getData() { return this.byType; } // Paper - public accessor
+     private final Runnable setDirty;
+     private boolean isValid;
+ 
+@@ -88,7 +88,7 @@ public class PoiSection implements ca.spottedleaf.moonrise.patches.chunk_system.
+         }
+ 
+         this.records.put(s, _record);
+-        this.byType.computeIfAbsent(poiType, holder -> Sets.newHashSet()).add(_record);
++        this.byType.computeIfAbsent(poiType, holder -> new it.unimi.dsi.fastutil.objects.ObjectOpenHashSet<>()).add(_record);
+         return true;
+     }
+ 
+diff --git a/net/minecraft/world/entity/ai/village/poi/PoiTypes.java b/net/minecraft/world/entity/ai/village/poi/PoiTypes.java
+index e2875cf82165143852d512d9f0476abd6a6815f2..8ccdaaed7dd80a96a9a460414c9cab2088a185e2 100644
+--- a/net/minecraft/world/entity/ai/village/poi/PoiTypes.java
++++ b/net/minecraft/world/entity/ai/village/poi/PoiTypes.java
+@@ -66,7 +66,7 @@ public class PoiTypes {
+         .stream()
+         .flatMap(block -> block.getStateDefinition().getPossibleStates().stream())
+         .collect(ImmutableSet.toImmutableSet());
+-    private static final Map<BlockState, Holder<PoiType>> TYPE_BY_STATE = Maps.newHashMap();
++    private static final Map<BlockState, Holder<PoiType>> TYPE_BY_STATE = new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>();
+ 
+     private static Set<BlockState> getBlockStates(Block block) {
+         return ImmutableSet.copyOf(block.getStateDefinition().getPossibleStates());

@@ -21,43 +21,49 @@ Given that we do a lot of varint writing as well, this should provide a small pe
 This includes a test to ensure that the behavior is as expected and fixes the initialization loop so that the correct results will be given. Much thanks to @octylFractal for acting as my duck while trying to figure this out.
 
 diff --git a/net/minecraft/network/VarInt.java b/net/minecraft/network/VarInt.java
-index 4897ff4648083ebe737ae5b32bae344af27357e4..7a78d80d80f1364e654c49b1e8a1be1af7db8e25 100644
+index 4897ff4648083ebe737ae5b32bae344af27357e4..6a8459a7743add2e82aa59ac9dc70fc335ea301d 100644
 --- a/net/minecraft/network/VarInt.java
 +++ b/net/minecraft/network/VarInt.java
-@@ -51,7 +51,42 @@ public class VarInt {
+@@ -51,7 +51,48 @@ public class VarInt {
      }
  
      public static ByteBuf write(ByteBuf buffer, int value) {
 -     // Paper start - Optimize VarInts
-+        // Gale start - Velocity - optimized VarInt#write
-+        if ((value & 0xFFFFFF80) == 0) {
-+            buffer.writeByte(value);
-+        } else if ((value & 0xFFFFC000) == 0) {
-+            int w = (value & 0x7F) << 8
-+                    | (value >>> 7)
-+                    | 0x00008000;
-+            buffer.writeShort(w);
-+        } else if ((value & 0xFFE00000) == 0) {
-+            int w = (value & 0x7F) << 16
-+                    | (value & 0x3F80) << 1
-+                    | (value >>> 14)
-+                    | 0x00808000;
-+            buffer.writeMedium(w);
-+        } else if ((value & 0xF0000000) == 0) {
-+            int w = (value & 0x7F) << 24
-+                    | ((value & 0x3F80) << 9)
-+                    | (value & 0x1FC000) >> 6
-+                    | (value >>> 21)
-+                    | 0x80808000;
-+            buffer.writeInt(w);
-+        } else {
-+            int w = (value & 0x7F) << 24
-+                    | (value & 0x3F80) << 9
-+                    | (value & 0x1FC000) >> 6
-+                    | ((value >>> 21) & 0x7F)
-+                    | 0x80808080;
-+            buffer.writeInt(w);
-+            buffer.writeByte(value >>> 28);
++        // Gale start - Velocity - optimized VarInt#write // Leaf - help JIT by using switch case
++        int bytesNeeded = getByteSize(value);
++
++        switch (bytesNeeded) {
++            case 1:
++                buffer.writeByte(value);
++                break;
++            case 2:
++                int w2 = ((value & 0x7F) << 8) | (value >>> 7) | 0x00008000;
++                buffer.writeShort(w2);
++                break;
++            case 3:
++                int w3 = (value & 0x7F) << 16
++                        | (value & 0x3F80) << 1
++                        | (value >>> 14)
++                        | 0x00808000;
++                buffer.writeMedium(w3);
++                break;
++            case 4:
++                int w4 = (value & 0x7F) << 24
++                        | ((value & 0x3F80) << 9)
++                        | (value & 0x1FC000) >> 6
++                        | (value >>> 21)
++                        | 0x80808000;
++                buffer.writeInt(w4);
++                break;
++            case 5:
++                int w5 = (value & 0x7F) << 24
++                        | (value & 0x3F80) << 9
++                        | (value & 0x1FC000) >> 6
++                        | ((value >>> 21) & 0x7F)
++                        | 0x80808080;
++                buffer.writeInt(w5);
++                buffer.writeByte(value >>> 28);
++                break;
 +        }
 +        return buffer;
 +    }
@@ -68,7 +74,7 @@ index 4897ff4648083ebe737ae5b32bae344af27357e4..7a78d80d80f1364e654c49b1e8a1be1a
          // Peel the one and two byte count cases explicitly as they are the most common VarInt sizes
          // that the proxy will write, to improve inlining.
          if ((value & (0xFFFFFFFF << 7)) == 0) {
-@@ -60,11 +95,11 @@ public class VarInt {
+@@ -60,11 +101,11 @@ public class VarInt {
              int w = (value & 0x7F | 0x80) << 8 | (value >>> 7);
              buffer.writeShort(w);
          } else {
