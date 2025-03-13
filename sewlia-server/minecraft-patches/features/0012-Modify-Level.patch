@@ -159,3 +159,90 @@ index b8fb1d5cbbae708ccc08e1e06f1cf3b065aa84f8..ea077602275374c80661321f2a2c7209
          for (Entity entity : slices.getAllEntities()) {
              org.bukkit.entity.Entity bukkit = entity.getBukkitEntity();
              if (bukkit != null && bukkit.isValid()) {
+diff --git a/net/minecraft/world/level/chunk/ChunkAccess.java b/net/minecraft/world/level/chunk/ChunkAccess.java
+index 6d565b52552534ce9cacfc35ad1bf4adcb69eac3..76452ebc0dc8d3adc937bd261db00cc0ebac868c 100644
+--- a/net/minecraft/world/level/chunk/ChunkAccess.java
++++ b/net/minecraft/world/level/chunk/ChunkAccess.java
+@@ -76,9 +76,9 @@ public abstract class ChunkAccess implements BiomeManager.NoiseBiomeSource, Ligh
+     protected BlendingData blendingData;
+     public final Map<Heightmap.Types, Heightmap> heightmaps = Maps.newEnumMap(Heightmap.Types.class);
+     // Paper - rewrite chunk system
+-    private final Map<Structure, StructureStart> structureStarts = Maps.newHashMap();
+-    private final Map<Structure, LongSet> structuresRefences = Maps.newHashMap();
+-    protected final Map<BlockPos, CompoundTag> pendingBlockEntities = Maps.newHashMap();
++    private final Map<Structure, StructureStart> structureStarts =new Object2ObjectOpenHashMap<>();
++    private final Map<Structure, LongSet> structuresRefences = new Object2ObjectOpenHashMap<>();
++    protected final Map<BlockPos, CompoundTag> pendingBlockEntities = new Object2ObjectOpenHashMap<>();
+     public final Map<BlockPos, BlockEntity> blockEntities = new Object2ObjectOpenHashMap<>();
+     protected final LevelHeightAccessor levelHeightAccessor;
+     protected final LevelChunkSection[] sections;
+diff --git a/net/minecraft/world/level/chunk/ChunkGenerator.java b/net/minecraft/world/level/chunk/ChunkGenerator.java
+index b85c547f281c58bf45c9062d0b886cb4ff7b386b..6360a6c6a0d189d9e9833cf4c77e5e5a9cdc2e8c 100644
+--- a/net/minecraft/world/level/chunk/ChunkGenerator.java
++++ b/net/minecraft/world/level/chunk/ChunkGenerator.java
+@@ -130,7 +130,10 @@ public abstract class ChunkGenerator {
+         // Paper start - StructuresLocateEvent
+         final org.bukkit.World bukkitWorld = level.getWorld();
+         final org.bukkit.Location origin = io.papermc.paper.util.MCUtil.toLocation(level, pos);
+-        final List<org.bukkit.generator.structure.Structure> apiStructures = structure.stream().map(Holder::value).map(nms -> org.bukkit.craftbukkit.generator.structure.CraftStructure.minecraftToBukkit(nms)).toList();
++        final List<org.bukkit.generator.structure.Structure> apiStructures = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
++        for (Holder<Structure> holder : structure) {
++            apiStructures.add(org.bukkit.craftbukkit.generator.structure.CraftStructure.minecraftToBukkit(holder.value()));
++        }
+         if (!apiStructures.isEmpty()) {
+             final io.papermc.paper.event.world.StructuresLocateEvent event = new io.papermc.paper.event.world.StructuresLocateEvent(bukkitWorld, origin, apiStructures, searchRadius, skipKnownStructures);
+             if (!event.callEvent()) {
+@@ -160,7 +163,7 @@ public abstract class ChunkGenerator {
+             Pair<BlockPos, Holder<Structure>> pair = null;
+             double d = Double.MAX_VALUE;
+             StructureManager structureManager = level.structureManager();
+-            List<Entry<StructurePlacement, Set<Holder<Structure>>>> list = new ArrayList<>(map.size());
++            List<Entry<StructurePlacement, Set<Holder<Structure>>>> list = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(map.size());
+ 
+             for (Entry<StructurePlacement, Set<Holder<Structure>>> entry : map.entrySet()) {
+                 StructurePlacement structurePlacement1 = entry.getKey();
+@@ -554,7 +557,8 @@ public abstract class ChunkGenerator {
+                                 level
+                             );
+                         } else {
+-                            ArrayList<StructureSet.StructureSelectionEntry> list1 = new ArrayList<>(list.size());
++
++                            List<StructureSet.StructureSelectionEntry> list1 = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(list.size());
+                             list1.addAll(list);
+                             WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
+                             worldgenRandom.setLargeFeatureSeed(structureState.getLevelSeed(), pos.x, pos.z);
+@@ -654,7 +658,7 @@ public abstract class ChunkGenerator {
+     }
+ 
+     public void createReferences(WorldGenLevel level, StructureManager structureManager, ChunkAccess chunk) {
+-        int i = 8;
++        //int i = 8;
+         ChunkPos pos = chunk.getPos();
+         int i1 = pos.x;
+         int i2 = pos.z;
+diff --git a/net/minecraft/world/level/chunk/ChunkGeneratorStructureState.java b/net/minecraft/world/level/chunk/ChunkGeneratorStructureState.java
+index 619b98e42e254c0c260c171a26a2472ddf59b885..1ff76fddc9307e5c6cc12974f0701f006b87f9f7 100644
+--- a/net/minecraft/world/level/chunk/ChunkGeneratorStructureState.java
++++ b/net/minecraft/world/level/chunk/ChunkGeneratorStructureState.java
+@@ -202,7 +202,7 @@ public class ChunkGeneratorStructureState {
+             Stopwatch stopwatch = Stopwatch.createStarted(Util.TICKER);
+             int distance = placement.distance();
+             int count = placement.count();
+-            List<CompletableFuture<ChunkPos>> list = new ArrayList<>(count);
++            List<CompletableFuture<ChunkPos>> list = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(count);
+             int spread = placement.spread();
+             HolderSet<Biome> holderSet = placement.preferredBiomes();
+             RandomSource randomSource = RandomSource.create();
+diff --git a/net/minecraft/world/level/chunk/HashMapPalette.java b/net/minecraft/world/level/chunk/HashMapPalette.java
+index 718d00a386f32423db9f6d6c95b4a20698b976f5..a8912db5b8106c2c7c4c89b7fd21156308fff45f 100644
+--- a/net/minecraft/world/level/chunk/HashMapPalette.java
++++ b/net/minecraft/world/level/chunk/HashMapPalette.java
+@@ -113,7 +113,7 @@ public class HashMapPalette<T> implements Palette<T>, ca.spottedleaf.moonrise.pa
+     }
+ 
+     public List<T> getEntries() {
+-        ArrayList<T> list = new ArrayList<>();
++        List<T> list = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+         this.values.iterator().forEachRemaining(list::add);
+         return list;
+     }

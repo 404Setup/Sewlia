@@ -146,10 +146,10 @@ index f44461f92a10cbfdb8fcdbc3a2442e526b9d3d33..2b697a891e66035ef945bc7b853d953d
      public final Biome.ClimateSettings climateSettings;
      private final BiomeGenerationSettings generationSettings;
 diff --git a/net/minecraft/world/level/chunk/ChunkGenerator.java b/net/minecraft/world/level/chunk/ChunkGenerator.java
-index b85c547f281c58bf45c9062d0b886cb4ff7b386b..04a61b5a15ac46cc6d4d09bb7e9776054fa83d69 100644
+index 6360a6c6a0d189d9e9833cf4c77e5e5a9cdc2e8c..6ded4fcb157f5b3da886ea270306a7b866c9e2b0 100644
 --- a/net/minecraft/world/level/chunk/ChunkGenerator.java
 +++ b/net/minecraft/world/level/chunk/ChunkGenerator.java
-@@ -454,7 +454,7 @@ public abstract class ChunkGenerator {
+@@ -457,7 +457,7 @@ public abstract class ChunkGenerator {
              int x = chunk.getPos().x;
              int z = chunk.getPos().z;
              for (org.bukkit.generator.BlockPopulator populator : world.getPopulators()) {
@@ -158,9 +158,9 @@ index b85c547f281c58bf45c9062d0b886cb4ff7b386b..04a61b5a15ac46cc6d4d09bb7e977605
                  seededrandom.setDecorationSeed(level.getSeed(), x, z);
                  populator.populate(world, new org.bukkit.craftbukkit.util.RandomSourceWrapper.RandomWrapper(seededrandom), x, z, limitedRegion);
              }
-@@ -556,7 +556,7 @@ public abstract class ChunkGenerator {
-                         } else {
-                             ArrayList<StructureSet.StructureSelectionEntry> list1 = new ArrayList<>(list.size());
+@@ -560,7 +560,7 @@ public abstract class ChunkGenerator {
+ 
+                             List<StructureSet.StructureSelectionEntry> list1 = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(list.size());
                              list1.addAll(list);
 -                            WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
 +                            WorldgenRandom worldgenRandom = new WorldgenRandom(one.tranic.sewlia.config.mod.unsafe.optimization.fast_rng.EnableForWorldgen.value ? new one.tranic.su.math.random.FasterRandomSource(0L) : new LegacyRandomSource(0L)); // Leaf - Faster random generator
@@ -168,11 +168,11 @@ index b85c547f281c58bf45c9062d0b886cb4ff7b386b..04a61b5a15ac46cc6d4d09bb7e977605
                              int i = 0;
  
 diff --git a/net/minecraft/world/level/chunk/ChunkGeneratorStructureState.java b/net/minecraft/world/level/chunk/ChunkGeneratorStructureState.java
-index 619b98e42e254c0c260c171a26a2472ddf59b885..86bd14fe9888879f5729a6617be02ed0241b318d 100644
+index 1ff76fddc9307e5c6cc12974f0701f006b87f9f7..d6ba53e24967bad0e9b92cf3aa4a8d2983ed742d 100644
 --- a/net/minecraft/world/level/chunk/ChunkGeneratorStructureState.java
 +++ b/net/minecraft/world/level/chunk/ChunkGeneratorStructureState.java
 @@ -205,7 +205,7 @@ public class ChunkGeneratorStructureState {
-             List<CompletableFuture<ChunkPos>> list = new ArrayList<>(count);
+             List<CompletableFuture<ChunkPos>> list = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(count);
              int spread = placement.spread();
              HolderSet<Biome> holderSet = placement.preferredBiomes();
 -            RandomSource randomSource = RandomSource.create();

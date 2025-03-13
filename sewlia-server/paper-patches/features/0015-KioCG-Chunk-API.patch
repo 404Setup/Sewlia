@@ -5,7 +5,7 @@ Subject: [PATCH] KioCG: Chunk API
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
-index de8b9048c8395c05b8688bc9d984b8ad680f15b3..f42692cd4f0154705c3d5b030d281cfc333803ed 100644
+index 046a268d58a81628aa5162959893127479bf3b48..20ea7dc34509e973e1708b5323d40156d8856f94 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
 @@ -437,4 +437,12 @@ public class CraftChunk implements Chunk {

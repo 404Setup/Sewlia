@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Thu, 13 Mar 2025 19:04:36 +0800
+Subject: [PATCH] Modify item
+
+
+diff --git a/net/minecraft/world/item/ItemStack.java b/net/minecraft/world/item/ItemStack.java
+index d3b98f1d36b643989708ea22753a0c0d0d4243bc..3f4777d242cdcda6788e772f9e49efd8af8508c7 100644
+--- a/net/minecraft/world/item/ItemStack.java
++++ b/net/minecraft/world/item/ItemStack.java
+@@ -444,7 +444,7 @@ public final class ItemStack implements DataComponentHolder {
+             if (player != null && interactionResult instanceof InteractionResult.Success success && success.wasItemInteraction()) {
+                 InteractionHand hand = context.getHand();
+                 org.bukkit.event.block.BlockPlaceEvent placeEvent = null;
+-                List<org.bukkit.block.BlockState> blocks = new java.util.ArrayList<>(worldData.capturedBlockStates.values()); // Folia - region threading
++                List<org.bukkit.block.BlockState> blocks = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(worldData.capturedBlockStates.values()); // Folia - region threading
+                 worldData.capturedBlockStates.clear(); // Folia - region threading
+                 if (blocks.size() > 1) {
+                     placeEvent = org.bukkit.craftbukkit.event.CraftEventFactory.callBlockMultiPlaceEvent(serverLevel, player, hand, blocks, clickedPos.getX(), clickedPos.getY(), clickedPos.getZ());
+@@ -1081,7 +1081,7 @@ public final class ItemStack implements DataComponentHolder {
+         if (!tooltipFlag.isCreative() && this.has(DataComponents.HIDE_TOOLTIP)) {
+             return shouldPrintOpWarning ? OP_NBT_WARNING : List.of();
+         } else {
+-            List<Component> list = Lists.newArrayList();
++            List<Component> list = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+             list.add(this.getStyledHoverName());
+             if (!tooltipFlag.isAdvanced() && !this.has(DataComponents.CUSTOM_NAME)) {
+                 MapId mapId = this.get(DataComponents.MAP_ID);

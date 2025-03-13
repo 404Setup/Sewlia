@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Thu, 13 Mar 2025 18:59:58 +0800
+Subject: [PATCH] Modify command
+
+
+diff --git a/src/main/java/org/bukkit/command/SimpleCommandMap.java b/src/main/java/org/bukkit/command/SimpleCommandMap.java
+index d90454655f012cedf59ad79f680b5ff061d502eb..8cf24ec87366f0c2eefb74eee936954abcb7a078 100644
+--- a/src/main/java/org/bukkit/command/SimpleCommandMap.java
++++ b/src/main/java/org/bukkit/command/SimpleCommandMap.java
+@@ -200,7 +200,7 @@ public class SimpleCommandMap implements CommandMap {
+         int spaceIndex = cmdLine.indexOf(' ');
+ 
+         if (spaceIndex == -1) {
+-            ArrayList<String> completions = new ArrayList<String>();
++            List<String> completions = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+             Map<String, Command> knownCommands = this.knownCommands;
+ 
+             final String prefix = (sender instanceof Player ? "/" : "");
+@@ -219,7 +219,7 @@ public class SimpleCommandMap implements CommandMap {
+                 }
+             }
+ 
+-            Collections.sort(completions, String.CASE_INSENSITIVE_ORDER);
++            completions.sort(String.CASE_INSENSITIVE_ORDER);
+             return completions;
+         }
+ 
+diff --git a/src/main/java/org/bukkit/event/server/TabCompleteEvent.java b/src/main/java/org/bukkit/event/server/TabCompleteEvent.java
+index c71c122ccc4775d030688f7b8df0b4feb49136f4..14434720d8c5e3629ba8d668e7242b16649c9a42 100644
+--- a/src/main/java/org/bukkit/event/server/TabCompleteEvent.java
++++ b/src/main/java/org/bukkit/event/server/TabCompleteEvent.java
+@@ -44,7 +44,7 @@ public class TabCompleteEvent extends Event implements Cancellable {
+ 
+         this.sender = sender;
+         this.buffer = buffer;
+-        this.completions = new java.util.ArrayList<>(completions); // Paper - Completions must be mutable
++        this.completions = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(completions); // Paper - Completions must be mutable
+     }
+ 
+     /**

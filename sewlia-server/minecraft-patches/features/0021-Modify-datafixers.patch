@@ -1,0 +1,52 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Thu, 13 Mar 2025 17:56:35 +0800
+Subject: [PATCH] Modify datafixers
+
+
+diff --git a/com/mojang/datafixers/DataFixerBuilder.java b/com/mojang/datafixers/DataFixerBuilder.java
+index c4984ad9c3dc471acd23fa53a0fb0069691992c0..4b1b9e4a044ec4f5c89ee5060e30315e37cfb1ab 100644
+--- a/com/mojang/datafixers/DataFixerBuilder.java
++++ b/com/mojang/datafixers/DataFixerBuilder.java
+@@ -27,7 +27,7 @@ public class DataFixerBuilder {
+ 
+     private final int dataVersion;
+     private final Int2ObjectSortedMap<Schema> schemas = new Int2ObjectAVLTreeMap<>();
+-    private final List<DataFix> globalList = new ArrayList<>();
++    private final List<DataFix> globalList = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+     private final IntSortedSet fixerVersions = new IntAVLTreeSet();
+     private final int minDataFixPrecacheVersion; // Paper - Perf: Cache DataFixerUpper Rewrite Rules on demand
+ 
+@@ -65,7 +65,7 @@ public class DataFixerBuilder {
+     }
+ 
+     public Result build() {
+-        final DataFixerUpper fixer = new DataFixerUpper(new Int2ObjectAVLTreeMap<>(schemas), new ArrayList<>(globalList), new IntAVLTreeSet(fixerVersions));
++        final DataFixerUpper fixer = new DataFixerUpper(new Int2ObjectAVLTreeMap<>(schemas), new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(globalList), new IntAVLTreeSet(fixerVersions));
+         return new Result(fixer);
+     }
+ 
+@@ -82,8 +82,8 @@ public class DataFixerBuilder {
+ 
+         public CompletableFuture<?> optimize(final Set<DSL.TypeReference> requiredTypes, final Executor executor) {
+             final Instant started = Instant.now();
+-            final List<CompletableFuture<?>> doneFutures = new ArrayList<>();
+-            final List<CompletableFuture<?>> failFutures = new ArrayList<>();
++            final List<CompletableFuture<?>> doneFutures = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
++            final List<CompletableFuture<?>> failFutures = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+ 
+             final Set<String> requiredTypeNames = requiredTypes.stream().map(DSL.TypeReference::typeName).collect(Collectors.toSet());
+ 
+diff --git a/com/mojang/serialization/codecs/ListCodec.java b/com/mojang/serialization/codecs/ListCodec.java
+index 9306d5161d21c7112df89e2744d22df5a685bfb8..888d52019ecaa2455a7a9f69dccf5a0bccffb39a 100644
+--- a/com/mojang/serialization/codecs/ListCodec.java
++++ b/com/mojang/serialization/codecs/ListCodec.java
+@@ -56,7 +56,7 @@ public record ListCodec<E>(Codec<E> elementCodec, int minSize, int maxSize) impl
+         private static final DataResult<Unit> INITIAL_RESULT = DataResult.success(Unit.INSTANCE, Lifecycle.stable());
+ 
+         private final DynamicOps<T> ops;
+-        private final List<E> elements = new ArrayList<>();
++        private final List<E> elements = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+         private final Stream.Builder<T> failed = Stream.builder();
+         private DataResult<Unit> result = INITIAL_RESULT;
+         private int totalCount;

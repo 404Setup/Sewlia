@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Thu, 13 Mar 2025 17:59:38 +0800
+Subject: [PATCH] Modify brigadier
+
+
+diff --git a/com/mojang/brigadier/tree/CommandNode.java b/com/mojang/brigadier/tree/CommandNode.java
+index 2ae5b80338282ac73c74765fc0729af2d54f6d6c..aa0645a922666a3038075f5da027123e56b67b03 100644
+--- a/com/mojang/brigadier/tree/CommandNode.java
++++ b/com/mojang/brigadier/tree/CommandNode.java
+@@ -24,9 +24,9 @@ import java.util.concurrent.CompletableFuture;
+ import java.util.function.Predicate;
+ 
+ public abstract class CommandNode<S> implements Comparable<CommandNode<S>> {
+-    private final Map<String, CommandNode<S>> children = new LinkedHashMap<>();
+-    private final Map<String, LiteralCommandNode<S>> literals = new LinkedHashMap<>();
+-    private final Map<String, ArgumentCommandNode<S, ?>> arguments = new LinkedHashMap<>();
++    private final Map<String, CommandNode<S>> children = new it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap<>();
++    private final Map<String, LiteralCommandNode<S>> literals = new it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap<>();
++    private final Map<String, ArgumentCommandNode<S, ?>> arguments = new it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap<>();
+     public Predicate<S> requirement; // Paper - public-f
+     private final CommandNode<S> redirect;
+     private final RedirectModifier<S> modifier;
+@@ -111,7 +111,7 @@ public abstract class CommandNode<S> implements Comparable<CommandNode<S>> {
+     }
+ 
+     public void findAmbiguities(final AmbiguityConsumer<S> consumer) {
+-        Set<String> matches = new HashSet<>();
++        Set<String> matches = new it.unimi.dsi.fastutil.objects.ObjectOpenHashSet<>();
+ 
+         for (final CommandNode<S> child : children.values()) {
+             for (final CommandNode<S> sibling : children.values()) {
+@@ -127,7 +127,7 @@ public abstract class CommandNode<S> implements Comparable<CommandNode<S>> {
+ 
+                 if (matches.size() > 0) {
+                     consumer.ambiguous(this, child, sibling, matches);
+-                    matches = new HashSet<>();
++                    matches = new it.unimi.dsi.fastutil.objects.ObjectOpenHashSet<>();
+                 }
+             }
+ 

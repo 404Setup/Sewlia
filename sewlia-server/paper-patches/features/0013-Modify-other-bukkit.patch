@@ -1,0 +1,427 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Thu, 13 Mar 2025 18:58:12 +0800
+Subject: [PATCH] Modify other bukkit
+
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
+index de8b9048c8395c05b8688bc9d984b8ad680f15b3..046a268d58a81628aa5162959893127479bf3b48 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
+@@ -164,7 +164,7 @@ public class CraftChunk implements Chunk {
+         }
+         ChunkAccess chunk = this.getHandle(ChunkStatus.FULL);
+ 
+-        java.util.List<BlockState> entities = new java.util.ArrayList<>();
++        java.util.List<BlockState> entities = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+ 
+         for (BlockPos position : chunk.blockEntities.keySet()) {
+             Block block = this.worldServer.getWorld().getBlockAt(position.getX(), position.getY(), position.getZ());
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftLootTable.java b/src/main/java/org/bukkit/craftbukkit/CraftLootTable.java
+index 4f29e9af057f5f885bbb83b130687272335a9ff6..f34af8a9a715a8710923e3dadf3174b5ff50c8cd 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftLootTable.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftLootTable.java
+@@ -71,7 +71,7 @@ public class CraftLootTable implements org.bukkit.loot.LootTable {
+         Preconditions.checkArgument(context != null, "LootContext cannot be null");
+         LootParams nmsContext = this.convertContext(context);
+         List<net.minecraft.world.item.ItemStack> nmsItems = this.handle.getRandomItems(nmsContext, random == null ? null : new RandomSourceWrapper(random));
+-        Collection<ItemStack> bukkit = new ArrayList<>(nmsItems.size());
++        Collection<ItemStack> bukkit = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(nmsItems.size());
+ 
+         for (net.minecraft.world.item.ItemStack item : nmsItems) {
+             if (item.isEmpty()) {
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+index c0a9f7dfcd3f55098cca797f31629d13492f4347..5244195d966c79e976f39a4c3410d6323b2ea3ab 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+@@ -285,7 +285,7 @@ public final class CraftServer implements Server {
+     private final StructureManager structureManager;
+     protected final DedicatedServer console;
+     protected final DedicatedPlayerList playerList;
+-    private final Map<String, World> worlds = new LinkedHashMap<String, World>();
++    private final Map<String, World> worlds = new it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap<>();
+     // private final Map<Class<?>, Registry<?>> registries = new HashMap<>(); // Paper - replace with RegistryAccess
+     private YamlConfiguration configuration;
+     private YamlConfiguration commandsConfiguration;
+@@ -460,7 +460,7 @@ public final class CraftServer implements Server {
+         if (legacyAlias != null) {
+             ConfigurationSection aliases = this.commandsConfiguration.createSection("aliases");
+             for (String key : legacyAlias.getKeys(false)) {
+-                ArrayList<String> commands = new ArrayList<String>();
++                List<String> commands = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+ 
+                 if (legacyAlias.isList(key)) {
+                     for (String command : legacyAlias.getStringList(key)) {
+@@ -572,7 +572,7 @@ public final class CraftServer implements Server {
+     private List<File> extraPluginJars() {
+         @SuppressWarnings("unchecked")
+         final List<File> jars = (List<File>) this.console.options.valuesOf("add-plugin");
+-        final List<File> list = new ArrayList<>();
++        final List<File> list = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+         for (final File file : jars) {
+             if (!file.exists()) {
+                 net.minecraft.server.MinecraftServer.LOGGER.warn("File '{}' specified through 'add-plugin' argument does not exist, cannot load a plugin from it!", file.getAbsolutePath());
+@@ -643,7 +643,7 @@ public final class CraftServer implements Server {
+     private void enablePlugin(Plugin plugin) {
+         try {
+             List<Permission> perms = plugin.getDescription().getPermissions();
+-            List<Permission> permsToLoad = new ArrayList<>(); // Paper
++            List<Permission> permsToLoad = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(); // Paper
+             for (Permission perm : perms) {
+                 // Paper start
+                 if (this.paperPluginManager.getPermission(perm.getName()) == null) {
+@@ -747,7 +747,7 @@ public final class CraftServer implements Server {
+     public List<Player> matchPlayer(String partialName) {
+         Preconditions.checkArgument(partialName != null, "partialName cannot be null");
+ 
+-        List<Player> matchedPlayers = new ArrayList<>();
++        List<Player> matchedPlayers = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+ 
+         for (Player iterPlayer : this.getOnlinePlayers()) {
+             String iterPlayerName = iterPlayer.getName();
+@@ -976,7 +976,7 @@ public final class CraftServer implements Server {
+ 
+     @Override
+     public List<World> getWorlds() {
+-        return new ArrayList<World>(this.worlds.values());
++        return new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(this.worlds.values());
+     }
+ 
+     @Override
+@@ -1692,7 +1692,7 @@ public final class CraftServer implements Server {
+     public List<Recipe> getRecipesFor(ItemStack result) {
+         Preconditions.checkArgument(result != null, "ItemStack cannot be null");
+ 
+-        List<Recipe> results = new ArrayList<Recipe>();
++        List<Recipe> results = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+         Iterator<Recipe> iter = this.recipeIterator();
+         while (iter.hasNext()) {
+             Recipe recipe = iter.next();
+@@ -1888,7 +1888,7 @@ public final class CraftServer implements Server {
+     @Override
+     public Map<String, String[]> getCommandAliases() {
+         ConfigurationSection section = this.commandsConfiguration.getConfigurationSection("aliases");
+-        Map<String, String[]> result = new LinkedHashMap<String, String[]>();
++        Map<String, String[]> result = new it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap<>();
+ 
+         if (section != null) {
+             for (String key : section.getKeys(false)) {
+@@ -2352,7 +2352,7 @@ public final class CraftServer implements Server {
+ 
+     @Override
+     public Set<OfflinePlayer> getWhitelistedPlayers() {
+-        Set<OfflinePlayer> result = new LinkedHashSet<OfflinePlayer>();
++        Set<OfflinePlayer> result = new it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet<>();
+ 
+         for (UserWhiteListEntry entry : this.playerList.getWhiteList().getEntries()) {
+             result.add(this.getOfflinePlayer(entry.getUser()));
+@@ -2669,7 +2669,7 @@ public final class CraftServer implements Server {
+     }
+ 
+     public List<String> tabCompleteChat(Player player, String message) {
+-        List<String> completions = new ArrayList<String>();
++        List<String> completions = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+         PlayerChatTabCompleteEvent event = new PlayerChatTabCompleteEvent(player, message, completions);
+         String token = event.getLastToken();
+         for (Player p : this.getOnlinePlayers()) {
+@@ -3033,7 +3033,7 @@ public final class CraftServer implements Server {
+             throw new IllegalArgumentException("Could not parse selector: " + selector, ex);
+         }
+ 
+-        return new ArrayList<>(Lists.transform(nms, (entity) -> entity.getBukkitEntity()));
++        return new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(Lists.transform(nms, (entity) -> entity.getBukkitEntity()));
+     }
+ 
+     @Override
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServerLinks.java b/src/main/java/org/bukkit/craftbukkit/CraftServerLinks.java
+index b214e7b302abbfe1641485a05f1371ac65ffb517..0c160aac7d12ca67dcb3f97d2cab04db6b8cb658 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftServerLinks.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftServerLinks.java
+@@ -35,7 +35,9 @@ public class CraftServerLinks implements ServerLinks {
+ 
+     @Override
+     public List<ServerLink> getLinks() {
+-        return this.getServerLinks().entries().stream().map(nms -> (ServerLink) new CraftServerLink(nms)).toList();
++        List<ServerLink> links = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
++        for (net.minecraft.server.ServerLinks.Entry nms : this.getServerLinks().entries()) links.add(new CraftServerLink(nms));
++        return links;
+     }
+ 
+     @Override
+@@ -86,7 +88,7 @@ public class CraftServerLinks implements ServerLinks {
+     }
+ 
+     private void addLink(CraftServerLink link) {
+-        List<net.minecraft.server.ServerLinks.Entry> lst = new ArrayList<>(this.getServerLinks().entries());
++        List<net.minecraft.server.ServerLinks.Entry> lst = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(this.getServerLinks().entries());
+         lst.add(link.handle);
+ 
+         this.setLinks(new net.minecraft.server.ServerLinks(lst));
+@@ -96,7 +98,7 @@ public class CraftServerLinks implements ServerLinks {
+     public boolean removeLink(ServerLink link) {
+         Preconditions.checkArgument(link != null, "link cannot be null");
+ 
+-        List<net.minecraft.server.ServerLinks.Entry> lst = new ArrayList<>(this.getServerLinks().entries());
++        List<net.minecraft.server.ServerLinks.Entry> lst = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(this.getServerLinks().entries());
+         boolean result = lst.remove(((CraftServerLink) link).handle);
+ 
+         this.setLinks(new net.minecraft.server.ServerLinks(lst));
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftSoundGroup.java b/src/main/java/org/bukkit/craftbukkit/CraftSoundGroup.java
+index 63a48ec761d1eca0856e8419e7fd0147bce92a44..488e3fc78efee1ac08fb79c52592b481369b893b 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftSoundGroup.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftSoundGroup.java
+@@ -1,6 +1,6 @@
+ package org.bukkit.craftbukkit;
+ 
+-import java.util.HashMap;
++import java.util.Map;
+ import net.minecraft.world.level.block.SoundType;
+ import org.bukkit.Sound;
+ import org.bukkit.SoundGroup;
+@@ -8,7 +8,7 @@ import org.bukkit.SoundGroup;
+ public class CraftSoundGroup implements SoundGroup {
+ 
+     private final net.minecraft.world.level.block.SoundType handle;
+-    private static final HashMap<SoundType, CraftSoundGroup> SOUND_GROUPS = new HashMap<>();
++    private static final Map<SoundType, CraftSoundGroup> SOUND_GROUPS = new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>();
+ 
+     public static SoundGroup getSoundGroup(SoundType soundEffectType) {
+         return CraftSoundGroup.SOUND_GROUPS.computeIfAbsent(soundEffectType, CraftSoundGroup::new);
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
+index 82d26889661a944e057be0c450fb5a296122ea8e..403bc97463257d112755f9a7cbf2bc2c5b1feab4 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
+@@ -158,7 +158,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+     private final CraftServer server = (CraftServer) Bukkit.getServer();
+     private final ChunkGenerator generator;
+     private final BiomeProvider biomeProvider;
+-    private final List<BlockPopulator> populators = new ArrayList<BlockPopulator>();
++    private final List<BlockPopulator> populators = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+     private final BlockMetadataStore blockMetadata = new BlockMetadataStore(this);
+     private final Object2IntOpenHashMap<SpawnCategory> spawnCategoryLimit = new Object2IntOpenHashMap<>();
+     private final CraftPersistentDataContainer persistentDataContainer = new CraftPersistentDataContainer(CraftWorld.DATA_TYPE_REGISTRY);
+@@ -600,7 +600,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+     @NotNull
+     @Override
+     public Collection<Chunk> getIntersectingChunks(@NotNull BoundingBox boundingBox) {
+-        List<Chunk> chunks = new ArrayList<>();
++        List<Chunk> chunks = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+ 
+         int minX = NumberConversions.floor(boundingBox.getMinX()) >> 4;
+         int maxX = NumberConversions.floor(boundingBox.getMaxX()) >> 4;
+@@ -1079,7 +1079,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+ 
+         AABB bb = new AABB(boundingBox.getMinX(), boundingBox.getMinY(), boundingBox.getMinZ(), boundingBox.getMaxX(), boundingBox.getMaxY(), boundingBox.getMaxZ());
+         List<net.minecraft.world.entity.Entity> entityList = this.getHandle().getEntities((net.minecraft.world.entity.Entity) null, bb, Predicates.alwaysTrue());
+-        List<Entity> bukkitEntityList = new ArrayList<org.bukkit.entity.Entity>(entityList.size());
++        List<Entity> bukkitEntityList = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(entityList.size());
+ 
+         for (net.minecraft.world.entity.Entity entity : entityList) {
+             Entity bukkitEntity = entity.getBukkitEntity();
+@@ -1254,7 +1254,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+ 
+     @Override
+     public List<Player> getPlayers() {
+-        List<Player> list = new ArrayList<Player>(this.world.players().size());
++        List<Player> list = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(this.world.players().size());
+ 
+         for (net.minecraft.world.entity.player.Player human : this.world.players()) {
+             HumanEntity bukkitEntity = human.getBukkitEntity();
+@@ -2012,7 +2012,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+     }
+ 
+     public static Map<String, GameRules.Key<?>> getGameRulesNMS(GameRules gameRules) {
+-        Map<String, GameRules.Key<?>> gamerules = new HashMap<>();
++        Map<String, GameRules.Key<?>> gamerules = new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>();
+         gameRules.visitGameRuleTypes(new GameRules.GameRuleTypeVisitor() {
+             @Override
+             public <T extends GameRules.Value<T>> void visit(GameRules.Key<T> key, GameRules.Type<T> type) {
+@@ -2028,7 +2028,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+             return this.gameruleDefinitions;
+         }
+ 
+-        Map<String, GameRules.Type<?>> gameruleDefinitions = new HashMap<>();
++        Map<String, GameRules.Type<?>> gameruleDefinitions = new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>();
+         this.getHandle().getGameRules().visitGameRuleTypes(new GameRules.GameRuleTypeVisitor() {
+             @Override
+             public <T extends GameRules.Value<T>> void visit(GameRules.Key<T> key, GameRules.Type<T> type) {
+@@ -2280,7 +2280,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+ 
+     @Override
+     public StructureSearchResult locateNearestStructure(Location origin, StructureType structureType, int radius, boolean findUnexplored) {
+-        List<Structure> structures = new ArrayList<>();
++        List<Structure> structures = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+         for (Structure structure : RegistryAccess.registryAccess().getRegistry(RegistryKey.STRUCTURE)) {
+             if (structure.getStructureType() == structureType) {
+                 structures.add(structure);
+@@ -2297,7 +2297,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+ 
+     public StructureSearchResult locateNearestStructure(Location origin, List<Structure> structures, int radius, boolean findUnexplored) {
+         BlockPos originPos = BlockPos.containing(origin.getX(), origin.getY(), origin.getZ());
+-        List<Holder<net.minecraft.world.level.levelgen.structure.Structure>> holders = new ArrayList<>();
++        List<Holder<net.minecraft.world.level.levelgen.structure.Structure>> holders = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+ 
+         for (Structure structure : structures) {
+             holders.add(Holder.direct(CraftStructure.bukkitToMinecraft(structure)));
+diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
+index 3023b8ba22106d2dbe34f1a1db0e0e968500d6c6..1f21aec1a368a7c9cf4cee8b7e52f7ed4d9d797f 100644
+--- a/src/main/java/org/bukkit/craftbukkit/Main.java
++++ b/src/main/java/org/bukkit/craftbukkit/Main.java
+@@ -286,6 +286,6 @@ public class Main {
+     }
+ 
+     private static List<String> asList(String... params) {
+-        return Arrays.asList(params);
++        return new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(params);
+     }
+ }
+diff --git a/src/main/java/org/bukkit/craftbukkit/attribute/AttributeMappings.java b/src/main/java/org/bukkit/craftbukkit/attribute/AttributeMappings.java
+index ce23ac9bcf5b043a07130da39cc8804f0d0be1e5..b498cc39ea2eef93130af225681e107704ec719b 100644
+--- a/src/main/java/org/bukkit/craftbukkit/attribute/AttributeMappings.java
++++ b/src/main/java/org/bukkit/craftbukkit/attribute/AttributeMappings.java
+@@ -7,7 +7,7 @@ import org.bukkit.NamespacedKey;
+ import org.jetbrains.annotations.NotNull;
+ 
+ final class AttributeMappings {
+-    private static final Map<UUID, NamespacedKey> ATTRIBUTE_MODIFIER_IDS = new HashMap<>();
++    private static final Map<UUID, NamespacedKey> ATTRIBUTE_MODIFIER_IDS = new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>();
+ 
+     static {
+         add(-4483571535397864886L, -5989644940537681742L, "armor.body");
+diff --git a/src/main/java/org/bukkit/craftbukkit/attribute/CraftAttributeInstance.java b/src/main/java/org/bukkit/craftbukkit/attribute/CraftAttributeInstance.java
+index 34b9d79fd1a4aa7395b3383fa721f5689494aa12..301dfd7c9c90ef5486ed5d4bec889c60e1ed6ced 100644
+--- a/src/main/java/org/bukkit/craftbukkit/attribute/CraftAttributeInstance.java
++++ b/src/main/java/org/bukkit/craftbukkit/attribute/CraftAttributeInstance.java
+@@ -37,7 +37,7 @@ public class CraftAttributeInstance implements AttributeInstance {
+ 
+     @Override
+     public Collection<AttributeModifier> getModifiers() {
+-        List<AttributeModifier> result = new ArrayList<AttributeModifier>();
++        List<AttributeModifier> result = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+         for (net.minecraft.world.entity.ai.attributes.AttributeModifier nms : this.handle.getModifiers()) {
+             result.add(CraftAttributeInstance.convert(nms));
+         }
+diff --git a/src/main/java/org/bukkit/craftbukkit/bootstrap/Main.java b/src/main/java/org/bukkit/craftbukkit/bootstrap/Main.java
+index 3a7ba39c0bf59443392eacae547c7a58ed14f653..d8ceea09c13cdbe885f15010a7dd0210ca271eb7 100644
+--- a/src/main/java/org/bukkit/craftbukkit/bootstrap/Main.java
++++ b/src/main/java/org/bukkit/craftbukkit/bootstrap/Main.java
+@@ -41,7 +41,7 @@ public class Main {
+             System.out.println("Unbundling libraries to " + outputDir);
+ 
+             boolean readOnly = Boolean.getBoolean("bundlerReadOnly");
+-            List<URL> extractedUrls = new ArrayList<>();
++            List<URL> extractedUrls = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+             this.readAndExtractDir("versions", outputDir, extractedUrls, readOnly);
+             this.readAndExtractDir("libraries", outputDir, extractedUrls, readOnly);
+ 
+diff --git a/src/main/java/org/bukkit/craftbukkit/command/ConsoleCommandCompleter.java b/src/main/java/org/bukkit/craftbukkit/command/ConsoleCommandCompleter.java
+index 25303f144422469350fdc6f84320b16bcc9f6e0c..9915b72857cb9ab56ff28448ad3cb418d1a2b397 100644
+--- a/src/main/java/org/bukkit/craftbukkit/command/ConsoleCommandCompleter.java
++++ b/src/main/java/org/bukkit/craftbukkit/command/ConsoleCommandCompleter.java
+@@ -39,14 +39,13 @@ public class ConsoleCommandCompleter implements Completer {
+         if (event.isCancelled() || event.isHandled()) {
+             // Still fire sync event with the provided completions, if someone is listening
+             if (!event.isCancelled() && TabCompleteEvent.getHandlerList().getRegisteredListeners().length > 0) {
+-                List<com.destroystokyo.paper.event.server.AsyncTabCompleteEvent.Completion> finalCompletions = new java.util.ArrayList<>(completions);
++                List<com.destroystokyo.paper.event.server.AsyncTabCompleteEvent.Completion> finalCompletions = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(completions);
+                 Waitable<List<String>> syncCompletions = new Waitable<List<String>>() {
+                     @Override
+                     protected List<String> evaluate() {
+-                        org.bukkit.event.server.TabCompleteEvent syncEvent = new org.bukkit.event.server.TabCompleteEvent(server.getConsoleSender(), buffer,
+-                            finalCompletions.stream()
+-                                .map(com.destroystokyo.paper.event.server.AsyncTabCompleteEvent.Completion::suggestion)
+-                                .collect(java.util.stream.Collectors.toList()));
++                        List<String> suggestions = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
++                        for (com.destroystokyo.paper.event.server.AsyncTabCompleteEvent.Completion completion : finalCompletions) suggestions.add(completion.suggestion());
++                        org.bukkit.event.server.TabCompleteEvent syncEvent = new org.bukkit.event.server.TabCompleteEvent(server.getConsoleSender(), buffer, suggestions);
+                         return syncEvent.callEvent() ? syncEvent.getCompletions() : com.google.common.collect.ImmutableList.of();
+                     }
+                 };
+diff --git a/src/main/java/org/bukkit/craftbukkit/command/VanillaCommandWrapper.java b/src/main/java/org/bukkit/craftbukkit/command/VanillaCommandWrapper.java
+index 68001fbc7abf4c87740ebe8e7e492fa254be0da1..72d1985eb705cb98735e3a14c059d674ba5b7788 100644
+--- a/src/main/java/org/bukkit/craftbukkit/command/VanillaCommandWrapper.java
++++ b/src/main/java/org/bukkit/craftbukkit/command/VanillaCommandWrapper.java
+@@ -66,7 +66,7 @@ public class VanillaCommandWrapper extends BukkitCommand { // Paper
+         CommandSourceStack icommandlistener = VanillaCommandWrapper.getListener(sender);
+         ParseResults<CommandSourceStack> parsed = this.commands().getDispatcher().parse(this.toDispatcher(args, this.getName()), icommandlistener); // Paper
+ 
+-        List<String> results = new ArrayList<>();
++        List<String> results = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+         this.commands().getDispatcher().getCompletionSuggestions(parsed).thenAccept((suggestions) -> { // Paper
+             suggestions.getList().forEach((s) -> results.add(s.getText()));
+         });
+diff --git a/src/main/java/org/bukkit/craftbukkit/profile/CraftPlayerProfile.java b/src/main/java/org/bukkit/craftbukkit/profile/CraftPlayerProfile.java
+index f58dec12326734c61f4bc2298a87fb38f1ac1dc4..0243e4cfe822052c730aa9b25709ceafc49f3747 100644
+--- a/src/main/java/org/bukkit/craftbukkit/profile/CraftPlayerProfile.java
++++ b/src/main/java/org/bukkit/craftbukkit/profile/CraftPlayerProfile.java
+@@ -286,7 +286,7 @@ public final class CraftPlayerProfile implements PlayerProfile, com.destroystoky
+     @Override
+     public Map<String, Object> serialize() {
+         // Paper - diff on change
+-        Map<String, Object> map = new LinkedHashMap<>();
++        Map<String, Object> map = new it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap<>();
+         if (this.uniqueId != null) {
+             map.put("uniqueId", this.uniqueId.toString());
+         }
+@@ -295,7 +295,7 @@ public final class CraftPlayerProfile implements PlayerProfile, com.destroystoky
+         }
+         this.rebuildDirtyProperties();
+         if (!this.properties.isEmpty()) {
+-            List<Object> propertiesData = new ArrayList<>();
++            List<Object> propertiesData = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+             this.properties.forEach((propertyName, property) -> propertiesData.add(CraftProfileProperty.serialize(property)));
+             map.put("properties", propertiesData);
+         }
+diff --git a/src/main/java/org/bukkit/craftbukkit/profile/CraftProfileProperty.java b/src/main/java/org/bukkit/craftbukkit/profile/CraftProfileProperty.java
+index e250f7ba718f22a8c1ede2d30c569e1ee59693a7..86a578507968716c0856e7e84b05c8ac0251f82e 100644
+--- a/src/main/java/org/bukkit/craftbukkit/profile/CraftProfileProperty.java
++++ b/src/main/java/org/bukkit/craftbukkit/profile/CraftProfileProperty.java
+@@ -116,7 +116,7 @@ public final class CraftProfileProperty {
+     }
+ 
+     public static Map<String, Object> serialize(@Nonnull Property property) {
+-        Map<String, Object> map = new LinkedHashMap<>();
++        Map<String, Object> map = new it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap<>();
+         map.put("name", property.name());
+         map.put("value", property.value());
+         if (property.hasSignature()) {
+diff --git a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java
+index fad85bea8643a3a88ec5c4194de7a5060e81c136..8498d628ec94a8147f840f8c46ff110581e950df 100644
+--- a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java
++++ b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java
+@@ -88,7 +88,7 @@ public class CraftScheduler implements BukkitScheduler {
+     /**
+      * Main thread logic only
+      */
+-    private final List<CraftTask> temp = new ArrayList<CraftTask>();
++    private final List<CraftTask> temp = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+     /**
+      * These are tasks that are currently active. It's provided for 'viewing' the current state.
+      */
+@@ -402,7 +402,7 @@ public class CraftScheduler implements BukkitScheduler {
+             return this.asyncScheduler.getActiveWorkers();
+         }
+         // Paper end
+-        final ArrayList<BukkitWorker> workers = new ArrayList<BukkitWorker>();
++        final List<BukkitWorker> workers = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+         for (final CraftTask taskObj : this.runners.values()) {
+             // Iterator will be a best-effort (may fail to grab very new values) if called from an async thread
+             if (taskObj.isSync()) {
+@@ -419,7 +419,7 @@ public class CraftScheduler implements BukkitScheduler {
+ 
+     @Override
+     public List<BukkitTask> getPendingTasks() {
+-        final ArrayList<CraftTask> truePending = new ArrayList<CraftTask>();
++        final List<CraftTask> truePending = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+         for (CraftTask task = this.head.getNext(); task != null; task = task.getNext()) {
+             if (task.getTaskId() != -1) {
+                 // -1 is special code
+@@ -427,7 +427,7 @@ public class CraftScheduler implements BukkitScheduler {
+             }
+         }
+ 
+-        final ArrayList<BukkitTask> pending = new ArrayList<BukkitTask>();
++        final List<BukkitTask> pending = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+         for (CraftTask task : this.runners.values()) {
+             if (task.getPeriod() >= CraftTask.NO_REPEATING) {
+                 pending.add(task);
