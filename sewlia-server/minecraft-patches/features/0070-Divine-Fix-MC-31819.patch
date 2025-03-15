@@ -7,7 +7,7 @@ Original code by NONPLAYT
 You can find the original code on https://github.com/DivineMC/DivineMC
 
 diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
-index 73cc598aa1b4163daf6e758930acaf0dab2855d7..fb67e058d7b6565f726d22750c7ca25039c69611 100644
+index 1f029e0b9e3b9406412b01cc63c80cb2822819b3..ed46e94de7106ee42af9e5bcb5be6a62cab62817 100644
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
 @@ -1848,6 +1848,9 @@ public abstract class Player extends LivingEntity {

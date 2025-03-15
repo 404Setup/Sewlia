@@ -7,7 +7,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Gale - https://galemc.org
 
 diff --git a/net/minecraft/world/item/ItemStack.java b/net/minecraft/world/item/ItemStack.java
-index 3f4777d242cdcda6788e772f9e49efd8af8508c7..e65c7422c24cfebe6de5ac32e14d6eb70d014997 100644
+index d3b98f1d36b643989708ea22753a0c0d0d4243bc..db1dca668306dd89a07e79d7e916fb68bc57f064 100644
 --- a/net/minecraft/world/item/ItemStack.java
 +++ b/net/minecraft/world/item/ItemStack.java
 @@ -885,11 +885,11 @@ public final class ItemStack implements DataComponentHolder {

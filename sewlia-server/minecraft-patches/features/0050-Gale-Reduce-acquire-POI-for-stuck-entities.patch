@@ -31,7 +31,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 diff --git a/net/minecraft/world/entity/ai/behavior/AcquirePoi.java b/net/minecraft/world/entity/ai/behavior/AcquirePoi.java
-index aace443368a0013c62e07f12eaf649526a58aee5..65f7e6e24adc1e747c75716b65fcdb0ab6bc4de6 100644
+index b9174ae7e3a3e2de2d570b95ab5012ac3c3a2eda..035c2b12f06d3171f2000e05e322af7001c88f21 100644
 --- a/net/minecraft/world/entity/ai/behavior/AcquirePoi.java
 +++ b/net/minecraft/world/entity/ai/behavior/AcquirePoi.java
 @@ -28,6 +28,13 @@ import org.apache.commons.lang3.mutable.MutableLong;

@@ -17,7 +17,7 @@ index 8d67b4629c69d3039b199aaad45533d1acde114e..f7bfeca4b11b9860241d5eb80b6df420
          ((ca.spottedleaf.moonrise.patches.chunk_tick_iteration.ChunkTickServerLevel)(ServerLevel)chunk.getLevel()).moonrise$removeChunkForPlayerTicking(chunk); // Moonrise - chunk tick iteration
      }
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 51ba64ed90aa4be0484ed11794fb1ca758a9867c..7502f2f124af13202cf5d25f83d31806fe55ac28 100644
+index 54b55e8da9cbb116f051136fc2b597052eb265d8..f9a247f7797e9ed8d8ae1eaea0c58c82df947ad0 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
 @@ -1666,7 +1666,37 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -150,7 +150,7 @@ index 23b342cc31c7e72ade0e1ccad86a9ccf34380f13..249cb7326c8e4012dcffdb6bbb7bfc1f
 +    // KioCG end
  }
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index a9ef891d56af44e4f70f2bfcccaf55a664901dcc..0f59acd17b90770626ff468fbf13b8f53aedd254 100644
+index 2cd2ce1060f567be6c72b7bc9d02651ec7166203..66c8b5cd3653beaeb4bd63206a9a97572c6e84f0 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
 @@ -5919,4 +5919,6 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -225,7 +225,7 @@ index 6655d06e2011e20e7346dfe57527795269094d8a..48aa6fcb5c16fdbb4ae902cbb72c6b8e
 +    // KioCG end
  }
 diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
-index dd0839f2966c9744a9e24a03d93429bd3b5c987f..73cc598aa1b4163daf6e758930acaf0dab2855d7 100644
+index e70919757dee4b02384ded3551c8f580d289584a..1f029e0b9e3b9406412b01cc63c80cb2822819b3 100644
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
 @@ -2455,4 +2455,11 @@ public abstract class Player extends LivingEntity {

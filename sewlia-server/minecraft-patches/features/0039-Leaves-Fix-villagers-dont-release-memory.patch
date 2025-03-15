@@ -5,7 +5,7 @@ Subject: [PATCH] Leaves: Fix villagers dont release memory
 
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index b1c1b0e8cae4600477b0f561a3b8bce7e89620e6..96f1c5399deb7b1246ce6981c5d1017ae3052df3 100644
+index e1c61c9a033707d6adbc713f43edccb2aa849656..06f4176c3ccd2b95e934071192fced699c499364 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
 @@ -4640,7 +4640,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -15,7 +15,7 @@ index b1c1b0e8cae4600477b0f561a3b8bce7e89620e6..96f1c5399deb7b1246ce6981c5d1017a
 -    private Entity teleportCrossDimension(ServerLevel level, TeleportTransition teleportTransition) {
 +    protected Entity teleportCrossDimension(ServerLevel level, TeleportTransition teleportTransition) { // Leaves - private -> protected
          List<Entity> passengers = this.getPassengers();
-         List<Entity> list = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(passengers.size());
+         List<Entity> list = new ArrayList<>(passengers.size());
          this.ejectPassengers();
 diff --git a/net/minecraft/world/entity/npc/Villager.java b/net/minecraft/world/entity/npc/Villager.java
 index db235101be529b50cb6925d2b7ff015bd2a7cf84..19ee59b124cd2f866fd0b5e73b42c793d461e98d 100644
