@@ -51,6 +51,7 @@ This refers to patches that once existed in Sewlia, but have not been provided d
 Sewlia gets patches or inspiration from the following server software or projects. 
 Thanks to these developers for their contributions.
 
+- cao-awa/Sepals
 - CaffeineMC/lithium-fabric
 - DivineMC/DivineMC
 - Dreeam-qwq/Gale
@@ -68,4 +69,4 @@ Thanks to these developers for their contributions.
 - SparklyPower/SparklyPaper
 - TECHNOVE/Airplane
 - Wesley1808/ServerCore
-- Winds-Studio/Leaf
+- [Winds-Studio/Leaf](https://github.com/Winds-Studio/Leaf)

@@ -18,10 +18,10 @@ index b1c1b0e8cae4600477b0f561a3b8bce7e89620e6..96f1c5399deb7b1246ce6981c5d1017a
          List<Entity> list = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(passengers.size());
          this.ejectPassengers();
 diff --git a/net/minecraft/world/entity/npc/Villager.java b/net/minecraft/world/entity/npc/Villager.java
-index 7ea74aeb905b95e5919d74df5fbc5e8f7a9985e3..792ab00905e2a731406813dd74d7e8a4de62d36c 100644
+index db235101be529b50cb6925d2b7ff015bd2a7cf84..19ee59b124cd2f866fd0b5e73b42c793d461e98d 100644
 --- a/net/minecraft/world/entity/npc/Villager.java
 +++ b/net/minecraft/world/entity/npc/Villager.java
-@@ -1020,4 +1020,19 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
+@@ -1030,4 +1030,19 @@ public class Villager extends AbstractVillager implements ReputationEventHandler
          Optional<Long> memory = this.brain.getMemory(MemoryModuleType.LAST_SLEPT);
          return memory.filter(_long -> gameTime - _long < 24000L).isPresent();
      }
