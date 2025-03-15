@@ -33,7 +33,7 @@
 +    compileOnly("net.java.dev.jna:jna-platform:5.15.0")
 +
 +    api("one.tranic:t-proxy:1.0.0")
-+    api("one.tranic:t-utils:1.2.0")
++    api("one.tranic:t-utils:1.2.2.1")
 +    // Sewlia end
  }
  
