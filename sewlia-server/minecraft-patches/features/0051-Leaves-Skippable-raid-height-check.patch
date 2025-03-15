@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: violetc <58360096+s-yh-china@users.noreply.github.com>
+Date: Fri, 14 Mar 2025 10:55:57 +0800
+Subject: [PATCH] Leaves: Skippable raid height check
+
+
+diff --git a/net/minecraft/world/entity/raid/Raid.java b/net/minecraft/world/entity/raid/Raid.java
+index 2f45befbb50645f1bfb5961ad725f3670ff0d592..bcf85adb8ca9bbda146fc3398f4f90fd1dde076e 100644
+--- a/net/minecraft/world/entity/raid/Raid.java
++++ b/net/minecraft/world/entity/raid/Raid.java
+@@ -674,10 +674,10 @@ public class Raid {
+             int i2 = this.center.getX() + Mth.floor(Mth.cos(f2) * 32.0F * f) + this.level.random.nextInt(3) * Mth.floor(f);
+             int i3 = this.center.getZ() + Mth.floor(Mth.sin(f2) * 32.0F * f) + this.level.random.nextInt(3) * Mth.floor(f);
+             int height = this.level.getHeight(Heightmap.Types.WORLD_SURFACE, i2, i3);
+-            if (Mth.abs(height - this.center.getY()) <= 96) {
++            if (one.tranic.sewlia.config.mod.unsafe.raid.SkipHeightCheck.value || Mth.abs(height - this.center.getY()) <= 96) { // Leaves - skippable
+                 mutableBlockPos.set(i2, height, i3);
+                 if (!this.level.isVillage(mutableBlockPos) || i <= 7) {
+-                    int i4 = 10;
++                    //int i4 = 10;
+                     if (this.level
+                             .hasChunksAt(mutableBlockPos.getX() - 10, mutableBlockPos.getZ() - 10, mutableBlockPos.getX() + 10, mutableBlockPos.getZ() + 10)
+                         && this.level.isPositionEntityTicking(mutableBlockPos)

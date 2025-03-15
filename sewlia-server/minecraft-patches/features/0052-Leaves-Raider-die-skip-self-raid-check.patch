@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: violetc <58360096+s-yh-china@users.noreply.github.com>
+Date: Sun, 9 Jul 2023 16:51:47 +0800
+Subject: [PATCH] Leaves: Raider die skip self raid check
+
+
+diff --git a/net/minecraft/world/entity/raid/Raider.java b/net/minecraft/world/entity/raid/Raider.java
+index 1f00af8d6a40ad22a233a39c01945f4f122020be..7f064a89cf2bac19f9b94092a6c6b850889b9711 100644
+--- a/net/minecraft/world/entity/raid/Raider.java
++++ b/net/minecraft/world/entity/raid/Raider.java
+@@ -190,7 +190,7 @@ public abstract class Raider extends PatrollingMonster {
+     }
+ 
+     public boolean hasRaid() {
+-        return this.level() instanceof ServerLevel serverLevel && (this.getCurrentRaid() != null || serverLevel.getRaidAt(this.blockPosition()) != null);
++        return !one.tranic.sewlia.config.mod.unsafe.raid.SkipSelfRaidCheck.value && (this.level() instanceof ServerLevel serverLevel && (this.getCurrentRaid() != null || serverLevel.getRaidAt(this.blockPosition()) != null));  // Leaves - skip self raid check
+     }
+ 
+     public boolean hasActiveRaid() {

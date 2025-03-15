@@ -21,7 +21,7 @@ index 80f17f33f670018240c854df589cf90cdeab6e70..cab1308abf2cdc27f32322e35e0d06aa
              if (raidAt == null || raidAt.getRaidOmenLevel() < raidAt.getMaxRaidOmenLevel()) {
                  serverPlayer.addEffect(new MobEffectInstance(MobEffects.RAID_OMEN, 600, amplifier));
 diff --git a/net/minecraft/world/entity/raid/Raider.java b/net/minecraft/world/entity/raid/Raider.java
-index 7c385baae81b9a987c0e1e4deb017884600331bc..51fcffe5cdbdb8dbd0a4e9cca186410738f19fc9 100644
+index 7c385baae81b9a987c0e1e4deb017884600331bc..1f00af8d6a40ad22a233a39c01945f4f122020be 100644
 --- a/net/minecraft/world/entity/raid/Raider.java
 +++ b/net/minecraft/world/entity/raid/Raider.java
 @@ -125,6 +125,43 @@ public abstract class Raider extends PatrollingMonster {
@@ -31,7 +31,7 @@ index 7c385baae81b9a987c0e1e4deb017884600331bc..51fcffe5cdbdb8dbd0a4e9cca1864107
 +
 +            // Leaves start - Revert raid changes
 +            if (this.level() instanceof ServerLevel serverLevel) {
-+                if (one.tranic.sewlia.config.mod.unsafe.raid.GiveBadOmenWhenKillPatrolLeader.value && this.isPatrolLeader() && raid == null && serverLevel.getRaidAt(this.blockPosition()) == null) {
++                if (one.tranic.sewlia.config.mod.unsafe.raid.GiveBadOmenWhenKillPatrolLeader.value && !this.hasRaid()) {
 +                    ItemStack itemstack = this.getItemBySlot(EquipmentSlot.HEAD);
 +                    net.minecraft.world.entity.player.Player entityhuman = null;
 +                    if (entity instanceof net.minecraft.world.entity.player.Player player) {
