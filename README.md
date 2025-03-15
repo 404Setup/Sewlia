@@ -43,7 +43,6 @@ which can relieve me from boredom.
 ## Temporarily unavailable
 This refers to patches that once existed in Sewlia, but have not been provided due to version upgrades.
 
-- Full VT2 > A small part was damaged, but it didn't affect much. There are plans to make it compatible with threads that depend on TickThread, but it's a bit cumbersome.
 - Secure Seed > Low priority
 - Other patches > In order
 
