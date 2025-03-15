@@ -1,0 +1,20 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Taiyou06 <kaandindar21@gmail.com>
+Date: Sun, 16 Feb 2025 01:13:04 +0100
+Subject: [PATCH] Leaf: Use ensureCapacity to pre-populate the size of ticking
+ chunks list output
+
+
+diff --git a/net/minecraft/server/level/ServerChunkCache.java b/net/minecraft/server/level/ServerChunkCache.java
+index a6404d670460cfa7c69d950787348943eb239e8c..1d5a09c07b46b36ddcbe7c227ec368c4627f611c 100644
+--- a/net/minecraft/server/level/ServerChunkCache.java
++++ b/net/minecraft/server/level/ServerChunkCache.java
+@@ -570,7 +570,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+         final ServerChunkCache.ChunkAndHolder[] raw = tickingChunks.getRawDataUnchecked();
+         final int size = tickingChunks.size();
+ 
+-        final ChunkMap chunkMap = this.chunkMap;
++        if (output instanceof it.unimi.dsi.fastutil.objects.ObjectArrayList<LevelChunk> arrayList) arrayList.ensureCapacity(size); // Leaf - Use ensureCapacity to pre-populate the size of ticking chunks list output
+ 
+         for (int i = 0; i < size; ++i) {
+             final ServerChunkCache.ChunkAndHolder chunkAndHolder = raw[i];
