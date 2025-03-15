@@ -1,0 +1,56 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Sat, 15 Mar 2025 10:37:57 +0800
+Subject: [PATCH] Modify leafprofiler
+
+
+diff --git a/ca/spottedleaf/leafprofiler/LProfileGraph.java b/ca/spottedleaf/leafprofiler/LProfileGraph.java
+index 19c13bd372711bce978a463f85130f1e10202da9..66b019397945355a8a46456b908153046ed266b8 100644
+--- a/ca/spottedleaf/leafprofiler/LProfileGraph.java
++++ b/ca/spottedleaf/leafprofiler/LProfileGraph.java
+@@ -26,7 +26,7 @@ public final class LProfileGraph {
+     public static record GraphNode(GraphNode parent, int nodeId, int timerId) {}
+ 
+     public List<GraphNode> getDFS() {
+-        final List<GraphNode> ret = new ArrayList<>();
++        final List<GraphNode> ret = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+         final ArrayDeque<GraphNode> queue = new ArrayDeque<>();
+ 
+         queue.addFirst(new GraphNode(null, ROOT_NODE, -1));
+diff --git a/ca/spottedleaf/leafprofiler/LeafProfiler.java b/ca/spottedleaf/leafprofiler/LeafProfiler.java
+index d1d259fbf6633ea38799b1519bca6deb623704a3..c5f3b835cab53f2d22b40a27bac246aebef850a0 100644
+--- a/ca/spottedleaf/leafprofiler/LeafProfiler.java
++++ b/ca/spottedleaf/leafprofiler/LeafProfiler.java
+@@ -168,7 +168,7 @@ public final class LeafProfiler {
+         public final LProfilerRegistry.ProfilerEntry profiler;
+         public final long totalTime;
+         public final long totalCount;
+-        public final List<ProfileNode> children = new ArrayList<>();
++        public final List<ProfileNode> children = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+         public long childrenTimingCount;
+         public int depth = -1;
+         public boolean lastChild;
+@@ -221,7 +221,7 @@ public final class LeafProfiler {
+                 nodeMap.put(graphNode, profileNode);
+             }
+ 
+-            final List<String> ret = new ArrayList<>();
++            final List<String> ret = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>();
+ 
+             long totalTime = 0L;
+ 
+diff --git a/ca/spottedleaf/leafprofiler/RegionizedProfiler.java b/ca/spottedleaf/leafprofiler/RegionizedProfiler.java
+index 6e9b04613c5c867a74fa4f266a8ae8e60416cb6d..a80a4d50c7b176c4d140c3310ae6cf29c425212e 100644
+--- a/ca/spottedleaf/leafprofiler/RegionizedProfiler.java
++++ b/ca/spottedleaf/leafprofiler/RegionizedProfiler.java
+@@ -242,8 +242,8 @@ public final class RegionizedProfiler {
+                         this.profilerGroup.id,
+                         this.profilerGroup.absoluteStart,
+                         endTime,
+-                        new ArrayList<>(this.profilerGroup.timings),
+-                        new ArrayList<>(this.profilerGroup.operations)
++                        new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(this.profilerGroup.timings),
++                        new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(this.profilerGroup.operations)
+                     )
+                 );
+             }

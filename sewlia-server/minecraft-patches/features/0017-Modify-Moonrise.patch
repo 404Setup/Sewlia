@@ -4,6 +4,19 @@ Date: Sat, 22 Feb 2025 14:07:16 +0800
 Subject: [PATCH] Modify Moonrise
 
 
+diff --git a/ca/spottedleaf/moonrise/common/misc/NearbyPlayers.java b/ca/spottedleaf/moonrise/common/misc/NearbyPlayers.java
+index 0027a3896c0cfce2f46eca8a0a77a90223723dc7..256c4998ff98f9fd76ae5493e719774415c8843c 100644
+--- a/ca/spottedleaf/moonrise/common/misc/NearbyPlayers.java
++++ b/ca/spottedleaf/moonrise/common/misc/NearbyPlayers.java
+@@ -105,7 +105,7 @@ public final class NearbyPlayers {
+             return;
+         }
+ 
+-        for (final ServerPlayer player : new ArrayList<>(this.players.keySet())) {
++        for (final ServerPlayer player : new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(this.players.keySet())) {
+             this.removePlayer(player);
+         }
+     }
 diff --git a/ca/spottedleaf/moonrise/patches/blockstate_propertyaccess/util/ZeroCollidingReferenceStateTable.java b/ca/spottedleaf/moonrise/patches/blockstate_propertyaccess/util/ZeroCollidingReferenceStateTable.java
 index 866f38eb0f379ffbe2888023a7d1c290f521a231..1416f9f95f8c27a4c96aca857e85b46c8c1ff00e 100644
 --- a/ca/spottedleaf/moonrise/patches/blockstate_propertyaccess/util/ZeroCollidingReferenceStateTable.java

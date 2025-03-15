@@ -5,7 +5,7 @@ Subject: [PATCH] Modify network
 
 
 diff --git a/net/minecraft/network/Connection.java b/net/minecraft/network/Connection.java
-index 2021142e677e028654f26cb9ecfc29e2aefc9825..7592dc8ac2b4f3df7da1a8619803cc7bde7b4d95 100644
+index 7713b44b8bce38704efa563a79facbb9cf9914ac..697e355266712dd09398c51fef9d046f1ffb241f 100644
 --- a/net/minecraft/network/Connection.java
 +++ b/net/minecraft/network/Connection.java
 @@ -133,7 +133,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
