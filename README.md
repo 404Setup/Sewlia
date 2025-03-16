@@ -43,7 +43,7 @@ which can relieve me from boredom.
 ## Temporarily unavailable
 This refers to patches that once existed in Sewlia, but have not been provided due to version upgrades.
 
-- Secure Seed > Low priority
+- Secure Seed > TODO
 - Other patches > In order
 
 ## Thanks
