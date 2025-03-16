@@ -1,0 +1,54 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrHua269 <mrhua269@gmail.com>
+Date: Sat, 8 Mar 2025 09:56:15 +0800
+Subject: [PATCH] Luminol: Clean up the entity memory that does not belong to
+ the current tickregion
+
+
+diff --git a/net/minecraft/world/entity/ai/Brain.java b/net/minecraft/world/entity/ai/Brain.java
+index 65b2b3ece213d901cdd585093e2fafcd2ef4a7cd..11a830c3a835b9070b931ada1fe5814d589c6bff 100644
+--- a/net/minecraft/world/entity/ai/Brain.java
++++ b/net/minecraft/world/entity/ai/Brain.java
+@@ -399,7 +399,7 @@ public class Brain<E extends LivingEntity> {
+     }
+ 
+     public void tick(ServerLevel level, E entity) {
+-        this.forgetOutdatedMemories();
++        this.forgetOutdatedMemories(entity);
+         this.tickSensors(level, entity);
+         this.startEachNonRunningBehavior(level, entity);
+         this.tickEachRunningBehavior(level, entity);
+@@ -411,10 +411,32 @@ public class Brain<E extends LivingEntity> {
+         }
+     }
+ 
+-    private void forgetOutdatedMemories() {
++    private void forgetOutdatedMemories(E owner) {
+         for (Entry<MemoryModuleType<?>, Optional<? extends ExpirableValue<?>>> entry : this.memories.entrySet()) {
+             if (entry.getValue().isPresent()) {
+                 ExpirableValue<?> expirableValue = (ExpirableValue<?>)entry.getValue().get();
++
++                // Luminol start - Add config to force clean entity memory that don't belong to current tick region
++                final Object value = expirableValue.getValue();
++                final net.minecraft.world.level.Level ownerLevel = owner.level();
++
++                // type: entity
++                if (one.tranic.sewlia.config.mod.unsafe.fix.force_cleanup_brain_memory.EnabledForEntity.value && value instanceof LivingEntity entity) {
++                    if (!ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(entity)) {
++                        this.eraseMemory(entry.getKey());
++                        continue;
++                    }
++                }
++
++                // type: block_pos
++                if (one.tranic.sewlia.config.mod.unsafe.fix.force_cleanup_brain_memory.EnabledForBlockPos.value && value instanceof net.minecraft.core.BlockPos blockPos) {
++                    if (!ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(ownerLevel, blockPos)) {
++                        this.eraseMemory(entry.getKey());
++                        continue;
++                    }
++                }
++                // Luminol end
++
+                 if (expirableValue.hasExpired()) {
+                     this.eraseMemory(entry.getKey());
+                 }
