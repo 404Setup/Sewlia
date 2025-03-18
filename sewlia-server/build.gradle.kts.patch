@@ -74,6 +74,20 @@
      runtimeOnly(log4jPlugins.output)
      alsoShade(log4jPlugins.output)
  
+@@ -170,8 +_,11 @@
+     implementation("org.spongepowered:configurate-yaml:4.2.0-20250225.064233-199")
+     implementation("org.spongepowered:configurate-core:4.2.0-20250225.064233-204") // Pinned dependency of above pinned yaml snapshot.
+     implementation("commons-lang:commons-lang:2.6")
+-    runtimeOnly("org.xerial:sqlite-jdbc:3.47.0.0")
+-    runtimeOnly("com.mysql:mysql-connector-j:9.1.0")
++    runtimeOnly("org.xerial:sqlite-jdbc:3.47.2.0")
++    runtimeOnly("com.mysql:mysql-connector-j:9.2.0") {
++        exclude("com.google.protobuf", "protobuf-java")
++    }
++    runtimeOnly("com.google.protobuf:protobuf-java:4.30.1")
+     runtimeOnly("com.lmax:disruptor:3.4.4")
+ 
+     runtimeOnly("org.apache.maven:maven-resolver-provider:3.9.6")
 @@ -199,6 +_,15 @@
      // Spark
      implementation("me.lucko:spark-api:0.1-20240720.200737-2")
@@ -84,7 +98,7 @@
 +        exclude(group="org.yaml", module="snakeyaml")
 +    }
 +    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
-+    implementation("com.github.luben:zstd-jni:1.5.7-1")
++    implementation("com.github.luben:zstd-jni:1.5.7-2")
 +    implementation("org.lz4:lz4-java:1.8.0")
 +    // Sewlia end
  }
