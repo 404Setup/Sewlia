@@ -4,6 +4,7 @@ Date: Sun, 16 Feb 2025 01:13:04 +0100
 Subject: [PATCH] Leaf: Directly use the pre-filtered ticking chunks list as
  the output
 
+This patch uses already pre filtered chunks, which completely skips the isChunkNearPlayer check
 
 diff --git a/net/minecraft/server/level/ServerChunkCache.java b/net/minecraft/server/level/ServerChunkCache.java
 index 1d5a09c07b46b36ddcbe7c227ec368c4627f611c..eddee960ed5099b51a64c56c2dd8eca853c18879 100644

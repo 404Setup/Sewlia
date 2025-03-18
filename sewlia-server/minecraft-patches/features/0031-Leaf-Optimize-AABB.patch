@@ -3,6 +3,7 @@ From: Taiyou06 <kaandindar21@gmail.com>
 Date: Sun, 16 Feb 2025 19:03:23 +0100
 Subject: [PATCH] Leaf: Optimize AABB
 
+Pretty minor stuff but, it improves AABB.intersect by around ~5%
 
 diff --git a/net/minecraft/world/phys/AABB.java b/net/minecraft/world/phys/AABB.java
 index 85148858db1fd5e9da8bbdde4b0d84110d80e373..3825eb0691972e68efa9c9e28f03a82e348c94e9 100644

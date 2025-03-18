@@ -59,7 +59,7 @@ Thanks to these developers for their contributions.
 - KaiijuMC/Kaiiju
 - KIOCG
 - LeavesMC/Leaves
-- LuminolMC/Luminol
+- [LuminolMC/Luminol](https://github.com/LuminolMC/Luminol)
 - MultiPaper/MultiPaper
 - PaperMC/Velocity
 - pufferfish-gg/Pufferfish
