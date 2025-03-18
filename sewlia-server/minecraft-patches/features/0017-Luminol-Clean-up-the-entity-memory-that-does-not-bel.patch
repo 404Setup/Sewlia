@@ -6,7 +6,7 @@ Subject: [PATCH] Luminol: Clean up the entity memory that does not belong to
 
 
 diff --git a/net/minecraft/world/entity/ai/Brain.java b/net/minecraft/world/entity/ai/Brain.java
-index 65b2b3ece213d901cdd585093e2fafcd2ef4a7cd..11a830c3a835b9070b931ada1fe5814d589c6bff 100644
+index 21f45e5fbc1dc20b3a5d0d0c938a01533ad92ba2..22fe2952d04cf02e785ee489751094a135cc684e 100644
 --- a/net/minecraft/world/entity/ai/Brain.java
 +++ b/net/minecraft/world/entity/ai/Brain.java
 @@ -399,7 +399,7 @@ public class Brain<E extends LivingEntity> {
