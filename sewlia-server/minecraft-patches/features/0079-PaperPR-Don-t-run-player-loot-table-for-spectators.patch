@@ -6,10 +6,10 @@ Subject: [PATCH] PaperPR: Don't run player loot table for spectators
 source: https://github.com/PaperMC/Paper/pull/11801
 
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
-index bc5a97ed58c9b0d7b58111c7ec5e8fdcbc2b9762..0986359baf8a9d5af87d7203b0139f87c94060e9 100644
+index 4cefd37b34e04d392ae0d65c83a43c6567cb0f3c..d7d12d99715ed4f4291d3dc7344b77d26e715a9e 100644
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
-@@ -1276,7 +1276,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -1283,7 +1283,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
                  }
              }
          }
