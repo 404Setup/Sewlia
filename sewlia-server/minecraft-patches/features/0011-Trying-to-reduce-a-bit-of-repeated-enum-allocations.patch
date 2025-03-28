@@ -1,0 +1,1198 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 404Setup <153366651+404Setup@users.noreply.github.com>
+Date: Fri, 28 Mar 2025 22:44:41 +0800
+Subject: [PATCH] Trying to reduce a bit of repeated enum allocations
+
+
+diff --git a/com/mojang/math/OctahedralGroup.java b/com/mojang/math/OctahedralGroup.java
+index 11902e7427761746ee098fea3276a34fef0096ba..b149e52d2c5db8189f9bc2cc7e2c62bf910fb190 100644
+--- a/com/mojang/math/OctahedralGroup.java
++++ b/com/mojang/math/OctahedralGroup.java
+@@ -143,12 +143,12 @@ public enum OctahedralGroup implements StringRepresentable {
+     public void initializeRotationDirections() { // Paper - Avoid Lazy Initialization for Enum Fields
+         if (this.rotatedDirections == null) {
+             this.rotatedDirections = Maps.newEnumMap(Direction.class);
+-            Direction.Axis[] axiss = Direction.Axis.values();
++            //Direction.Axis[] axiss = Direction.Axis.values();
+ 
+-            for (Direction direction1 : Direction.values()) {
++            for (Direction direction1 : Direction.VALUES) {
+                 Direction.Axis axis = direction1.getAxis();
+                 Direction.AxisDirection axisDirection = direction1.getAxisDirection();
+-                Direction.Axis axis1 = axiss[this.permutation.permutation(axis.ordinal())];
++                Direction.Axis axis1 = Direction.Axis.VALUES[this.permutation.permutation(axis.ordinal())];
+                 Direction.AxisDirection axisDirection1 = this.inverts(axis1) ? axisDirection.opposite() : axisDirection;
+                 Direction direction2 = Direction.fromAxisAndDirection(axis1, axisDirection1);
+                 this.rotatedDirections.put(direction1, direction2);
+diff --git a/net/minecraft/core/AxisCycle.java b/net/minecraft/core/AxisCycle.java
+index e80c9d1d3334c325c13d192410e3956951cac609..3c0633b4aebd6678488461da844ca3f3b9f264e6 100644
+--- a/net/minecraft/core/AxisCycle.java
++++ b/net/minecraft/core/AxisCycle.java
+@@ -35,7 +35,7 @@ public enum AxisCycle {
+ 
+         @Override
+         public Direction.Axis cycle(Direction.Axis axis) {
+-            return AXIS_VALUES[Math.floorMod(axis.ordinal() + 1, 3)];
++            return Direction.Axis.VALUES[Math.floorMod(axis.ordinal() + 1, 3)];
+         }
+ 
+         @Override
+@@ -56,7 +56,7 @@ public enum AxisCycle {
+ 
+         @Override
+         public Direction.Axis cycle(Direction.Axis axis) {
+-            return AXIS_VALUES[Math.floorMod(axis.ordinal() - 1, 3)];
++            return Direction.Axis.VALUES[Math.floorMod(axis.ordinal() - 1, 3)];
+         }
+ 
+         @Override
+@@ -65,7 +65,7 @@ public enum AxisCycle {
+         }
+     };
+ 
+-    public static final Direction.Axis[] AXIS_VALUES = Direction.Axis.values();
++    //public static final Direction.Axis[] AXIS_VALUES = Direction.Axis.values();
+     public static final AxisCycle[] VALUES = values();
+ 
+     public abstract int cycle(int x, int y, int z, Direction.Axis axis);
+diff --git a/net/minecraft/core/BlockMath.java b/net/minecraft/core/BlockMath.java
+index 6933b44059fade77d4398f71cbabc4cf919ef541..11c6b4743b777aa520ac69e44e666aa3e93e3828 100644
+--- a/net/minecraft/core/BlockMath.java
++++ b/net/minecraft/core/BlockMath.java
+@@ -20,7 +20,7 @@ public class BlockMath {
+         map.put(Direction.DOWN, new Transformation(null, new Quaternionf().rotateX((float) (Math.PI / 2)), null, null));
+     });
+     public static final Map<Direction, Transformation> VANILLA_UV_TRANSFORM_GLOBAL_TO_LOCAL = Util.make(Maps.newEnumMap(Direction.class), map -> {
+-        for (Direction direction : Direction.values()) {
++        for (Direction direction : Direction.VALUES) {
+             map.put(direction, VANILLA_UV_TRANSFORM_LOCAL_TO_GLOBAL.get(direction).inverse());
+         }
+     });
+diff --git a/net/minecraft/core/Direction.java b/net/minecraft/core/Direction.java
+index 216f97207dac88cc1dc3df59c6ee8a62c7614b4a..bc420d9adc4bb283ee357ac1ae0e236a346858e6 100644
+--- a/net/minecraft/core/Direction.java
++++ b/net/minecraft/core/Direction.java
+@@ -48,7 +48,7 @@ public enum Direction implements StringRepresentable, ca.spottedleaf.moonrise.pa
+     private final Direction.AxisDirection axisDirection;
+     private final Vec3i normal;
+     private final Vec3 normalVec3;
+-    private static final Direction[] VALUES = values();
++    public static final Direction[] VALUES = values();
+     private static final Direction[] BY_3D_DATA = Arrays.stream(VALUES)
+         .sorted(Comparator.comparingInt(direction -> direction.data3d))
+         .toArray(Direction[]::new);
+@@ -169,7 +169,7 @@ public enum Direction implements StringRepresentable, ca.spottedleaf.moonrise.pa
+     }
+ 
+     public static Collection<Direction> allShuffled(RandomSource random) {
+-        return Util.shuffledCopy(values(), random);
++        return Util.shuffledCopy(VALUES, random);
+     }
+ 
+     public static Stream<Direction> stream() {
+diff --git a/net/minecraft/core/FrontAndTop.java b/net/minecraft/core/FrontAndTop.java
+index 5dd229887b3e876b48cb5ab52dbdecbe18a6a89b..785be416b9c95e9108616d5369e547176e333ae8 100644
+--- a/net/minecraft/core/FrontAndTop.java
++++ b/net/minecraft/core/FrontAndTop.java
+@@ -17,7 +17,7 @@ public enum FrontAndTop implements StringRepresentable {
+     NORTH_UP("north_up", Direction.NORTH, Direction.UP),
+     SOUTH_UP("south_up", Direction.SOUTH, Direction.UP);
+ 
+-    private static final int NUM_DIRECTIONS = Direction.values().length;
++    private static final int NUM_DIRECTIONS = Direction.VALUES.length;
+     private static final FrontAndTop[] BY_TOP_FRONT = Util.make(new FrontAndTop[NUM_DIRECTIONS * NUM_DIRECTIONS], frontAndTops -> {
+         for (FrontAndTop frontAndTop : values()) {
+             frontAndTops[lookupKey(frontAndTop.front, frontAndTop.top)] = frontAndTop;
+diff --git a/net/minecraft/data/loot/BlockLootSubProvider.java b/net/minecraft/data/loot/BlockLootSubProvider.java
+index 12f9238cc41d231049a5a6c46942fb8b68cbe5f2..093f80e399ea271c61c0aa737fee8d0d9a70ec60 100644
+--- a/net/minecraft/data/loot/BlockLootSubProvider.java
++++ b/net/minecraft/data/loot/BlockLootSubProvider.java
+@@ -463,7 +463,7 @@ public abstract class BlockLootSubProvider implements LootTableSubProvider {
+                             LootItem.lootTableItem(block)
+                                 .when(builder)
+                                 .apply(
+-                                    Direction.values(),
++                                    Direction.VALUES,
+                                     direction -> SetItemCountFunction.setCount(ConstantValue.exactly(1.0F), true)
+                                         .when(
+                                             LootItemBlockStatePropertyCondition.hasBlockStateProperties(block)
+@@ -487,7 +487,7 @@ public abstract class BlockLootSubProvider implements LootTableSubProvider {
+                             block,
+                             LootItem.lootTableItem(block)
+                                 .apply(
+-                                    Direction.values(),
++                                    Direction.VALUES,
+                                     direction -> SetItemCountFunction.setCount(ConstantValue.exactly(1.0F), true)
+                                         .when(
+                                             LootItemBlockStatePropertyCondition.hasBlockStateProperties(block)
+diff --git a/net/minecraft/util/ParticleUtils.java b/net/minecraft/util/ParticleUtils.java
+index b17598f0f3069084b4e1d599dfaa9a06e3d4c792..ed427393a0a18298d319c1b94739f38e3323fe1c 100644
+--- a/net/minecraft/util/ParticleUtils.java
++++ b/net/minecraft/util/ParticleUtils.java
+@@ -15,7 +15,7 @@ import net.minecraft.world.phys.Vec3;
+ 
+ public class ParticleUtils {
+     public static void spawnParticlesOnBlockFaces(Level level, BlockPos pos, ParticleOptions particle, IntProvider count) {
+-        for (Direction direction : Direction.values()) {
++        for (Direction direction : Direction.VALUES) {
+             spawnParticlesOnBlockFace(level, pos, particle, count, direction, () -> getRandomSpeedRanges(level.random), 0.55);
+         }
+     }
+diff --git a/net/minecraft/world/entity/ai/behavior/CelebrateVillagersSurvivedRaid.java b/net/minecraft/world/entity/ai/behavior/CelebrateVillagersSurvivedRaid.java
+index 66f0b4718dbcf949b8164081714aaa9e5a518f39..1e0bcf9b916ccf79227c23c8e8896cac8091549c 100644
+--- a/net/minecraft/world/entity/ai/behavior/CelebrateVillagersSurvivedRaid.java
++++ b/net/minecraft/world/entity/ai/behavior/CelebrateVillagersSurvivedRaid.java
+@@ -53,7 +53,7 @@ public class CelebrateVillagersSurvivedRaid extends Behavior<Villager> {
+         }
+ 
+         if (random.nextInt(200) == 0 && MoveToSkySeeingSpot.hasNoBlocksAbove(level, owner, owner.blockPosition())) {
+-            DyeColor dyeColor = Util.getRandom(DyeColor.values(), random);
++            DyeColor dyeColor = Util.getRandom(one.tranic.su.util.SharedEnum.DYE_COLORS, random);
+             int randomInt = random.nextInt(3);
+             ItemStack firework = this.getFirework(dyeColor, randomInt);
+             Projectile.spawnProjectile(new FireworkRocketEntity(owner.level(), owner, owner.getX(), owner.getEyeY(), owner.getZ(), firework), level, firework);
+diff --git a/net/minecraft/world/entity/monster/Shulker.java b/net/minecraft/world/entity/monster/Shulker.java
+index 07e340e1240457f1ffcb3f49591c407e56143e5d..b313a4015b8a4c0416188193a83eeeba50173b0c 100644
+--- a/net/minecraft/world/entity/monster/Shulker.java
++++ b/net/minecraft/world/entity/monster/Shulker.java
+@@ -345,7 +345,7 @@ public class Shulker extends AbstractGolem implements VariantHolder<Optional<Dye
+ 
+     @Nullable
+     protected Direction findAttachableSurface(BlockPos pos) {
+-        for (Direction direction : Direction.values()) {
++        for (Direction direction : Direction.VALUES) {
+             if (this.canStayAt(pos, direction)) {
+                 return direction;
+             }
+diff --git a/net/minecraft/world/level/SignalGetter.java b/net/minecraft/world/level/SignalGetter.java
+index e036487b1c2fda067420f844c61452176dd44c44..81d0ee859ebab767482f681c0dfb8cdbc9f9e84f 100644
+--- a/net/minecraft/world/level/SignalGetter.java
++++ b/net/minecraft/world/level/SignalGetter.java
+@@ -8,7 +8,7 @@ import net.minecraft.world.level.block.RedStoneWireBlock;
+ import net.minecraft.world.level.block.state.BlockState;
+ 
+ public interface SignalGetter extends BlockGetter {
+-    Direction[] DIRECTIONS = Direction.values();
++    //Direction[] DIRECTIONS = Direction.values();
+ 
+     default int getDirectSignal(BlockPos pos, Direction direction) {
+         return this.getBlockState(pos).getDirectSignal(this, pos, direction);
+@@ -80,7 +80,7 @@ public interface SignalGetter extends BlockGetter {
+     default int getBestNeighborSignal(BlockPos pos) {
+         int i = 0;
+ 
+-        for (Direction direction : DIRECTIONS) {
++        for (Direction direction : Direction.VALUES) {
+             int signal = this.getSignal(pos.relative(direction), direction);
+             if (signal >= 15) {
+                 return 15;
+diff --git a/net/minecraft/world/level/block/BaseCoralPlantTypeBlock.java b/net/minecraft/world/level/block/BaseCoralPlantTypeBlock.java
+index 045d85b1267e20ca66ef08eb981f167c64d8c780..3c5ed46158c6bba90fc99f383f625a037ea4c1f8 100644
+--- a/net/minecraft/world/level/block/BaseCoralPlantTypeBlock.java
++++ b/net/minecraft/world/level/block/BaseCoralPlantTypeBlock.java
+@@ -42,7 +42,7 @@ public abstract class BaseCoralPlantTypeBlock extends Block implements SimpleWat
+         if (state.getValue(WATERLOGGED)) {
+             return true;
+         } else {
+-            for (Direction direction : Direction.values()) {
++            for (Direction direction : Direction.VALUES) {
+                 if (level.getFluidState(pos.relative(direction)).is(FluidTags.WATER)) {
+                     return true;
+                 }
+diff --git a/net/minecraft/world/level/block/BaseFireBlock.java b/net/minecraft/world/level/block/BaseFireBlock.java
+index 45df9f008b74dd0d6d790c91102e9afe1da45633..84ff05dfaec17140a49bc7f0ca579d33e7730745 100644
+--- a/net/minecraft/world/level/block/BaseFireBlock.java
++++ b/net/minecraft/world/level/block/BaseFireBlock.java
+@@ -204,7 +204,7 @@ public abstract class BaseFireBlock extends Block {
+             BlockPos.MutableBlockPos mutableBlockPos = pos.mutable();
+             boolean flag = false;
+ 
+-            for (Direction direction1 : Direction.values()) {
++            for (Direction direction1 : Direction.VALUES) {
+                 if (level.getBlockState(mutableBlockPos.set(pos).move(direction1)).is(Blocks.OBSIDIAN)) {
+                     flag = true;
+                     break;
+diff --git a/net/minecraft/world/level/block/BuddingAmethystBlock.java b/net/minecraft/world/level/block/BuddingAmethystBlock.java
+index f6850d3ab54a6eb4ff718d861f39aac2facd3a88..ef1a10a251aa7963f7e6bc4ffb6166e308303950 100644
+--- a/net/minecraft/world/level/block/BuddingAmethystBlock.java
++++ b/net/minecraft/world/level/block/BuddingAmethystBlock.java
+@@ -12,7 +12,7 @@ import net.minecraft.world.level.material.Fluids;
+ public class BuddingAmethystBlock extends AmethystBlock {
+     public static final MapCodec<BuddingAmethystBlock> CODEC = simpleCodec(BuddingAmethystBlock::new);
+     public static final int GROWTH_CHANCE = 5;
+-    private static final Direction[] DIRECTIONS = Direction.values();
++    //private static final Direction[] DIRECTIONS = Direction.VALUES;
+ 
+     @Override
+     public MapCodec<BuddingAmethystBlock> codec() {
+@@ -26,7 +26,7 @@ public class BuddingAmethystBlock extends AmethystBlock {
+     @Override
+     protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+         if (random.nextInt(5) == 0) {
+-            Direction direction = DIRECTIONS[random.nextInt(DIRECTIONS.length)];
++            Direction direction = Direction.VALUES[random.nextInt(Direction.VALUES.length)];
+             BlockPos blockPos = pos.relative(direction);
+             BlockState blockState = level.getBlockState(blockPos);
+             Block block = null;
+diff --git a/net/minecraft/world/level/block/ConcretePowderBlock.java b/net/minecraft/world/level/block/ConcretePowderBlock.java
+index cdf97483ae303ef0ba078b94112c896cdc46623e..91a3b54c4cbf5d9738fb1075be1e210f6ee8c436 100644
+--- a/net/minecraft/world/level/block/ConcretePowderBlock.java
++++ b/net/minecraft/world/level/block/ConcretePowderBlock.java
+@@ -75,7 +75,7 @@ public class ConcretePowderBlock extends FallingBlock {
+         boolean flag = false;
+         BlockPos.MutableBlockPos mutableBlockPos = pos.mutable();
+ 
+-        for (Direction direction : Direction.values()) {
++        for (Direction direction : Direction.VALUES) {
+             BlockState blockState = level.getBlockState(mutableBlockPos);
+             if (direction != Direction.DOWN || canSolidify(blockState)) {
+                 mutableBlockPos.setWithOffset(pos, direction);
+diff --git a/net/minecraft/world/level/block/CoralBlock.java b/net/minecraft/world/level/block/CoralBlock.java
+index e0be02eaa07d40d0738931383426517d20fe3b0b..b6ef626b3ce498fc80dabe8e98d70351b19e00c1 100644
+--- a/net/minecraft/world/level/block/CoralBlock.java
++++ b/net/minecraft/world/level/block/CoralBlock.java
+@@ -65,7 +65,7 @@ public class CoralBlock extends Block {
+     }
+ 
+     protected boolean scanForWater(BlockGetter level, BlockPos pos) {
+-        for (Direction direction : Direction.values()) {
++        for (Direction direction : Direction.VALUES) {
+             FluidState fluidState = level.getFluidState(pos.relative(direction));
+             if (fluidState.is(FluidTags.WATER)) {
+                 return true;
+diff --git a/net/minecraft/world/level/block/CreakingHeartBlock.java b/net/minecraft/world/level/block/CreakingHeartBlock.java
+index 72bf1bcd13ea6ec587ee585ec1937ddf2d68015a..d6e14e6050a1b214a57d7f17a844cfa89c600ad5 100644
+--- a/net/minecraft/world/level/block/CreakingHeartBlock.java
++++ b/net/minecraft/world/level/block/CreakingHeartBlock.java
+@@ -113,7 +113,7 @@ public class CreakingHeartBlock extends BaseEntityBlock {
+     }
+ 
+     private static boolean isSurroundedByLogs(LevelAccessor level, BlockPos pos) {
+-        for (Direction direction : Direction.values()) {
++        for (Direction direction : Direction.VALUES) {
+             BlockPos blockPos = pos.relative(direction);
+             BlockState blockState = level.getBlockState(blockPos);
+             if (!blockState.is(BlockTags.PALE_OAK_LOGS)) {
+diff --git a/net/minecraft/world/level/block/DiodeBlock.java b/net/minecraft/world/level/block/DiodeBlock.java
+index ab56acaf54af8dc9e9410437866e61d6ca60af92..2d3e425853c915fb75a46d43ee6b129aeba28da1 100644
+--- a/net/minecraft/world/level/block/DiodeBlock.java
++++ b/net/minecraft/world/level/block/DiodeBlock.java
+@@ -99,7 +99,7 @@ public abstract class DiodeBlock extends HorizontalDirectionalBlock {
+             dropResources(state, level, pos, blockEntity);
+             level.removeBlock(pos, false);
+ 
+-            for (Direction direction : Direction.values()) {
++            for (Direction direction : Direction.VALUES) {
+                 level.updateNeighborsAt(pos.relative(direction), this);
+             }
+         }
+diff --git a/net/minecraft/world/level/block/FireBlock.java b/net/minecraft/world/level/block/FireBlock.java
+index 7340c664fdcf991a2549c8f07f6ab093bbe6e4e8..dd9d05b4f7ff016fb6c2ce53f87c4f1b98a3f0b6 100644
+--- a/net/minecraft/world/level/block/FireBlock.java
++++ b/net/minecraft/world/level/block/FireBlock.java
+@@ -159,7 +159,7 @@ public class FireBlock extends BaseFireBlock {
+         if (!this.canBurn(blockState) && !blockState.isFaceSturdy(level, blockPos, Direction.UP)) {
+             BlockState blockState1 = this.defaultBlockState();
+ 
+-            for (Direction direction : Direction.values()) {
++            for (Direction direction : Direction.VALUES) {
+                 BooleanProperty booleanProperty = PROPERTY_BY_DIRECTION.get(direction);
+                 if (booleanProperty != null) {
+                     blockState1 = blockState1.setValue(booleanProperty, Boolean.valueOf(this.canBurn(level.getBlockState(pos.relative(direction)))));
+@@ -331,7 +331,7 @@ public class FireBlock extends BaseFireBlock {
+     }
+ 
+     private boolean isValidFireLocation(BlockGetter level, BlockPos pos) {
+-        for (Direction direction : Direction.values()) {
++        for (Direction direction : Direction.VALUES) {
+             if (this.canBurn(level.getBlockState(pos.relative(direction)))) {
+                 return true;
+             }
+@@ -346,7 +346,7 @@ public class FireBlock extends BaseFireBlock {
+         } else {
+             int i = 0;
+ 
+-            for (Direction direction : Direction.values()) {
++            for (Direction direction : Direction.VALUES) {
+                 BlockState blockState = level.getBlockState(pos.relative(direction));
+                 i = Math.max(this.getIgniteOdds(blockState), i);
+             }
+diff --git a/net/minecraft/world/level/block/FrostedIceBlock.java b/net/minecraft/world/level/block/FrostedIceBlock.java
+index 8eb24bf0477c8d0cf4bfa7f122bbcd20aa2a5d5b..383c67aa849f9818dd0b0f14031574b3670a0cb1 100644
+--- a/net/minecraft/world/level/block/FrostedIceBlock.java
++++ b/net/minecraft/world/level/block/FrostedIceBlock.java
+@@ -48,7 +48,7 @@ public class FrostedIceBlock extends IceBlock {
+             && this.slightlyMelt(state, level, pos)) {
+             BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
+ 
+-            for (Direction direction : Direction.values()) {
++            for (Direction direction : Direction.VALUES) {
+                 mutableBlockPos.setWithOffset(pos, direction);
+                 BlockState blockState = level.getBlockState(mutableBlockPos);
+                 if (blockState.is(this) && !this.slightlyMelt(blockState, level, mutableBlockPos)) {
+@@ -84,7 +84,7 @@ public class FrostedIceBlock extends IceBlock {
+         int i = 0;
+         BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
+ 
+-        for (Direction direction : Direction.values()) {
++        for (Direction direction : Direction.VALUES) {
+             mutableBlockPos.setWithOffset(pos, direction);
+             if (level.getBlockState(mutableBlockPos).is(this)) {
+                 if (++i >= neighborsRequired) {
+diff --git a/net/minecraft/world/level/block/LeavesBlock.java b/net/minecraft/world/level/block/LeavesBlock.java
+index a97b22e5acb791e959c528ccb330fa5ff92251e4..e338d36ded2499a0c0790db1b5f1f24a1a104228 100644
+--- a/net/minecraft/world/level/block/LeavesBlock.java
++++ b/net/minecraft/world/level/block/LeavesBlock.java
+@@ -117,7 +117,7 @@ public class LeavesBlock extends Block implements SimpleWaterloggedBlock {
+         int i = 7;
+         BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
+ 
+-        for (Direction direction : Direction.values()) {
++        for (Direction direction : Direction.VALUES) {
+             mutableBlockPos.setWithOffset(pos, direction);
+             i = Math.min(i, getDistanceAt(level.getBlockState(mutableBlockPos)) + 1);
+             if (i == 1) {
+diff --git a/net/minecraft/world/level/block/MultifaceBlock.java b/net/minecraft/world/level/block/MultifaceBlock.java
+index ec9c8c1fbca0a15d6a3ffd06440c86e0264d967d..da3e6e53b71fbf65044da2a673467cd9a5f2e93d 100644
+--- a/net/minecraft/world/level/block/MultifaceBlock.java
++++ b/net/minecraft/world/level/block/MultifaceBlock.java
+@@ -50,7 +50,7 @@ public class MultifaceBlock extends Block implements SimpleWaterloggedBlock {
+         map.put(Direction.UP, UP_AABB);
+         map.put(Direction.DOWN, DOWN_AABB);
+     });
+-    protected static final Direction[] DIRECTIONS = Direction.values();
++    //protected static final Direction[] DIRECTIONS = Direction.values();
+     private final ImmutableMap<BlockState, VoxelShape> shapesCache;
+     private final boolean canRotate;
+     private final boolean canMirrorX;
+@@ -76,7 +76,7 @@ public class MultifaceBlock extends Block implements SimpleWaterloggedBlock {
+         } else {
+             Set<Direction> set = EnumSet.noneOf(Direction.class);
+ 
+-            for (Direction direction : Direction.values()) {
++            for (Direction direction : Direction.VALUES) {
+                 if (hasFace(state, direction)) {
+                     set.add(direction);
+                 }
+@@ -89,7 +89,7 @@ public class MultifaceBlock extends Block implements SimpleWaterloggedBlock {
+     public static Set<Direction> unpack(byte packedDirections) {
+         Set<Direction> set = EnumSet.noneOf(Direction.class);
+ 
+-        for (Direction direction : Direction.values()) {
++        for (Direction direction : Direction.VALUES) {
+             if ((packedDirections & (byte)(1 << direction.ordinal())) > 0) {
+                 set.add(direction);
+             }
+@@ -114,7 +114,7 @@ public class MultifaceBlock extends Block implements SimpleWaterloggedBlock {
+ 
+     @Override
+     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+-        for (Direction direction : DIRECTIONS) {
++        for (Direction direction : Direction.VALUES) {
+             if (this.isFaceSupported(direction)) {
+                 builder.add(getFaceProperty(direction));
+             }
+@@ -161,7 +161,7 @@ public class MultifaceBlock extends Block implements SimpleWaterloggedBlock {
+     protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+         boolean flag = false;
+ 
+-        for (Direction direction : DIRECTIONS) {
++        for (Direction direction : Direction.VALUES) {
+             if (hasFace(state, direction)) {
+                 if (!canAttachTo(level, pos, direction)) {
+                     return false;
+@@ -236,7 +236,7 @@ public class MultifaceBlock extends Block implements SimpleWaterloggedBlock {
+     private BlockState mapDirections(BlockState state, Function<Direction, Direction> directionalFunction) {
+         BlockState blockState = state;
+ 
+-        for (Direction direction : DIRECTIONS) {
++        for (Direction direction : Direction.VALUES) {
+             if (this.isFaceSupported(direction)) {
+                 blockState = blockState.setValue(getFaceProperty(directionalFunction.apply(direction)), state.getValue(getFaceProperty(direction)));
+             }
+@@ -283,7 +283,7 @@ public class MultifaceBlock extends Block implements SimpleWaterloggedBlock {
+     private static VoxelShape calculateMultifaceShape(BlockState state) {
+         VoxelShape voxelShape = Shapes.empty();
+ 
+-        for (Direction direction : DIRECTIONS) {
++        for (Direction direction : Direction.VALUES) {
+             if (hasFace(state, direction)) {
+                 voxelShape = Shapes.or(voxelShape, SHAPE_BY_DIRECTION.get(direction));
+             }
+@@ -293,7 +293,7 @@ public class MultifaceBlock extends Block implements SimpleWaterloggedBlock {
+     }
+ 
+     protected static boolean hasAnyFace(BlockState state) {
+-        for (Direction direction : DIRECTIONS) {
++        for (Direction direction : Direction.VALUES) {
+             if (hasFace(state, direction)) {
+                 return true;
+             }
+@@ -303,7 +303,7 @@ public class MultifaceBlock extends Block implements SimpleWaterloggedBlock {
+     }
+ 
+     private static boolean hasAnyVacantFace(BlockState state) {
+-        for (Direction direction : DIRECTIONS) {
++        for (Direction direction : Direction.VALUES) {
+             if (!hasFace(state, direction)) {
+                 return true;
+             }
+diff --git a/net/minecraft/world/level/block/PipeBlock.java b/net/minecraft/world/level/block/PipeBlock.java
+index 0928aef1115b1e71f3ad321422a7945b1a5a883d..334b01046d17bfb6475877367f1f3ae78ad387ae 100644
+--- a/net/minecraft/world/level/block/PipeBlock.java
++++ b/net/minecraft/world/level/block/PipeBlock.java
+@@ -17,7 +17,7 @@ import net.minecraft.world.phys.shapes.Shapes;
+ import net.minecraft.world.phys.shapes.VoxelShape;
+ 
+ public abstract class PipeBlock extends Block {
+-    private static final Direction[] DIRECTIONS = Direction.values();
++    //private static final Direction[] DIRECTIONS = Direction.values();
+     public static final BooleanProperty NORTH = BlockStateProperties.NORTH;
+     public static final BooleanProperty EAST = BlockStateProperties.EAST;
+     public static final BooleanProperty SOUTH = BlockStateProperties.SOUTH;
+@@ -46,10 +46,10 @@ public abstract class PipeBlock extends Block {
+         float f = 0.5F - apothem;
+         float f1 = 0.5F + apothem;
+         VoxelShape voxelShape = Block.box(f * 16.0F, f * 16.0F, f * 16.0F, f1 * 16.0F, f1 * 16.0F, f1 * 16.0F);
+-        VoxelShape[] voxelShapes = new VoxelShape[DIRECTIONS.length];
++        VoxelShape[] voxelShapes = new VoxelShape[Direction.VALUES.length];
+ 
+-        for (int i = 0; i < DIRECTIONS.length; i++) {
+-            Direction direction = DIRECTIONS[i];
++        for (int i = 0; i < Direction.VALUES.length; i++) {
++            Direction direction = Direction.VALUES[i];
+             voxelShapes[i] = Shapes.box(
+                 0.5 + Math.min((double)(-apothem), direction.getStepX() * 0.5),
+                 0.5 + Math.min((double)(-apothem), direction.getStepY() * 0.5),
+@@ -65,7 +65,7 @@ public abstract class PipeBlock extends Block {
+         for (int i1 = 0; i1 < 64; i1++) {
+             VoxelShape voxelShape1 = voxelShape;
+ 
+-            for (int i2 = 0; i2 < DIRECTIONS.length; i2++) {
++            for (int i2 = 0; i2 < Direction.VALUES.length; i2++) {
+                 if ((i1 & 1 << i2) != 0) {
+                     voxelShape1 = Shapes.or(voxelShape1, voxelShapes[i2]);
+                 }
+@@ -90,8 +90,8 @@ public abstract class PipeBlock extends Block {
+     protected int getAABBIndex(BlockState state) {
+         int i = 0;
+ 
+-        for (int i1 = 0; i1 < DIRECTIONS.length; i1++) {
+-            if (state.getValue(PROPERTY_BY_DIRECTION.get(DIRECTIONS[i1]))) {
++        for (int i1 = 0; i1 < Direction.VALUES.length; i1++) {
++            if (state.getValue(PROPERTY_BY_DIRECTION.get(Direction.VALUES[i1]))) {
+                 i |= 1 << i1;
+             }
+         }
+diff --git a/net/minecraft/world/level/block/RedStoneOreBlock.java b/net/minecraft/world/level/block/RedStoneOreBlock.java
+index b0eab490be31a528f59e1ee717611494376ffaa5..e0fbaaee9da96aa26eed9563c5c4cd2fb1d7265c 100644
+--- a/net/minecraft/world/level/block/RedStoneOreBlock.java
++++ b/net/minecraft/world/level/block/RedStoneOreBlock.java
+@@ -134,7 +134,7 @@ public class RedStoneOreBlock extends Block {
+         double d = 0.5625;
+         RandomSource randomSource = level.random;
+ 
+-        for (Direction direction : Direction.values()) {
++        for (Direction direction : Direction.VALUES) {
+             BlockPos blockPos = pos.relative(direction);
+             if (!level.getBlockState(blockPos).isSolidRender()) {
+                 Direction.Axis axis = direction.getAxis();
+diff --git a/net/minecraft/world/level/block/RedStoneWireBlock.java b/net/minecraft/world/level/block/RedStoneWireBlock.java
+index 996e8d5b4e4aac7a0c0f846dd765711a2dfb5682..04e2ce72c19a08ce533c0c3e2a2bb52ca5fea2b3 100644
+--- a/net/minecraft/world/level/block/RedStoneWireBlock.java
++++ b/net/minecraft/world/level/block/RedStoneWireBlock.java
+@@ -369,7 +369,7 @@ public class RedStoneWireBlock extends Block {
+         if (level.getBlockState(pos).is(this)) {
+             level.updateNeighborsAt(pos, this);
+ 
+-            for (Direction direction : Direction.values()) {
++            for (Direction direction : Direction.VALUES) {
+                 level.updateNeighborsAt(pos.relative(direction), this);
+             }
+         }
+@@ -399,7 +399,7 @@ public class RedStoneWireBlock extends Block {
+         if (!isMoving && !state.is(newState.getBlock())) {
+             super.onRemove(state, level, pos, newState, isMoving);
+             if (!level.isClientSide) {
+-                for (Direction direction : Direction.values()) {
++                for (Direction direction : Direction.VALUES) {
+                     level.updateNeighborsAt(pos.relative(direction), this);
+                 }
+ 
+diff --git a/net/minecraft/world/level/block/RedstoneTorchBlock.java b/net/minecraft/world/level/block/RedstoneTorchBlock.java
+index d5ac5d8fddeaff0def61a909faf2c909337ada57..9a406a06405d634730730661302e028a6c101391 100644
+--- a/net/minecraft/world/level/block/RedstoneTorchBlock.java
++++ b/net/minecraft/world/level/block/RedstoneTorchBlock.java
+@@ -48,7 +48,7 @@ public class RedstoneTorchBlock extends BaseTorchBlock {
+     private void notifyNeighbors(Level level, BlockPos pos, BlockState state) {
+         Orientation orientation = this.randomOrientation(level, state);
+ 
+-        for (Direction direction : Direction.values()) {
++        for (Direction direction : Direction.VALUES) {
+             level.updateNeighborsAt(pos.relative(direction), this, ExperimentalRedstoneUtils.withFront(orientation, direction));
+         }
+     }
+diff --git a/net/minecraft/world/level/block/SculkSensorBlock.java b/net/minecraft/world/level/block/SculkSensorBlock.java
+index 2fd1bae800b7dca0a58b572095e2c58012412481..184157ec28de70eb14a82fdc3d16dd7aa18fa016 100644
+--- a/net/minecraft/world/level/block/SculkSensorBlock.java
++++ b/net/minecraft/world/level/block/SculkSensorBlock.java
+@@ -265,7 +265,7 @@ public class SculkSensorBlock extends BaseEntityBlock implements SimpleWaterlogg
+     }
+ 
+     public static void tryResonateVibration(@Nullable Entity entity, Level level, BlockPos pos, int frequency) {
+-        for (Direction direction : Direction.values()) {
++        for (Direction direction : Direction.VALUES) {
+             BlockPos blockPos = pos.relative(direction);
+             BlockState blockState = level.getBlockState(blockPos);
+             if (blockState.is(BlockTags.VIBRATION_RESONATORS)) {
+diff --git a/net/minecraft/world/level/block/SculkVeinBlock.java b/net/minecraft/world/level/block/SculkVeinBlock.java
+index 5f9fbb930e1d7b26a49da14437aa20144ab4ec83..c0960c0b23ca1e0eeeed2746b8ce90ea3c58eed1 100644
+--- a/net/minecraft/world/level/block/SculkVeinBlock.java
++++ b/net/minecraft/world/level/block/SculkVeinBlock.java
+@@ -69,7 +69,7 @@ public class SculkVeinBlock extends MultifaceSpreadeableBlock implements SculkBe
+     @Override
+     public void onDischarged(LevelAccessor level, BlockState state, BlockPos pos, RandomSource random) {
+         if (state.is(this)) {
+-            for (Direction direction : DIRECTIONS) {
++            for (Direction direction : Direction.VALUES) {
+                 BooleanProperty faceProperty = getFaceProperty(direction);
+                 if (state.getValue(faceProperty) && level.getBlockState(pos.relative(direction)).is(Blocks.SCULK)) {
+                     state = state.setValue(faceProperty, Boolean.valueOf(false));
+@@ -117,7 +117,7 @@ public class SculkVeinBlock extends MultifaceSpreadeableBlock implements SculkBe
+                     this.veinSpreader.spreadAll(blockState2, level, blockPos, spreader.isWorldGeneration());
+                     Direction opposite = direction.getOpposite();
+ 
+-                    for (Direction direction1 : DIRECTIONS) {
++                    for (Direction direction1 : Direction.VALUES) {
+                         if (direction1 != opposite) {
+                             BlockPos blockPos1 = blockPos.relative(direction1);
+                             BlockState blockState3 = level.getBlockState(blockPos1);
+@@ -139,7 +139,7 @@ public class SculkVeinBlock extends MultifaceSpreadeableBlock implements SculkBe
+         if (!state.is(Blocks.SCULK_VEIN)) {
+             return false;
+         } else {
+-            for (Direction direction : DIRECTIONS) {
++            for (Direction direction : Direction.VALUES) {
+                 if (hasFace(state, direction) && level.getBlockState(pos.relative(direction)).is(BlockTags.SCULK_REPLACEABLE)) {
+                     return true;
+                 }
+diff --git a/net/minecraft/world/level/block/SpongeBlock.java b/net/minecraft/world/level/block/SpongeBlock.java
+index 88e7320a48b08f052ae1cac914ebbcb905baf693..d704ce5f933d8992c122932b94c5a83d691138fa 100644
+--- a/net/minecraft/world/level/block/SpongeBlock.java
++++ b/net/minecraft/world/level/block/SpongeBlock.java
+@@ -18,7 +18,7 @@ public class SpongeBlock extends Block {
+     public static final MapCodec<SpongeBlock> CODEC = simpleCodec(SpongeBlock::new);
+     public static final int MAX_DEPTH = 6;
+     public static final int MAX_COUNT = 64;
+-    private static final Direction[] ALL_DIRECTIONS = Direction.values();
++    //private static final Direction[] ALL_DIRECTIONS = Direction.VALUES;
+ 
+     @Override
+     public MapCodec<SpongeBlock> codec() {
+@@ -56,7 +56,7 @@ public class SpongeBlock extends Block {
+                 6,
+                 65,
+                 (validPos, queueAdder) -> {
+-                    for (Direction direction : ALL_DIRECTIONS) {
++                    for (Direction direction : Direction.VALUES) {
+                         queueAdder.accept(validPos.relative(direction));
+                     }
+                 },
+diff --git a/net/minecraft/world/level/block/entity/BrushableBlockEntity.java b/net/minecraft/world/level/block/entity/BrushableBlockEntity.java
+index f34cec1de914d52381f8a53b173bf48e440757dc..efd841b0854a58383b9118f1e0053cc81e4dd115 100644
+--- a/net/minecraft/world/level/block/entity/BrushableBlockEntity.java
++++ b/net/minecraft/world/level/block/entity/BrushableBlockEntity.java
+@@ -220,7 +220,7 @@ public class BrushableBlockEntity extends BlockEntity {
+         }
+ 
+         if (tag.contains("hit_direction")) {
+-            this.hitDirection = Direction.values()[tag.getInt("hit_direction")];
++            this.hitDirection = Direction.VALUES[tag.getInt("hit_direction")];
+         }
+     }
+ 
+diff --git a/net/minecraft/world/level/block/entity/CreakingHeartBlockEntity.java b/net/minecraft/world/level/block/entity/CreakingHeartBlockEntity.java
+index f93c40987a4cc3001c167d300ab1217577360662..a1ba60cb0c75eca12070b101995448d0fc677c64 100644
+--- a/net/minecraft/world/level/block/entity/CreakingHeartBlockEntity.java
++++ b/net/minecraft/world/level/block/entity/CreakingHeartBlockEntity.java
+@@ -236,7 +236,7 @@ public class CreakingHeartBlockEntity extends BlockEntity {
+     private Optional<BlockPos> spreadResin() {
+         Mutable<BlockPos> mutable = new MutableObject<>(null);
+         BlockPos.breadthFirstTraversal(this.worldPosition, 2, 64, (pos, output) -> {
+-            for (Direction direction : Util.shuffledCopy(Direction.values(), this.level.random)) {
++            for (Direction direction : Util.shuffledCopy(Direction.VALUES, this.level.random)) {
+                 BlockPos blockPos = pos.relative(direction);
+                 if (this.level.getBlockState(blockPos).is(BlockTags.PALE_OAK_LOGS)) {
+                     output.accept(blockPos);
+@@ -246,7 +246,7 @@ public class CreakingHeartBlockEntity extends BlockEntity {
+             if (!this.level.getBlockState(pos).is(BlockTags.PALE_OAK_LOGS)) {
+                 return BlockPos.TraversalNodeStatus.ACCEPT;
+             } else {
+-                for (Direction direction : Util.shuffledCopy(Direction.values(), this.level.random)) {
++                for (Direction direction : Util.shuffledCopy(Direction.VALUES, this.level.random)) {
+                     BlockPos blockPos = pos.relative(direction);
+                     BlockState blockState = this.level.getBlockState(blockPos);
+                     Direction opposite = direction.getOpposite();
+diff --git a/net/minecraft/world/level/block/entity/TheEndGatewayBlockEntity.java b/net/minecraft/world/level/block/entity/TheEndGatewayBlockEntity.java
+index 61887e6b052bca715c90dff5d9cd657e0b3f6a78..50cebb0d3750f1f61cf6886927e42fe1f53bc2db 100644
+--- a/net/minecraft/world/level/block/entity/TheEndGatewayBlockEntity.java
++++ b/net/minecraft/world/level/block/entity/TheEndGatewayBlockEntity.java
+@@ -478,7 +478,7 @@ public class TheEndGatewayBlockEntity extends TheEndPortalBlockEntity {
+     public int getParticleAmount() {
+         int i = 0;
+ 
+-        for (Direction direction : Direction.values()) {
++        for (Direction direction : Direction.VALUES) {
+             i += this.shouldRenderFace(direction) ? 1 : 0;
+         }
+ 
+diff --git a/net/minecraft/world/level/block/piston/PistonBaseBlock.java b/net/minecraft/world/level/block/piston/PistonBaseBlock.java
+index aa7aefbc26db062e3ed731ca98229fa36a54b4ef..113f68fcda0869c87fb74fd02041c4db4d62a036 100644
+--- a/net/minecraft/world/level/block/piston/PistonBaseBlock.java
++++ b/net/minecraft/world/level/block/piston/PistonBaseBlock.java
+@@ -150,7 +150,7 @@ public class PistonBaseBlock extends DirectionalBlock {
+     }
+ 
+     private boolean getNeighborSignal(SignalGetter signalGetter, BlockPos pos, Direction direction) {
+-        for (Direction direction1 : Direction.values()) {
++        for (Direction direction1 : Direction.VALUES) {
+             if (direction1 != direction && signalGetter.hasSignal(pos.relative(direction1), direction1)) {
+                 return true;
+             }
+@@ -161,7 +161,7 @@ public class PistonBaseBlock extends DirectionalBlock {
+         } else {
+             BlockPos blockPos = pos.above();
+ 
+-            for (Direction direction2 : Direction.values()) {
++            for (Direction direction2 : Direction.VALUES) {
+                 if (direction2 != Direction.DOWN && signalGetter.hasSignal(blockPos.relative(direction2), direction2)) {
+                     return true;
+                 }
+diff --git a/net/minecraft/world/level/block/piston/PistonHeadBlock.java b/net/minecraft/world/level/block/piston/PistonHeadBlock.java
+index a89a42a3ad6cecd5cc4d44e4456d52a2997ba2e5..db2b5104a6aae299d82745dcf6aaad888b2554f6 100644
+--- a/net/minecraft/world/level/block/piston/PistonHeadBlock.java
++++ b/net/minecraft/world/level/block/piston/PistonHeadBlock.java
+@@ -66,7 +66,7 @@ public class PistonHeadBlock extends DirectionalBlock {
+     }
+ 
+     private static VoxelShape[] makeShapes(boolean extended) {
+-        return Arrays.stream(Direction.values()).map(dir -> calculateShape(dir, extended)).toArray(VoxelShape[]::new);
++        return Arrays.stream(Direction.VALUES).map(dir -> calculateShape(dir, extended)).toArray(VoxelShape[]::new);
+     }
+ 
+     private static VoxelShape calculateShape(Direction direction, boolean shortArm) {
+diff --git a/net/minecraft/world/level/block/piston/PistonStructureResolver.java b/net/minecraft/world/level/block/piston/PistonStructureResolver.java
+index ad143a92569f5b420ccaa2089758b2fb3b4ab7c5..e458759d78628e3b29f9b032f336760809a6da93 100644
+--- a/net/minecraft/world/level/block/piston/PistonStructureResolver.java
++++ b/net/minecraft/world/level/block/piston/PistonStructureResolver.java
+@@ -168,7 +168,7 @@ public class PistonStructureResolver {
+     private boolean addBranchingBlocks(BlockPos fromPos) {
+         BlockState blockState = this.level.getBlockState(fromPos);
+ 
+-        for (Direction direction : Direction.values()) {
++        for (Direction direction : Direction.VALUES) {
+             if (direction.getAxis() != this.pushDirection.getAxis()) {
+                 BlockPos blockPos = fromPos.relative(direction);
+                 BlockState blockState1 = this.level.getBlockState(blockPos);
+diff --git a/net/minecraft/world/level/block/state/BlockBehaviour.java b/net/minecraft/world/level/block/state/BlockBehaviour.java
+index 5473b4006f7e0266ea11a7b05cef78a113c30d97..0412e30dd8ffabb0f18da6e18c0181e3ded63274 100644
+--- a/net/minecraft/world/level/block/state/BlockBehaviour.java
++++ b/net/minecraft/world/level/block/state/BlockBehaviour.java
+@@ -417,10 +417,10 @@ public abstract class BlockBehaviour implements FeatureElement {
+     }
+ 
+     public abstract static class BlockStateBase extends StateHolder<Block, BlockState> implements ca.spottedleaf.moonrise.patches.starlight.blockstate.StarlightAbstractBlockState, ca.spottedleaf.moonrise.patches.collisions.block.CollisionBlockState { // Paper - rewrite chunk system // Paper - optimise collisions
+-        private static final Direction[] DIRECTIONS = Direction.values();
+-        private static final VoxelShape[] EMPTY_OCCLUSION_SHAPES = Util.make(new VoxelShape[DIRECTIONS.length], shape -> Arrays.fill(shape, Shapes.empty()));
++        //private static final Direction[] DIRECTIONS = Direction.values();
++        private static final VoxelShape[] EMPTY_OCCLUSION_SHAPES = Util.make(new VoxelShape[Direction.VALUES.length], shape -> Arrays.fill(shape, Shapes.empty()));
+         private static final VoxelShape[] FULL_BLOCK_OCCLUSION_SHAPES = Util.make(
+-            new VoxelShape[DIRECTIONS.length], shape -> Arrays.fill(shape, Shapes.block())
++            new VoxelShape[Direction.VALUES.length], shape -> Arrays.fill(shape, Shapes.block())
+         );
+         private final int lightEmission;
+         private final boolean useShapeForLightOcclusion;
+@@ -465,7 +465,7 @@ public abstract class BlockBehaviour implements FeatureElement {
+         // Paper end - rewrite chunk system
+         // Paper start - optimise collisions
+         private static final int RANDOM_OFFSET = 704237939;
+-        private static final Direction[] DIRECTIONS_CACHED = Direction.values();
++        //private static final Direction[] DIRECTIONS_CACHED = Direction.values();
+         private static final java.util.concurrent.atomic.AtomicInteger ID_GENERATOR = new java.util.concurrent.atomic.AtomicInteger();
+         private final int id1 = it.unimi.dsi.fastutil.HashCommon.murmurHash3(it.unimi.dsi.fastutil.HashCommon.murmurHash3(ID_GENERATOR.getAndIncrement() + RANDOM_OFFSET) + RANDOM_OFFSET);
+         private final int id2 = it.unimi.dsi.fastutil.HashCommon.murmurHash3(it.unimi.dsi.fastutil.HashCommon.murmurHash3(ID_GENERATOR.getAndIncrement() + RANDOM_OFFSET) + RANDOM_OFFSET);
+@@ -482,7 +482,7 @@ public abstract class BlockBehaviour implements FeatureElement {
+                 shape.bounds();
+             }
+             if (neighbours) {
+-                for (final Direction direction : DIRECTIONS_CACHED) {
++                for (final Direction direction : Direction.VALUES) {
+                     initCaches(((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)shape).moonrise$getFaceShapeClamped(direction), false);
+                     initCaches(shape.getFaceShape(direction), false);
+                 }
+@@ -594,9 +594,9 @@ public abstract class BlockBehaviour implements FeatureElement {
+             } else if (this.solidRender) {
+                 this.occlusionShapesByFace = FULL_BLOCK_OCCLUSION_SHAPES;
+             } else {
+-                this.occlusionShapesByFace = new VoxelShape[DIRECTIONS.length];
++                this.occlusionShapesByFace = new VoxelShape[Direction.VALUES.length];
+ 
+-                for (Direction direction : DIRECTIONS) {
++                for (Direction direction : Direction.VALUES) {
+                     this.occlusionShapesByFace[direction.ordinal()] = this.occlusionShape.getFaceShape(direction);
+                 }
+             }
+@@ -1048,7 +1048,7 @@ public abstract class BlockBehaviour implements FeatureElement {
+         }
+ 
+         static final class Cache {
+-            private static final Direction[] DIRECTIONS = Direction.values();
++            //private static final Direction[] DIRECTIONS = Direction.values();
+             private static final int SUPPORT_TYPE_COUNT = SupportType.values().length;
+             protected final VoxelShape collisionShape;
+             protected final boolean largeCollisionShape;
+@@ -1067,11 +1067,11 @@ public abstract class BlockBehaviour implements FeatureElement {
+                         )
+                     );
+                 } else {
+-                    this.largeCollisionShape = Arrays.stream(Direction.Axis.values())
++                    this.largeCollisionShape = Arrays.stream(Direction.Axis.VALUES)
+                         .anyMatch(dir -> this.collisionShape.min(dir) < 0.0 || this.collisionShape.max(dir) > 1.0);
+-                    this.faceSturdy = new boolean[DIRECTIONS.length * SUPPORT_TYPE_COUNT];
++                    this.faceSturdy = new boolean[Direction.VALUES.length * SUPPORT_TYPE_COUNT];
+ 
+-                    for (Direction direction : DIRECTIONS) {
++                    for (Direction direction : Direction.VALUES) {
+                         for (SupportType supportType : SupportType.values()) {
+                             this.faceSturdy[getFaceSupportIndex(direction, supportType)] = supportType.isSupporting(
+                                 state, EmptyBlockGetter.INSTANCE, BlockPos.ZERO, direction
+diff --git a/net/minecraft/world/level/block/state/pattern/BlockPattern.java b/net/minecraft/world/level/block/state/pattern/BlockPattern.java
+index f7bb979f08634a7e1b77c59040f59fb5e11aafa5..ed776c85672e071df124f626fc429c6a9c35b62d 100644
+--- a/net/minecraft/world/level/block/state/pattern/BlockPattern.java
++++ b/net/minecraft/world/level/block/state/pattern/BlockPattern.java
+@@ -79,8 +79,8 @@ public class BlockPattern {
+         int max = Math.max(Math.max(this.width, this.height), this.depth);
+ 
+         for (BlockPos blockPos : BlockPos.betweenClosed(pos, pos.offset(max - 1, max - 1, max - 1))) {
+-            for (Direction direction : Direction.values()) {
+-                for (Direction direction1 : Direction.values()) {
++            for (Direction direction : Direction.VALUES) {
++                for (Direction direction1 : Direction.VALUES) {
+                     if (direction1 != direction && direction1 != direction.getOpposite()) {
+                         BlockPattern.BlockPatternMatch blockPatternMatch = this.matches(blockPos, direction, direction1, loadingCache);
+                         if (blockPatternMatch != null) {
+diff --git a/net/minecraft/world/level/chunk/UpgradeData.java b/net/minecraft/world/level/chunk/UpgradeData.java
+index aa1aace33ca249c19ff20cf1b908571c63b5b6bc..6d59304e079a866dd5c3be07308e95dac34330ed 100644
+--- a/net/minecraft/world/level/chunk/UpgradeData.java
++++ b/net/minecraft/world/level/chunk/UpgradeData.java
+@@ -171,14 +171,14 @@ public class UpgradeData {
+             int i3 = pos.getMinBlockX() + (!flag4 || !flag3 && !flag2 ? (flag1 ? 0 : 15) : 14);
+             int i4 = pos.getMinBlockZ() + (!flag4 || !flag && !flag1 ? (flag3 ? 0 : 15) : 1);
+             int i5 = pos.getMinBlockZ() + (!flag4 || !flag && !flag1 ? (flag3 ? 0 : 15) : 14);
+-            Direction[] directions1 = Direction.values();
++            //Direction[] directions1 = Direction.values();
+             BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
+ 
+             for (BlockPos blockPos : BlockPos.betweenClosed(i2, level.getMinY(), i4, i3, level.getMaxY(), i5)) {
+                 BlockState blockState = level.getBlockState(blockPos);
+                 BlockState blockState1 = blockState;
+ 
+-                for (Direction direction : directions1) {
++                for (Direction direction : Direction.VALUES) {
+                     mutableBlockPos.setWithOffset(blockPos, direction);
+                     blockState1 = updateState(blockState1, direction, level, blockPos, mutableBlockPos);
+                 }
+@@ -204,7 +204,7 @@ public class UpgradeData {
+             int[] ints = this.index[i];
+             this.index[i] = null;
+             if (ints != null && ints.length > 0) {
+-                Direction[] directions = Direction.values();
++                Direction[] directions = Direction.VALUES;
+                 PalettedContainer<BlockState> states = section.getStates();
+                 int sectionYFromSectionIndex = chunk.getSectionYFromSectionIndex(i);
+                 int blockPosCoord = SectionPos.sectionToBlockCoord(sectionYFromSectionIndex);
+@@ -436,7 +436,7 @@ public class UpgradeData {
+                         if (blockState.getValue(BlockStateProperties.DISTANCE) >= i1) {
+                             level.setBlock(blockPos, blockState.setValue(BlockStateProperties.DISTANCE, Integer.valueOf(i1)), 18);
+                             if (i != 7) {
+-                                for (Direction direction : DIRECTIONS) {
++                                for (Direction direction : Direction.VALUES) {
+                                     mutableBlockPos.setWithOffset(blockPos, direction);
+                                     BlockState blockState1 = level.getBlockState(mutableBlockPos);
+                                     if (blockState1.hasProperty(BlockStateProperties.DISTANCE) && blockState.getValue(BlockStateProperties.DISTANCE) > i) {
+@@ -467,7 +467,7 @@ public class UpgradeData {
+             }
+         };
+ 
+-        public static final Direction[] DIRECTIONS = Direction.values();
++        //public static final Direction[] DIRECTIONS = Direction.values();
+ 
+         BlockFixers(final Block... blocks) {
+             this(false, blocks);
+diff --git a/net/minecraft/world/level/gameevent/vibrations/VibrationSystem.java b/net/minecraft/world/level/gameevent/vibrations/VibrationSystem.java
+index 60d34309f6a961448944faedafd242e7496d14d9..9d49105c0a9fc49ee533ea61359fabdec1f30df4 100644
+--- a/net/minecraft/world/level/gameevent/vibrations/VibrationSystem.java
++++ b/net/minecraft/world/level/gameevent/vibrations/VibrationSystem.java
+@@ -256,7 +256,7 @@ public interface VibrationSystem {
+             Vec3 vec3 = new Vec3(Mth.floor(eventPos.x) + 0.5, Mth.floor(eventPos.y) + 0.5, Mth.floor(eventPos.z) + 0.5);
+             Vec3 vec31 = new Vec3(Mth.floor(vibrationUserPos.x) + 0.5, Mth.floor(vibrationUserPos.y) + 0.5, Mth.floor(vibrationUserPos.z) + 0.5);
+ 
+-            for (Direction direction : Direction.values()) {
++            for (Direction direction : Direction.VALUES) {
+                 Vec3 vec32 = vec3.relative(direction, 1.0E-5F);
+                 if (level.isBlockInLine(new ClipBlockStateContext(vec32, vec31, state -> state.is(BlockTags.OCCLUDES_VIBRATION_SIGNALS))).getType()
+                     != HitResult.Type.BLOCK) {
+diff --git a/net/minecraft/world/level/levelgen/feature/BlueIceFeature.java b/net/minecraft/world/level/levelgen/feature/BlueIceFeature.java
+index 5bbc9cacd8675c96d99f8b46399742753888d2f7..640ecb6e2d5d3a85873d73bb6ff93e0ba09a6d25 100644
+--- a/net/minecraft/world/level/levelgen/feature/BlueIceFeature.java
++++ b/net/minecraft/world/level/levelgen/feature/BlueIceFeature.java
+@@ -26,7 +26,7 @@ public class BlueIceFeature extends Feature<NoneFeatureConfiguration> {
+         } else {
+             boolean flag = false;
+ 
+-            for (Direction direction : Direction.values()) {
++            for (Direction direction : Direction.VALUES) {
+                 if (direction != Direction.DOWN && worldGenLevel.getBlockState(blockPos.relative(direction)).is(Blocks.PACKED_ICE)) {
+                     flag = true;
+                     break;
+@@ -51,7 +51,7 @@ public class BlueIceFeature extends Feature<NoneFeatureConfiguration> {
+                         );
+                         BlockState blockState = worldGenLevel.getBlockState(blockPos1);
+                         if (blockState.isAir() || blockState.is(Blocks.WATER) || blockState.is(Blocks.PACKED_ICE) || blockState.is(Blocks.ICE)) {
+-                            for (Direction direction1 : Direction.values()) {
++                            for (Direction direction1 : Direction.VALUES) {
+                                 BlockState blockState1 = worldGenLevel.getBlockState(blockPos1.relative(direction1));
+                                 if (blockState1.is(Blocks.BLUE_ICE)) {
+                                     worldGenLevel.setBlock(blockPos1, Blocks.BLUE_ICE.defaultBlockState(), 2);
+diff --git a/net/minecraft/world/level/levelgen/feature/DeltaFeature.java b/net/minecraft/world/level/levelgen/feature/DeltaFeature.java
+index b57460d2eb3e8cb312d0c24a23bd5c2a6baf18f5..2b154b112999844466addefd60aac690d8b5413c 100644
+--- a/net/minecraft/world/level/levelgen/feature/DeltaFeature.java
++++ b/net/minecraft/world/level/levelgen/feature/DeltaFeature.java
+@@ -16,7 +16,7 @@ public class DeltaFeature extends Feature<DeltaFeatureConfiguration> {
+     private static final ImmutableList<Block> CANNOT_REPLACE = ImmutableList.of(
+         Blocks.BEDROCK, Blocks.NETHER_BRICKS, Blocks.NETHER_BRICK_FENCE, Blocks.NETHER_BRICK_STAIRS, Blocks.NETHER_WART, Blocks.CHEST, Blocks.SPAWNER
+     );
+-    private static final Direction[] DIRECTIONS = Direction.values();
++    //private static final Direction[] DIRECTIONS = Direction.values();
+     private static final double RIM_SPAWN_CHANCE = 0.9;
+ 
+     public DeltaFeature(Codec<DeltaFeatureConfiguration> codec) {
+@@ -67,7 +67,7 @@ public class DeltaFeature extends Feature<DeltaFeatureConfiguration> {
+         } else if (CANNOT_REPLACE.contains(blockState.getBlock())) {
+             return false;
+         } else {
+-            for (Direction direction : DIRECTIONS) {
++            for (Direction direction : Direction.VALUES) {
+                 boolean isAir = level.getBlockState(pos.relative(direction)).isAir();
+                 if (isAir && direction != Direction.UP || !isAir && direction == Direction.UP) {
+                     return false;
+diff --git a/net/minecraft/world/level/levelgen/feature/Feature.java b/net/minecraft/world/level/levelgen/feature/Feature.java
+index 6d7c2c6f0469f934b9599b59f00580cd1919be58..1fec58fa368ae2aad1b67e173a126f05c7ea1674 100644
+--- a/net/minecraft/world/level/levelgen/feature/Feature.java
++++ b/net/minecraft/world/level/levelgen/feature/Feature.java
+@@ -205,7 +205,7 @@ public abstract class Feature<FC extends FeatureConfiguration> {
+     public static boolean checkNeighbors(Function<BlockPos, BlockState> adjacentStateAccessor, BlockPos pos, Predicate<BlockState> filter) {
+         BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
+ 
+-        for (Direction direction : Direction.values()) {
++        for (Direction direction : Direction.VALUES) {
+             mutableBlockPos.setWithOffset(pos, direction);
+             if (filter.test(adjacentStateAccessor.apply(mutableBlockPos))) {
+                 return true;
+diff --git a/net/minecraft/world/level/levelgen/feature/GeodeFeature.java b/net/minecraft/world/level/levelgen/feature/GeodeFeature.java
+index 38475f6975533909924c8d54f438cf43cdfe31a3..1303fbe9c928e1f8d403e519248dde771f292165 100644
+--- a/net/minecraft/world/level/levelgen/feature/GeodeFeature.java
++++ b/net/minecraft/world/level/levelgen/feature/GeodeFeature.java
+@@ -25,7 +25,7 @@ import net.minecraft.world.level.levelgen.synth.NormalNoise;
+ import net.minecraft.world.level.material.FluidState;
+ 
+ public class GeodeFeature extends Feature<GeodeConfiguration> {
+-    private static final Direction[] DIRECTIONS = Direction.values();
++    //private static final Direction[] DIRECTIONS = Direction.values();
+ 
+     public GeodeFeature(Codec<GeodeConfiguration> codec) {
+         super(codec);
+@@ -113,7 +113,7 @@ public class GeodeFeature extends Feature<GeodeConfiguration> {
+                 if (flag && d8 >= d5 && d7 < d1) {
+                     this.safeSetBlock(worldGenLevel, blockPos2, Blocks.AIR.defaultBlockState(), predicate);
+ 
+-                    for (Direction direction : DIRECTIONS) {
++                    for (Direction direction : Direction.VALUES) {
+                         BlockPos blockPos4 = blockPos2.relative(direction);
+                         FluidState fluidState = worldGenLevel.getFluidState(blockPos4);
+                         if (!fluidState.isEmpty()) {
+@@ -147,7 +147,7 @@ public class GeodeFeature extends Feature<GeodeConfiguration> {
+         for (BlockPos blockPos1 : list2) {
+             BlockState blockState = Util.getRandom(list3, randomSource);
+ 
+-            for (Direction direction1 : DIRECTIONS) {
++            for (Direction direction1 : Direction.VALUES) {
+                 if (blockState.hasProperty(BlockStateProperties.FACING)) {
+                     blockState = blockState.setValue(BlockStateProperties.FACING, direction1);
+                 }
+diff --git a/net/minecraft/world/level/levelgen/feature/GlowstoneFeature.java b/net/minecraft/world/level/levelgen/feature/GlowstoneFeature.java
+index 0062e6ba05ff73ed80c5bc5d3765c8872ef081e0..376023138d62b999c02aebd5af325a0a751ac558 100644
+--- a/net/minecraft/world/level/levelgen/feature/GlowstoneFeature.java
++++ b/net/minecraft/world/level/levelgen/feature/GlowstoneFeature.java
+@@ -35,7 +35,7 @@ public class GlowstoneFeature extends Feature<NoneFeatureConfiguration> {
+                     if (worldGenLevel.getBlockState(blockPos1).isAir()) {
+                         int i1 = 0;
+ 
+-                        for (Direction direction : Direction.values()) {
++                        for (Direction direction : Direction.VALUES) {
+                             if (worldGenLevel.getBlockState(blockPos1.relative(direction)).is(Blocks.GLOWSTONE)) {
+                                 i1++;
+                             }
+diff --git a/net/minecraft/world/level/levelgen/feature/TreeFeature.java b/net/minecraft/world/level/levelgen/feature/TreeFeature.java
+index bd17dbe53c82001b60f4cfdd9d2dacb06a98f5ea..6a351af3226e47567d43a4abdc9da15c046114cb 100644
+--- a/net/minecraft/world/level/levelgen/feature/TreeFeature.java
++++ b/net/minecraft/world/level/levelgen/feature/TreeFeature.java
+@@ -203,7 +203,7 @@ public class TreeFeature extends Feature<TreeConfiguration> {
+ 
+                     discreteVoxelShape.fill(blockPos1.getX() - box.minX(), blockPos1.getY() - box.minY(), blockPos1.getZ() - box.minZ());
+ 
+-                    for (Direction direction : Direction.values()) {
++                    for (Direction direction : Direction.VALUES) {
+                         mutableBlockPos.setWithOffset(blockPos1, direction);
+                         if (box.isInside(mutableBlockPos)) {
+                             int i3 = mutableBlockPos.getX() - box.minX();
+diff --git a/net/minecraft/world/level/levelgen/feature/VinesFeature.java b/net/minecraft/world/level/levelgen/feature/VinesFeature.java
+index 256e130ff43f826c3eac2a0faa526dc12e5fda0e..7a31114e38f0058a8b49b195126b1146ca85e13f 100644
+--- a/net/minecraft/world/level/levelgen/feature/VinesFeature.java
++++ b/net/minecraft/world/level/levelgen/feature/VinesFeature.java
+@@ -21,7 +21,7 @@ public class VinesFeature extends Feature<NoneFeatureConfiguration> {
+         if (!worldGenLevel.isEmptyBlock(blockPos)) {
+             return false;
+         } else {
+-            for (Direction direction : Direction.values()) {
++            for (Direction direction : Direction.VALUES) {
+                 if (direction != Direction.DOWN && VineBlock.isAcceptableNeighbour(worldGenLevel, blockPos.relative(direction), direction)) {
+                     worldGenLevel.setBlock(
+                         blockPos, Blocks.VINE.defaultBlockState().setValue(VineBlock.getPropertyForFace(direction), Boolean.valueOf(true)), 2
+diff --git a/net/minecraft/world/level/levelgen/feature/WeepingVinesFeature.java b/net/minecraft/world/level/levelgen/feature/WeepingVinesFeature.java
+index cc857cc21a533afaee5b3a4d5f1052a17bdbef37..67c6d016dc574181b1f1593034df0f837c8efe8c 100644
+--- a/net/minecraft/world/level/levelgen/feature/WeepingVinesFeature.java
++++ b/net/minecraft/world/level/levelgen/feature/WeepingVinesFeature.java
+@@ -13,7 +13,7 @@ import net.minecraft.world.level.block.state.BlockState;
+ import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
+ 
+ public class WeepingVinesFeature extends Feature<NoneFeatureConfiguration> {
+-    private static final Direction[] DIRECTIONS = Direction.values();
++    //private static final Direction[] DIRECTIONS = Direction.values();
+ 
+     public WeepingVinesFeature(Codec<NoneFeatureConfiguration> codec) {
+         super(codec);
+@@ -50,7 +50,7 @@ public class WeepingVinesFeature extends Feature<NoneFeatureConfiguration> {
+             if (level.isEmptyBlock(mutableBlockPos)) {
+                 int i1 = 0;
+ 
+-                for (Direction direction : DIRECTIONS) {
++                for (Direction direction : Direction.VALUES) {
+                     BlockState blockState = level.getBlockState(mutableBlockPos1.setWithOffset(mutableBlockPos, direction));
+                     if (blockState.is(Blocks.NETHERRACK) || blockState.is(Blocks.NETHER_WART_BLOCK)) {
+                         i1++;
+diff --git a/net/minecraft/world/level/levelgen/feature/treedecorators/CreakingHeartDecorator.java b/net/minecraft/world/level/levelgen/feature/treedecorators/CreakingHeartDecorator.java
+index 75ae614790d46ba01003a13fb9d521299c675c56..f509bc317ed9b1a3f4b9ecd1902d1cb2c1c4e6ef 100644
+--- a/net/minecraft/world/level/levelgen/feature/treedecorators/CreakingHeartDecorator.java
++++ b/net/minecraft/world/level/levelgen/feature/treedecorators/CreakingHeartDecorator.java
+@@ -37,7 +37,7 @@ public class CreakingHeartDecorator extends TreeDecorator {
+                 List<BlockPos> list1 = new ArrayList<>(list);
+                 Util.shuffle(list1, randomSource);
+                 Optional<BlockPos> optional = list1.stream().filter(pos -> {
+-                    for (Direction direction : Direction.values()) {
++                    for (Direction direction : Direction.VALUES) {
+                         if (!context.checkBlock(pos.relative(direction), blockState -> blockState.is(BlockTags.LOGS))) {
+                             return false;
+                         }
+diff --git a/net/minecraft/world/level/levelgen/structure/structures/BuriedTreasurePieces.java b/net/minecraft/world/level/levelgen/structure/structures/BuriedTreasurePieces.java
+index f515f7c881d597072db226f60cfae2d7ebe89ea4..f8da09e0e5aafea5dc8ac0619c5198e4cedde932 100644
+--- a/net/minecraft/world/level/levelgen/structure/structures/BuriedTreasurePieces.java
++++ b/net/minecraft/world/level/levelgen/structure/structures/BuriedTreasurePieces.java
+@@ -54,7 +54,7 @@ public class BuriedTreasurePieces {
+                     || blockState1 == Blocks.DIORITE.defaultBlockState()) {
+                     BlockState blockState2 = !blockState.isAir() && !this.isLiquid(blockState) ? blockState : Blocks.SAND.defaultBlockState();
+ 
+-                    for (Direction direction : Direction.values()) {
++                    for (Direction direction : Direction.VALUES) {
+                         BlockPos blockPos = mutableBlockPos.relative(direction);
+                         BlockState blockState3 = level.getBlockState(blockPos);
+                         if (blockState3.isAir() || this.isLiquid(blockState3)) {
+diff --git a/net/minecraft/world/level/levelgen/structure/structures/MineshaftPieces.java b/net/minecraft/world/level/levelgen/structure/structures/MineshaftPieces.java
+index 1acd506f7c0679fa9f69b6ab221002b28d00c3e5..23d90a4a77734c97eb41ef6dfb5a6354180805dd 100644
+--- a/net/minecraft/world/level/levelgen/structure/structures/MineshaftPieces.java
++++ b/net/minecraft/world/level/levelgen/structure/structures/MineshaftPieces.java
+@@ -565,7 +565,7 @@ public class MineshaftPieces {
+             BlockPos.MutableBlockPos worldPos = this.getWorldPos(x, y, z);
+             int i = 0;
+ 
+-            for (Direction direction : Direction.values()) {
++            for (Direction direction : Direction.VALUES) {
+                 worldPos.move(direction);
+                 if (box.isInside(worldPos) && level.getBlockState(worldPos).isFaceSturdy(level, worldPos, direction.getOpposite())) {
+                     if (++i >= required) {
+diff --git a/net/minecraft/world/level/levelgen/structure/structures/OceanMonumentPieces.java b/net/minecraft/world/level/levelgen/structure/structures/OceanMonumentPieces.java
+index b70ef62b4e41ee4851b2cdf53e0be1083233d052..5a31b0e95a188c971e212a9fedeb45c339a865b7 100644
+--- a/net/minecraft/world/level/levelgen/structure/structures/OceanMonumentPieces.java
++++ b/net/minecraft/world/level/levelgen/structure/structures/OceanMonumentPieces.java
+@@ -244,7 +244,7 @@ public class OceanMonumentPieces {
+                     for (int i2 = 0; i2 < 3; i2++) {
+                         int roomIndex = getRoomIndex(i, i2, i1);
+                         if (roomDefinitions[roomIndex] != null) {
+-                            for (Direction direction : Direction.values()) {
++                            for (Direction direction : Direction.VALUES) {
+                                 int i3 = i + direction.getStepX();
+                                 int i4 = i2 + direction.getStepY();
+                                 int i5 = i1 + direction.getStepZ();
+diff --git a/net/minecraft/world/level/lighting/BlockLightEngine.java b/net/minecraft/world/level/lighting/BlockLightEngine.java
+index 5295dbca90452371dec537aef6464d7a426ed75f..d99dc96f3ab492329d6e77e374742002c43b5661 100644
+--- a/net/minecraft/world/level/lighting/BlockLightEngine.java
++++ b/net/minecraft/world/level/lighting/BlockLightEngine.java
+@@ -46,7 +46,7 @@ public final class BlockLightEngine extends LightEngine<BlockLightSectionStorage
+     protected void propagateIncrease(long packedPos, long queueEntry, int lightLevel) {
+         BlockState blockState = null;
+ 
+-        for (Direction direction : PROPAGATION_DIRECTIONS) {
++        for (Direction direction : Direction.VALUES) {
+             if (LightEngine.QueueEntry.shouldPropagateInDirection(queueEntry, direction)) {
+                 long offsetPackedBlockPos = BlockPos.offset(packedPos, direction);
+                 if (this.storage.storingLightForSection(SectionPos.blockToSection(offsetPackedBlockPos))) {
+@@ -82,7 +82,7 @@ public final class BlockLightEngine extends LightEngine<BlockLightSectionStorage
+     protected void propagateDecrease(long packedPos, long lightLevel) {
+         int fromLevel = LightEngine.QueueEntry.getFromLevel(lightLevel);
+ 
+-        for (Direction direction : PROPAGATION_DIRECTIONS) {
++        for (Direction direction : Direction.VALUES) {
+             if (LightEngine.QueueEntry.shouldPropagateInDirection(lightLevel, direction)) {
+                 long offsetPackedBlockPos = BlockPos.offset(packedPos, direction);
+                 if (this.storage.storingLightForSection(SectionPos.blockToSection(offsetPackedBlockPos))) {
+diff --git a/net/minecraft/world/level/lighting/LightEngine.java b/net/minecraft/world/level/lighting/LightEngine.java
+index 3f2d9568b7c5cd11c31c171b3a3653eba77087bc..643fe3d57d2c3cfeb461e618d1cc1b124adcf1ee 100644
+--- a/net/minecraft/world/level/lighting/LightEngine.java
++++ b/net/minecraft/world/level/lighting/LightEngine.java
+@@ -22,7 +22,7 @@ public abstract class LightEngine<M extends DataLayerStorageMap<M>, S extends La
+     protected static final int MIN_OPACITY = 1;
+     protected static final long PULL_LIGHT_IN_ENTRY = LightEngine.QueueEntry.decreaseAllDirections(1);
+     private static final int MIN_QUEUE_SIZE = 512;
+-    protected static final Direction[] PROPAGATION_DIRECTIONS = Direction.values();
++    //protected static final Direction[] PROPAGATION_DIRECTIONS = Direction.values();
+     protected final LightChunkGetter chunkSource;
+     protected final S storage;
+     private final LongOpenHashSet blockNodesToCheck = new LongOpenHashSet(512, 0.5F);
+diff --git a/net/minecraft/world/level/lighting/SkyLightEngine.java b/net/minecraft/world/level/lighting/SkyLightEngine.java
+index 71207c5f51c94f0859b749cd6fba2e0f9fb05616..cf4965f4db8fcd2d2af41942b8a1e841bb1c4f2b 100644
+--- a/net/minecraft/world/level/lighting/SkyLightEngine.java
++++ b/net/minecraft/world/level/lighting/SkyLightEngine.java
+@@ -141,7 +141,7 @@ public final class SkyLightEngine extends LightEngine<SkyLightSectionStorage.Sky
+         BlockState blockState = null;
+         int i = this.countEmptySectionsBelowIfAtBorder(packedPos);
+ 
+-        for (Direction direction : PROPAGATION_DIRECTIONS) {
++        for (Direction direction : Direction.VALUES) {
+             if (LightEngine.QueueEntry.shouldPropagateInDirection(queueEntry, direction)) {
+                 long offsetPackedBlockPos = BlockPos.offset(packedPos, direction);
+                 if (this.storage.storingLightForSection(SectionPos.blockToSection(offsetPackedBlockPos))) {
+@@ -180,7 +180,7 @@ public final class SkyLightEngine extends LightEngine<SkyLightSectionStorage.Sky
+         int i = this.countEmptySectionsBelowIfAtBorder(packedPos);
+         int fromLevel = LightEngine.QueueEntry.getFromLevel(lightLevel);
+ 
+-        for (Direction direction : PROPAGATION_DIRECTIONS) {
++        for (Direction direction : Direction.VALUES) {
+             if (LightEngine.QueueEntry.shouldPropagateInDirection(lightLevel, direction)) {
+                 long offsetPackedBlockPos = BlockPos.offset(packedPos, direction);
+                 if (this.storage.storingLightForSection(SectionPos.blockToSection(offsetPackedBlockPos))) {
+diff --git a/net/minecraft/world/level/material/LavaFluid.java b/net/minecraft/world/level/material/LavaFluid.java
+index 6f135caffb7638c6156f00341aeac12b50cea99d..b0aab108064b4a9d44ee4ac639b167541bfd77df 100644
+--- a/net/minecraft/world/level/material/LavaFluid.java
++++ b/net/minecraft/world/level/material/LavaFluid.java
+@@ -126,7 +126,7 @@ public abstract class LavaFluid extends FlowingFluid {
+     }
+ 
+     private boolean hasFlammableNeighbours(LevelReader level, BlockPos pos) {
+-        for (Direction direction : Direction.values()) {
++        for (Direction direction : Direction.VALUES) {
+             if (this.isFlammable(level, pos.relative(direction))) {
+                 return true;
+             }
+diff --git a/net/minecraft/world/level/pathfinder/AmphibiousNodeEvaluator.java b/net/minecraft/world/level/pathfinder/AmphibiousNodeEvaluator.java
+index 33047e446adf252a179cb0220c20a7d83f361482..4d07b6595c4d19f931987af8dd921a2eb2447193 100644
+--- a/net/minecraft/world/level/pathfinder/AmphibiousNodeEvaluator.java
++++ b/net/minecraft/world/level/pathfinder/AmphibiousNodeEvaluator.java
+@@ -97,7 +97,7 @@ public class AmphibiousNodeEvaluator extends WalkNodeEvaluator {
+         if (pathTypeFromState == PathType.WATER) {
+             BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
+ 
+-            for (Direction direction : Direction.values()) {
++            for (Direction direction : Direction.VALUES) {
+                 mutableBlockPos.set(x, y, z).move(direction);
+                 PathType pathTypeFromState1 = context.getPathTypeFromState(mutableBlockPos.getX(), mutableBlockPos.getY(), mutableBlockPos.getZ());
+                 if (pathTypeFromState1 == PathType.BLOCKED) {
+diff --git a/net/minecraft/world/level/pathfinder/SwimNodeEvaluator.java b/net/minecraft/world/level/pathfinder/SwimNodeEvaluator.java
+index f18aa938692a1c29228ff5e98ab9d58c4bfff094..dec94866f2ada3eabe64a1411178904a1b737cf9 100644
+--- a/net/minecraft/world/level/pathfinder/SwimNodeEvaluator.java
++++ b/net/minecraft/world/level/pathfinder/SwimNodeEvaluator.java
+@@ -51,7 +51,7 @@ public class SwimNodeEvaluator extends NodeEvaluator {
+         int i = 0;
+         Map<Direction, Node> map = Maps.newEnumMap(Direction.class);
+ 
+-        for (Direction direction : Direction.values()) {
++        for (Direction direction : Direction.VALUES) {
+             Node node1 = this.findAcceptedNode(node.x + direction.getStepX(), node.y + direction.getStepY(), node.z + direction.getStepZ());
+             map.put(direction, node1);
+             if (this.isNodeValid(node1)) {
+diff --git a/net/minecraft/world/level/redstone/DefaultRedstoneWireEvaluator.java b/net/minecraft/world/level/redstone/DefaultRedstoneWireEvaluator.java
+index 2d77780b6727f82ffc3cb216ca5f2d6483496cfd..509ea07945fba07a69e181842006777bc9f073ae 100644
+--- a/net/minecraft/world/level/redstone/DefaultRedstoneWireEvaluator.java
++++ b/net/minecraft/world/level/redstone/DefaultRedstoneWireEvaluator.java
+@@ -34,7 +34,7 @@ public class DefaultRedstoneWireEvaluator extends RedstoneWireEvaluator {
+             Set<BlockPos> set = Sets.newHashSet();
+             set.add(pos);
+ 
+-            for (Direction direction : Direction.values()) {
++            for (Direction direction : Direction.VALUES) {
+                 set.add(pos.relative(direction));
+             }
+ 
+diff --git a/net/minecraft/world/level/redstone/Orientation.java b/net/minecraft/world/level/redstone/Orientation.java
+index c3403cb05cc1c33af764d94d11c4759ad408ad13..795ce97aefae98939f18ff5fcd90eac8ec2731ca 100644
+--- a/net/minecraft/world/level/redstone/Orientation.java
++++ b/net/minecraft/world/level/redstone/Orientation.java
+@@ -135,7 +135,7 @@ public class Orientation {
+                 start.withSideBias.put(sideBias, generateContext(new Orientation(start.up, start.front, sideBias), output));
+             }
+ 
+-            for (Direction direction : Direction.values()) {
++            for (Direction direction : Direction.VALUES) {
+                 Direction direction1 = start.up;
+                 if (direction == start.up) {
+                     direction1 = start.front.getOpposite();
+@@ -148,7 +148,7 @@ public class Orientation {
+                 start.withFront.put(direction, generateContext(new Orientation(direction1, direction, start.sideBias), output));
+             }
+ 
+-            for (Direction direction : Direction.values()) {
++            for (Direction direction : Direction.VALUES) {
+                 Direction direction1x = start.front;
+                 if (direction == start.front) {
+                     direction1x = start.up.getOpposite();
+diff --git a/net/minecraft/world/phys/shapes/DiscreteVoxelShape.java b/net/minecraft/world/phys/shapes/DiscreteVoxelShape.java
+index 309a34f192f7737204ce7a5c3b4004bdd83842f2..a0584f177d82a8ffb40657f534f97859a88fff58 100644
+--- a/net/minecraft/world/phys/shapes/DiscreteVoxelShape.java
++++ b/net/minecraft/world/phys/shapes/DiscreteVoxelShape.java
+@@ -4,7 +4,7 @@ import net.minecraft.core.AxisCycle;
+ import net.minecraft.core.Direction;
+ 
+ public abstract class DiscreteVoxelShape implements ca.spottedleaf.moonrise.patches.collisions.shape.CollisionDiscreteVoxelShape { // Paper - optimise collisions
+-    private static final Direction.Axis[] AXIS_VALUES = Direction.Axis.values();
++    //private static final Direction.Axis[] AXIS_VALUES = Direction.Axis.values();
+     protected final int xSize;
+     protected final int ySize;
+     protected final int zSize;
+@@ -103,7 +103,7 @@ public abstract class DiscreteVoxelShape implements ca.spottedleaf.moonrise.patc
+     public abstract void fill(int x, int y, int z);
+ 
+     public boolean isEmpty() {
+-        for (Direction.Axis axis : AXIS_VALUES) {
++        for (Direction.Axis axis : Direction.Axis.VALUES) {
+             if (this.firstFull(axis) >= this.lastFull(axis)) {
+                 return true;
+             }

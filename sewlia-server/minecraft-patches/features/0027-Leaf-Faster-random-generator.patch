@@ -229,7 +229,7 @@ index c2d7cd788071e25b8ba2503c30ae80c7a9f353ed..a22508c50b34ca48328595cc7b69e008
  
      public static enum Algorithm {
 diff --git a/net/minecraft/world/level/levelgen/feature/GeodeFeature.java b/net/minecraft/world/level/levelgen/feature/GeodeFeature.java
-index 38475f6975533909924c8d54f438cf43cdfe31a3..5fd89670478d2f5b5069046ed1b4781692211b26 100644
+index 1303fbe9c928e1f8d403e519248dde771f292165..2e6c31e6419f71e6690ff14dd055eaf602726dee 100644
 --- a/net/minecraft/world/level/levelgen/feature/GeodeFeature.java
 +++ b/net/minecraft/world/level/levelgen/feature/GeodeFeature.java
 @@ -41,7 +41,7 @@ public class GeodeFeature extends Feature<GeodeConfiguration> {
