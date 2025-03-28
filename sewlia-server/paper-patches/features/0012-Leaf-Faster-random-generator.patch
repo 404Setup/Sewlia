@@ -14,7 +14,7 @@ ThreadUnsafeRandom (Moonrise): 102,265,100 ns
 SimpleThreadUnsafeRandom (Moonrise): 97,054,600 ns
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/generator/CustomChunkGenerator.java b/src/main/java/org/bukkit/craftbukkit/generator/CustomChunkGenerator.java
-index c60c05b9e426f56ed3e812abb9aae9ef52bd20e8..3cc6ed6821a3165fdefa4af5530887f13ebdbe5c 100644
+index c60c05b9e426f56ed3e812abb9aae9ef52bd20e8..ecdada478c00c176b09df7c71c15e1baaa87e968 100644
 --- a/src/main/java/org/bukkit/craftbukkit/generator/CustomChunkGenerator.java
 +++ b/src/main/java/org/bukkit/craftbukkit/generator/CustomChunkGenerator.java
 @@ -97,7 +97,7 @@ public class CustomChunkGenerator extends InternalChunkGenerator {
@@ -22,7 +22,7 @@ index c60c05b9e426f56ed3e812abb9aae9ef52bd20e8..3cc6ed6821a3165fdefa4af5530887f1
  
      private static WorldgenRandom getSeededRandom() {
 -        return new WorldgenRandom(new LegacyRandomSource(0));
-+        return new WorldgenRandom(one.tranic.sewlia.config.mod.unsafe.optimization.fast_rng.EnableForWorldgen.value ? new one.tranic.su.math.random.FasterRandomSource(0) : new LegacyRandomSource(0)); // Leaf - Faster random generator
++        return new WorldgenRandom(one.tranic.sewlia.config.mod.unsafe.optimization.fast_rng.EnableForWorldgen.isEnabled() ? new one.tranic.su.math.random.FasterRandomSource(0) : new LegacyRandomSource(0)); // Leaf - Faster random generator
      }
  
      @Override
