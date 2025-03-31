@@ -88,18 +88,16 @@
      runtimeOnly("com.lmax:disruptor:3.4.4")
  
      runtimeOnly("org.apache.maven:maven-resolver-provider:3.9.6")
-@@ -199,6 +_,15 @@
+@@ -199,6 +_,13 @@
      // Spark
      implementation("me.lucko:spark-api:0.1-20240720.200737-2")
      implementation("me.lucko:spark-paper:1.10.119-20241121.092015-1")
 +
 +    // Sewlia start
-+    implementation ("me.carleslc.Simple-YAML:Simple-Yaml:1.8.4") {
++    implementation("me.carleslc.Simple-YAML:Simple-Yaml:1.8.4") {
 +        exclude(group="org.yaml", module="snakeyaml")
 +    }
 +    implementation("com.github.ben-manes.caffeine:caffeine:3.2.0")
-+    implementation("com.github.luben:zstd-jni:1.5.7-2")
-+    implementation("org.lz4:lz4-java:1.8.0")
 +    // Sewlia end
  }
  
