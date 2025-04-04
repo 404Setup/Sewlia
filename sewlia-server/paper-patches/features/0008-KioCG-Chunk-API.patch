@@ -22,10 +22,10 @@ index de8b9048c8395c05b8688bc9d984b8ad680f15b3..f42692cd4f0154705c3d5b030d281cfc
 +    // KioCG end
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 71cb264e399d098f9e40c71258f1412aa0dbafc5..ae34eb53438a12edea723d3d33a7efd4a16b21ac 100644
+index ac878520dc4aaa0e6a1ce8de0982d60a8397bc15..85a46332d11e1f19ee59bbd4f556950f33f772b8 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -3636,4 +3636,11 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -3631,4 +3631,11 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
      public void setSimplifyContainerDesyncCheck(final boolean simplifyContainerDesyncCheck) {
          this.simplifyContainerDesyncCheck = simplifyContainerDesyncCheck;
      }
