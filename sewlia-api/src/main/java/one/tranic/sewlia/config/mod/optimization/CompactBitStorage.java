@@ -1,7 +1,7 @@
 package one.tranic.sewlia.config.mod.optimization;
 
-import one.tranic.sewlia.config.annotation.Comments;
-import one.tranic.sewlia.config.annotation.DisableReload;
+import one.tranic.sewlia.annotation.config.Comments;
+import one.tranic.sewlia.annotation.loader.DisableReload;
 
 public class CompactBitStorage {
     @Comments({"Fixes memory waste caused by some legacy servers (e.g. Hypixel) sending empty chunks",

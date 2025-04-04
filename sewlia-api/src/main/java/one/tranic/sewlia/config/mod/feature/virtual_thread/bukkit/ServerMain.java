@@ -1,6 +1,6 @@
 package one.tranic.sewlia.config.mod.feature.virtual_thread.bukkit;
 
-import one.tranic.sewlia.config.annotation.DisableReload;
+import one.tranic.sewlia.annotation.loader.DisableReload;
 
 public class ServerMain {
     @DisableReload

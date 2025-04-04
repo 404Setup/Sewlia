@@ -1,6 +1,6 @@
 package one.tranic.sewlia.config.mod.fix.entity_moving;
 
-import one.tranic.sewlia.config.annotation.Comments;
+import one.tranic.sewlia.annotation.config.Comments;
 
 public class Enable {
     @Comments({"A simple fix of a issue on folia.",

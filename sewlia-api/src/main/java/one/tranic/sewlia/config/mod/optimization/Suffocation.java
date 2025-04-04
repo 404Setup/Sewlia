@@ -1,6 +1,6 @@
 package one.tranic.sewlia.config.mod.optimization;
 
-import one.tranic.sewlia.config.annotation.Comments;
+import one.tranic.sewlia.annotation.config.Comments;
 
 public class Suffocation {
     @Comments({"Optimizes the suffocation check by selectively skipping",

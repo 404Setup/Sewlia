@@ -1,14 +1,20 @@
 package one.tranic.sewlia.config.mod.unsafe.optimization.fast_rng;
 
+import one.tranic.sewlia.annotation.loader.After;
+import one.tranic.sewlia.annotation.loader.DisableReload;
+import one.tranic.sewlia.annotation.loader.ReadAction;
 import one.tranic.sewlia.config.util.ConfigUtils;
-import one.tranic.sewlia.config.annotation.Comment;
+import one.tranic.sewlia.annotation.config.Comment;
 
+@After(EnableForWorldgen.class)
 public class WarnForSlimeChunk {
     @Comment("Warn if you are not using legacy random source for slime chunk generation.")
+    @DisableReload
     public static boolean value = true;
 
-    public static void ReadDo() {
-        if (Enabled.value && value) {
+    @ReadAction
+    public static void read() {
+        if (EnableForWorldgen.isEnabled() && value) {
             ConfigUtils.logger.warn("==========");
             ConfigUtils.logger.warn("You enabled faster random generator, it will offset location of slime chunk");
             ConfigUtils.logger.warn("If your server has slime farms or facilities need vanilla slime chunk,");

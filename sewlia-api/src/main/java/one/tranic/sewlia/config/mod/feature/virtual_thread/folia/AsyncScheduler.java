@@ -1,6 +1,6 @@
 package one.tranic.sewlia.config.mod.feature.virtual_thread.folia;
 
-import one.tranic.sewlia.config.annotation.DisableReload;
+import one.tranic.sewlia.annotation.loader.DisableReload;
 
 public class AsyncScheduler {
     @DisableReload

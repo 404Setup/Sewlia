@@ -1,6 +1,6 @@
 package one.tranic.sewlia.config.mod.optimization;
 
-import one.tranic.sewlia.config.annotation.Comments;
+import one.tranic.sewlia.annotation.config.Comments;
 
 public class InactiveGoalSelectorThrottle {
     @Comments({"Throttles the AI goal selector in entity inactive ticks.",

@@ -1,6 +1,6 @@
 package one.tranic.sewlia.config.mod.misc;
 
-import one.tranic.sewlia.config.annotation.Comment;
+import one.tranic.sewlia.annotation.config.Comment;
 
 public class DisableMoveCheck {
     @Comment("Disable player/entity overspeed checks")

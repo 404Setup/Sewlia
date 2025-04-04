@@ -1,7 +1,7 @@
 package one.tranic.sewlia.config.mod.misc.cache_player_profile;
 
-import one.tranic.sewlia.config.annotation.Comments;
-import one.tranic.sewlia.config.annotation.DisableReload;
+import one.tranic.sewlia.annotation.config.Comments;
+import one.tranic.sewlia.annotation.loader.DisableReload;
 
 public class Enable {
     @DisableReload

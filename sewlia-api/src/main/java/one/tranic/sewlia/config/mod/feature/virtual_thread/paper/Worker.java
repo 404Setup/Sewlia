@@ -1,9 +1,8 @@
 package one.tranic.sewlia.config.mod.feature.virtual_thread.paper;
 
 import com.google.common.util.concurrent.MoreExecutors;
-import one.tranic.sewlia.config.annotation.DisableReload;
+import one.tranic.sewlia.annotation.loader.DisableReload;
 
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 

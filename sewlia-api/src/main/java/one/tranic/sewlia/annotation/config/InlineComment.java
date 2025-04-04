@@ -1,4 +1,4 @@
-package one.tranic.sewlia.config.annotation;
+package one.tranic.sewlia.annotation.config;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface InlineComments {
-    @NotNull String[] value();
+public @interface InlineComment {
+    @NotNull String value();
 }

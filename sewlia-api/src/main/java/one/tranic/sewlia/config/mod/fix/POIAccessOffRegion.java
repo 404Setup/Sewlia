@@ -1,6 +1,6 @@
 package one.tranic.sewlia.config.mod.fix;
 
-import one.tranic.sewlia.config.annotation.Comments;
+import one.tranic.sewlia.annotation.config.Comments;
 
 public class POIAccessOffRegion {
     @Comments({"The POIManager of folia has something which has not been patched",
