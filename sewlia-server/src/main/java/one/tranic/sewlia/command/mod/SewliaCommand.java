@@ -4,6 +4,8 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import one.tranic.sewlia.config.ConfigUtils;
+import one.tranic.sewlia.plugin.InternalServerPlugin;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -11,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class SewliaCommand extends Command {
 
     public SewliaCommand() {
@@ -24,11 +27,13 @@ public class SewliaCommand extends Command {
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("reload")) {
                 if (isConsole || sender.hasPermission("sewlia.command.reload")) {
-                    ConfigUtils.reloadConfiguration(true);
-                    sender.sendMessage(Component.text(
-                            "Configuration reload has been completed. Some configurations require a restart to take effect.",
-                            NamedTextColor.AQUA
-                    ));
+                    Bukkit.getGlobalRegionScheduler().runDelayed(InternalServerPlugin.instance, (task) -> {
+                        ConfigUtils.reloadConfiguration(true);
+                        sender.sendMessage(Component.text(
+                                "Configuration reload has been completed. Some configurations require a restart to take effect.",
+                                NamedTextColor.AQUA
+                        ));
+                    }, 1);
                 } else {
                     sender.sendMessage(Component.text(
                             "You do not have permission to use this command!",

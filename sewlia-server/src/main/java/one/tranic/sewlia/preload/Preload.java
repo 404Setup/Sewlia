@@ -1,21 +1,22 @@
 package one.tranic.sewlia.preload;
 
+import one.tranic.sewlia.config.util.ConfigUtils;
 import one.tranic.sewlia.reflect.NewReflect;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Set;
 
 public class Preload {
 
     public Preload() {
         try {
-            Set<Preloads> set = NewReflect.findAllClass("one.tranic.sewlia.preload.mod", Preloads.class);
-            if (!set.isEmpty()) for (Preloads preload : set) preload.doPreload();
+            @NotNull Preloads[] preloads = NewReflect.findAllClass("one.tranic.sewlia.preload.mod", Preloads.class);
+            if (preloads.length < 1) return;
+            for (int i = 0; i < preloads.length; i++) preloads[i].doPreload();
         } catch (IOException e) {
-            Logger logger = LoggerFactory.getLogger("Sewlia-Preload");
-            logger.error(e.getMessage());
+            ConfigUtils.logger.error(e.getMessage());
         }
     }
 }

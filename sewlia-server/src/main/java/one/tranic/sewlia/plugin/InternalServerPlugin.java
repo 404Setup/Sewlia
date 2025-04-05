@@ -22,6 +22,8 @@ public class InternalServerPlugin extends PluginBase {
     private final String pluginName;
     private final PluginDescriptionFile pdf;
 
+    public static final InternalServerPlugin instance = new InternalServerPlugin();
+
     public InternalServerPlugin() {
         this.pluginName = "Minecraft";
         pdf = new PluginDescriptionFile(pluginName, "1.0", "nms");

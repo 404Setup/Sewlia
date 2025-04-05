@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unused")
 public class TPSBarCommand extends Command {
     public TPSBarCommand() {
         super("tpsbar");

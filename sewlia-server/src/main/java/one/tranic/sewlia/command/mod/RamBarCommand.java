@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class RamBarCommand extends Command {
     public RamBarCommand() {
         super("rambar");

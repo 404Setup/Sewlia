@@ -7,30 +7,32 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.Set;
 
+@SuppressWarnings("unused")
 public class NewReflect {
 
     private static final String INSTANCE_FIELD_NAME = "INSTANCE";
 
     @SuppressWarnings("unchecked")
-    public static <T extends Class<?>> @Nullable Set<T> scanPackage(@Nullable T filterClass, @NotNull String packageName) {
-        @Nullable Set<String> classNameSet = scanPackageString(filterClass, packageName);
-        if (classNameSet == null || classNameSet.isEmpty()) return null;
+    public static <T extends Class<?>> @Nullable T[] scanPackage(@Nullable T filterClass, @NotNull String packageName) {
+        @Nullable String[] classNameArrays = scanPackageString(filterClass, packageName);
+        if (classNameArrays == null || classNameArrays.length < 1) return null;
         try {
-            Set<T> result = new ObjectArraySet<>();
-            for (String className : classNameSet) result.add((T) Class.forName(className));
+            T[] result = (T[]) new Class<?>[classNameArrays.length];
+            for (int i = 0; i < classNameArrays.length; i++) result[i] = (T) Class.forName(classNameArrays[i]);
             return result;
         } catch (ClassNotFoundException e) {
             return null;
         }
     }
 
-    public static <T extends Class<?>> @Nullable Set<T> scanPackage(@NotNull String packageName) {
+    public static <T extends Class<?>> @Nullable T[] scanPackage(@NotNull String packageName) {
         return scanPackage(null, packageName);
     }
 
-    public static <T extends Class<?>> @Nullable Set<String> scanPackageString(@Nullable T filterClass, @NotNull String packageName) {
+    public static <T extends Class<?>> @Nullable String[] scanPackageString(@Nullable T filterClass, @NotNull String packageName) {
         try {
             ClassPath classPath = getClassPath();
             ImmutableSet<ClassPath.ClassInfo> classInfoSet = classPath.getTopLevelClassesRecursive(packageName);
@@ -42,54 +44,63 @@ public class NewReflect {
                 for (ClassPath.ClassInfo info : classInfoSet)
                     if (info.getClass().isAssignableFrom(filterClass)) result.add(info.getName());
             }
-            return result;
+
+            return result.toArray(new String[0]);
         } catch (Exception e) {
             return null;
         }
     }
 
-    public static @Nullable Set<String> scanPackageString(@NotNull String packageName) {
+    public static @Nullable String[] scanPackageString(@NotNull String packageName) {
         return scanPackageString(null, packageName);
     }
 
-    public static <T> @NotNull Set<T> findObjectClass(String packageName, Class<T> type) throws IOException {
+    public static <T> @NotNull T[] findObjectClass(String packageName, Class<T> type) throws IOException {
         return findClass(packageName, type, true, false);
     }
 
-    public static <T> @NotNull Set<T> findAllObjectClass(String packageName, Class<T> type) throws IOException {
+    public static <T> @NotNull T[] findAllObjectClass(String packageName, Class<T> type) throws IOException {
         return findClass(packageName, type, true, true);
     }
 
-    public static <T> @NotNull Set<T> findClass(String packageName, Class<T> type) throws IOException {
+    public static <T> @NotNull T[] findClass(String packageName, Class<T> type) throws IOException {
         return findClass(packageName, type, false, false);
     }
 
-    public static <T> @NotNull Set<T> findAllClass(String packageName, Class<T> type) throws IOException {
+    public static <T> @NotNull T[] findAllClass(String packageName, Class<T> type) throws IOException {
         return findClass(packageName, type, false, true);
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> @NotNull Set<T> findClass(String packageName, Class<T> type, boolean useSingletonInstance, boolean includeAllClasses) throws IOException {
-        Set<T> resultSet = new ObjectArraySet<>();
+    private static <T> @NotNull T[] findClass(String packageName, Class<T> type, boolean useSingletonInstance, boolean includeAllClasses) throws IOException {
+        int estimatedSize = 16;
+        Set<T> resultSet = new ObjectArraySet<>(estimatedSize);
+
         ClassPath classPath = getClassPath();
         Iterable<ClassPath.ClassInfo> classes = includeAllClasses
                 ? classPath.getTopLevelClassesRecursive(packageName)
                 : classPath.getTopLevelClasses(packageName);
         for (ClassPath.ClassInfo classInfo : classes) {
             try {
-                Class<?> clazz = Class.forName(classInfo.getName());
+                Class<?> clazz = classInfo.load();
+
                 if (!type.isAssignableFrom(clazz)) continue;
+
                 T instance = null;
                 if (useSingletonInstance) {
                     instance = getObjectInstance(clazz);
                 } else if (!clazz.isAnnotation() && !clazz.isEnum() && !clazz.isInterface()) {
                     instance = (T) clazz.getDeclaredConstructor().newInstance();
                 }
+
                 if (instance != null) resultSet.add(instance);
             } catch (Exception ignored) {
             }
         }
-        return resultSet;
+
+        T[] array = (T[]) Array.newInstance(type, resultSet.size());
+        return resultSet.toArray(array);
+
     }
 
     @SuppressWarnings("unchecked")
