@@ -6,10 +6,15 @@ import one.tranic.sewlia.annotation.config.Comment;
 import one.tranic.sewlia.annotation.config.Comments;
 import one.tranic.sewlia.annotation.config.InlineComment;
 import one.tranic.sewlia.annotation.config.InlineComments;
+import one.tranic.sewlia.annotation.loader.ReadAction;
+import one.tranic.sewlia.annotation.loader.WriteAction;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.slf4j.LoggerFactory;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +23,14 @@ import java.util.Set;
 public class ConfigUtils {
     public static final org.slf4j.Logger logger = LoggerFactory.getLogger("SewliaConfig");
 
+    /**
+     * Processes the annotations on a field and assigns corresponding comments or inline comments
+     * in a YamlConfiguration object based on the annotations present.
+     *
+     * @param field         The field being inspected for annotations.
+     * @param key           The key in the configuration that the comments should be associated with.
+     * @param configuration The YamlConfiguration object where the comments or inline comments will be set.
+     */
     public static void processCommentAnnotations(Field field, String key, YamlConfiguration configuration) {
         if (field.getAnnotation(Comment.class) != null) {
             configuration.setComments(key, List.of(field.getAnnotation(Comment.class).value()));
@@ -28,6 +41,41 @@ public class ConfigUtils {
         } else if (field.getAnnotation(InlineComments.class) != null) {
             configuration.setInlineComments(key, List.of(field.getAnnotation(InlineComments.class).value()));
         }
+    }
+
+    /**
+     * Finds and returns the first public static method in a given class that is annotated with a specific annotation.
+     *
+     * @param clazz           The class to search for the annotated static method.
+     * @param annotationClass The annotation class to look for on the methods.
+     * @return The first public static method annotated with the specified annotation, or null if no such method is found.
+     */
+    static Method findAnnotatedStaticMethod(Class<?> clazz, Class<? extends Annotation> annotationClass) {
+        for (Method method : clazz.getDeclaredMethods()) {
+            if (Modifier.isStatic(method.getModifiers()) &&
+                    Modifier.isPublic(method.getModifiers()) &&
+                    method.isAnnotationPresent(annotationClass)) {
+                return method;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Caches methods annotated with {@code ReadAction} and {@code WriteAction} for a given class.
+     * <p>
+     * The method searches for public static methods in the specified class that are annotated
+     * with {@code ReadAction} or {@code WriteAction}, and adds them to the respective maps in
+     * the {@code ConfigAction} class for further invocation.
+     *
+     * @param clazz The class to search for annotated static methods.
+     */
+    static void cacheAnnotatedMethods(Class<?> clazz) {
+        Method readMethod = ConfigUtils.findAnnotatedStaticMethod(clazz, ReadAction.class);
+        if (readMethod != null) ConfigAction.readActionMethodMap.put(clazz, readMethod);
+
+        Method writeMethod = ConfigUtils.findAnnotatedStaticMethod(clazz, WriteAction.class);
+        if (writeMethod != null) ConfigAction.writeActionMethodMap.put(clazz, writeMethod);
     }
 
     /**

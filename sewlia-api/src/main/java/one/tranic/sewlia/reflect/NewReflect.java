@@ -12,8 +12,8 @@ import java.util.Set;
 
 @SuppressWarnings("unused")
 public class NewReflect {
-
     private static final String INSTANCE_FIELD_NAME = "INSTANCE";
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     @SuppressWarnings("unchecked")
     public static <T extends Class<?>> @Nullable T[] scanPackage(@Nullable T filterClass, @NotNull String packageName) {
@@ -32,22 +32,32 @@ public class NewReflect {
         return scanPackage(null, packageName);
     }
 
-    public static <T extends Class<?>> @Nullable String[] scanPackageString(@Nullable T filterClass, @NotNull String packageName) {
+    @SuppressWarnings("all")
+    public static <T extends Class<?>> @NotNull String[] scanPackageString(@Nullable T filterClass, @NotNull String packageName) {
         try {
             ClassPath classPath = getClassPath();
             ImmutableSet<ClassPath.ClassInfo> classInfoSet = classPath.getTopLevelClassesRecursive(packageName);
-            if (classInfoSet.isEmpty()) return null;
-            Set<String> result = new ObjectArraySet<>();
+            if (classInfoSet.isEmpty()) return EMPTY_STRING_ARRAY;
+
+            String[] resultArray;
             if (filterClass == null) {
-                for (ClassPath.ClassInfo info : classInfoSet) result.add(info.getName());
+                resultArray = new String[classInfoSet.size()];
+                int i = 0;
+                for (ClassPath.ClassInfo info : classInfoSet) {
+                    resultArray[i++] = info.getName();
+                }
             } else {
-                for (ClassPath.ClassInfo info : classInfoSet)
-                    if (info.getClass().isAssignableFrom(filterClass)) result.add(info.getName());
+                Set<String> result = new ObjectArraySet<>();
+                for (ClassPath.ClassInfo info : classInfoSet) {
+                    if (filterClass.isAssignableFrom(info.load()))
+                        result.add(info.getName());
+                }
+                resultArray = (String[]) result.toArray();
             }
 
-            return result.toArray(new String[0]);
+            return resultArray;
         } catch (Exception e) {
-            return null;
+            return EMPTY_STRING_ARRAY;
         }
     }
 
