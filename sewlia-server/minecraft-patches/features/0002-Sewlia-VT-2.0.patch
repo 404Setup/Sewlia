@@ -136,7 +136,7 @@ index 009e6405a11a391adca41a7c4ecafbf3254d799d..5cb4e3709435e3d38a6484a1511cbda7
              .build(),
          new java.util.concurrent.ThreadPoolExecutor.DiscardPolicy()
 diff --git a/net/minecraft/network/Connection.java b/net/minecraft/network/Connection.java
-index 5f963104d67f41eba8a11246acac5c45b9c8beae..2021142e677e028654f26cb9ecfc29e2aefc9825 100644
+index 6caa695417945dc5a534755d6590555e0e5c50d2..7713b44b8bce38704efa563a79facbb9cf9914ac 100644
 --- a/net/minecraft/network/Connection.java
 +++ b/net/minecraft/network/Connection.java
 @@ -74,13 +74,13 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
@@ -233,7 +233,7 @@ index 2fc1c63dd6ba1894ad4d7c70b8e1c8cbac252c57..662bc6f5df8d85864f3ae4d644eec01b
              thread1.start();
          }
 diff --git a/net/minecraft/server/dedicated/DedicatedServer.java b/net/minecraft/server/dedicated/DedicatedServer.java
-index 18487a08c4bc358c825367ac5a4272d023e0ec23..e7a757b23171328646b7b18dfb20370e039f8e1d 100644
+index 56dec4cb629d8823667b53d3531718a667149c6e..3187c2ec14133a778eae50d47373cf29c82db4cb 100644
 --- a/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -1,20 +1,16 @@
@@ -318,7 +318,7 @@ index 18487a08c4bc358c825367ac5a4272d023e0ec23..e7a757b23171328646b7b18dfb20370e
          // CraftBukkit start - TODO: handle command-line logging arguments
          java.util.logging.Logger global = java.util.logging.Logger.getLogger("");
          global.setUseParentHandlers(false);
-@@ -339,7 +294,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -340,7 +295,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
              }
  
              if (false && this.getMaxTickLength() > 0L) { // Spigot - disable
@@ -327,7 +327,7 @@ index 18487a08c4bc358c825367ac5a4272d023e0ec23..e7a757b23171328646b7b18dfb20370e
                  thread1.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandlerWithName(LOGGER));
                  thread1.setName("Server Watchdog");
                  thread1.setDaemon(true);
-@@ -456,7 +411,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -457,7 +412,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
                      sender.sendMessage(net.kyori.adventure.text.Component.text("Failed to dump chunk information, see console", net.kyori.adventure.text.format.NamedTextColor.RED));
                  }
              };

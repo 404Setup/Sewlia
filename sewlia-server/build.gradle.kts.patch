@@ -88,7 +88,7 @@
      runtimeOnly("com.lmax:disruptor:3.4.4")
  
      runtimeOnly("org.apache.maven:maven-resolver-provider:3.9.6")
-@@ -199,6 +_,13 @@
+@@ -199,6 +_,14 @@
      // Spark
      implementation("me.lucko:spark-api:0.1-20240720.200737-2")
      implementation("me.lucko:spark-paper:1.10.119-20241121.092015-1")
@@ -98,6 +98,7 @@
 +        exclude(group="org.yaml", module="snakeyaml")
 +    }
 +    implementation("com.github.ben-manes.caffeine:caffeine:3.2.0")
++    implementation("com.github.oshi:oshi-core:6.8.0")
 +    // Sewlia end
  }
  
