@@ -17,8 +17,8 @@ public class NewReflect {
 
     @SuppressWarnings("unchecked")
     public static <T extends Class<?>> @Nullable T[] scanPackage(@Nullable T filterClass, @NotNull String packageName) {
-        @Nullable String[] classNameArrays = scanPackageString(filterClass, packageName);
-        if (classNameArrays == null || classNameArrays.length < 1) return null;
+        String[] classNameArrays = scanPackageString(filterClass, packageName);
+        if (classNameArrays.length < 1) return null;
         try {
             T[] result = (T[]) new Class<?>[classNameArrays.length];
             for (int i = 0; i < classNameArrays.length; i++) result[i] = (T) Class.forName(classNameArrays[i]);
@@ -61,7 +61,7 @@ public class NewReflect {
         }
     }
 
-    public static @Nullable String[] scanPackageString(@NotNull String packageName) {
+    public static @NotNull String[] scanPackageString(@NotNull String packageName) {
         return scanPackageString(null, packageName);
     }
 
