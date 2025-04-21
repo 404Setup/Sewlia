@@ -30,7 +30,7 @@
          this.saveEnderPearls(compound);
      }
  
-@@ -2691,6 +_,7 @@
+@@ -2692,6 +_,7 @@
              this.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.CHANGE_GAME_MODE, gameMode.getId()));
              if (gameMode == GameType.SPECTATOR) {
                  this.removeEntitiesOnShoulder();
@@ -38,7 +38,7 @@
                  this.stopRiding();
                  EnchantmentHelper.stopLocationBasedEffects(this);
              } else {
-@@ -3603,4 +_,22 @@
+@@ -3604,4 +_,22 @@
          return (org.bukkit.craftbukkit.entity.CraftPlayer) super.getBukkitEntity();
      }
      // CraftBukkit end
